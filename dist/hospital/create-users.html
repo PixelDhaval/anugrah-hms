@@ -347,6 +347,10 @@
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
+                                            <label for="age" class="form-label">Age</label>
+                                            <input type="text" class="form-control" id="age" name="age" readonly>
+                                        </div>
+                                        <div class="col-sm-4">
                                             <div class="form-group">
                                                 <label for="gender" class="form-label">Gender</label>
                                                 <select class="form-control" id="gender" required>
@@ -359,32 +363,36 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label for="phone" class="form-label">Phone</label>
-                                                <input type="tel" pattern="[0-9]{10}" class="form-control" id="phone" name="phone" placeholder="Phone No." required>
-                                                <div class="invalid-feedback">
-                                                    Please enter a 10-digit Phone number!
-                                                </div>
+                            </div>
+                            <div class="row clearfix">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="phone" class="form-label">Phone</label>
+                                        <input type="tel" pattern="[0-9]{10}" class="form-control" id="phone"
+                                            name="phone" placeholder="Phone No." required>
+                                        <div class="invalid-feedback">
+                                            Please enter a 10-digit Phone number!
+                                        </div>
+                                    </div>
+                                </div>
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="userType" class="form-label">User Type</label>
+                                            <select class="form-control" id="userType" required>
+                                                <option value="">- Select User Type -</option>
+                                                <option value="doctor">Doctor</option>
+                                                <option value="receptionist">Receptionist</option>
+                                            </select>
+                                            <div class="invalid-feedback">
+                                                Please select a user type.
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row clearfix">
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label for="userType" class="form-label">User Type</label>
-                                                <select class="form-control" id="userType" required>
-                                                    <option value="">- Select User Type -</option>
-                                                    <option value="doctor">Doctor</option>
-                                                    <option value="receptionist">Receptionist</option>
-                                                </select>
-                                                <div class="invalid-feedback">
-                                                    Please select a user type.
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-8">
-                                            <div class="form-group">
+                                </div>
+                                <div class="row clearfix">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
                                             <label for="permissions" class="form-label">Permissions</label><br>
                                             <div class="form-check form-check-inline">
                                                 <input class="form-check-input" type="checkbox" id="patients">
@@ -417,35 +425,36 @@
                                                 <label class="form-check-label" for="doctors">Doctors</label>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                                <div class="row clearfix">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="password" class="form-label">Password</label>
+                                            <input type="password" class="form-control" id="password" name="password"
+                                                placeholder="Enter the Password" pattern=".{8,15}" required>
+                                            <div class="invalid-feedback">Password must be between 8 and 15 characters
+                                                long!</div>
+
                                         </div>
                                     </div>
-                                    <div class="row clearfix">
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label for="password" class="form-label">Password</label>
-                                                <input type="password" class="form-control" id="password" name="password" placeholder="Enter the Password" pattern=".{8,15}" required>
-                                <div class="invalid-feedback">Password must be between 8 and 15 characters long!</div>
-                                            
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="confirmPassword" class="form-label">Confirm Password</label>
+                                            <input type="password" class="form-control" id="confirmPassword"
+                                                placeholder="Confirm Password" required>
+                                            <div class="invalid-feedback">
+                                                Please confirm your password.
                                             </div>
                                         </div>
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label for="confirmPassword" class="form-label">Confirm Password</label>
-                                                <input type="password" class="form-control" id="confirmPassword"
-                                                    placeholder="Confirm Password" required>
-                                                <div class="invalid-feedback">
-                                                    Please confirm your password.
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
-                                    <div class="row clearfix">
-                                        <div class="col-sm-12">
-                                            <button type="submit" class="btn btn-primary"
-                                                id="submitUser">Submit</button>
-                                            <button type="reset" class="btn btn-outline-secondary">Cancel</button>
-                                        </div>
+                                </div>
+                                <div class="row clearfix">
+                                    <div class="col-sm-12">
+                                        <button type="submit" class="btn btn-primary" id="submitUser">Submit</button>
+                                        <button type="reset" class="btn btn-outline-secondary">Cancel</button>
                                     </div>
+                                </div>
                                 </form>
                             </div>
                         </div>
@@ -469,24 +478,38 @@
     <script src="../assets/bundles/bootstrap.bundle.min.js"></script>
     <script>
         //Form Validation
-        document.addEventListener('DOMContentLoaded', function() {
-                var forms = document.getElementsByClassName('needs-validation');
-                Array.prototype.filter.call(forms, function (form) {
-                    form.addEventListener('submit', function (event) {
-                        if (form.checkValidity() === false || !passwordCheck()) {
-                            event.preventDefault();
-                            event.stopPropagation();
-                        } else {
-                            event.preventDefault();
-                            addUserToTable();
-                            form.reset();
-                            form.classList.remove('was-validated');
-                        }
-                        form.classList.add('was-validated');
-                    }, false);
-                });
-            }, false);
+        document.addEventListener('DOMContentLoaded', function () {
+            var forms = document.getElementsByClassName('needs-validation');
+            Array.prototype.filter.call(forms, function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (form.checkValidity() === false || !passwordCheck()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    } else {
+                        event.preventDefault();
+                        addUserToTable();
+                        form.reset();
+                        form.classList.remove('was-validated');
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
 
+        //Age
+        document.getElementById('dob').addEventListener('change', function () {
+            const dob = new Date(this.value);
+            const today = new Date();
+
+            let age = today.getFullYear() - dob.getFullYear();
+            const monthDifference = today.getMonth() - dob.getMonth();
+
+            if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < dob.getDate())) {
+                age--;
+            }
+
+            document.getElementById('age').value = age;
+        });
         // Passwords match validation
         function passwordCheck() {
             var password = document.getElementById('password');
