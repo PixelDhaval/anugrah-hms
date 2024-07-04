@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>AHMS :: Create User</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Iconic Bootstrap 4.5.0 Admin Template">
+    <meta name="author" content="WrapTheme, design by: ThemeMakker.com">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <!-- VENDOR CSS -->
+    <link rel="stylesheet" href="../dist/assets/vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../dist/assets/vendor/font-awesome/css/font-awesome.min.css">
+
+    <!-- MAIN Project CSS file -->
+    <link rel="stylesheet" href="../dist/assets/css/main.css">
+</head>
+
+<body data-theme="light" class="font-nunito">
+    <div id="wrapper" class="theme-cyan">
+
+        <!-- Page Loader -->
+        <div class="page-loader-wrapper">
+            <div class="loader">
+                <div class="m-t-30"><img src="../dist/assets/images/logo-icon.svg" width="48" height="48" alt="Iconic"></div>
+                <p>Please wait...</p>
+            </div>
+        </div>
+
+        <!-- Top navbar div start -->
+        <nav class="navbar navbar-fixed-top">
+            <div class="container-fluid">
+                <div class="navbar-brand">
+                    <button type="button" class="btn-toggle-offcanvas"><i class="fa fa-bars"></i></button>
+                    <button type="button" class="btn-toggle-fullwidth"><i class="fa fa-bars"></i></button>
+                    <a href="index.html">Anugrah</a>
+                </div>
+
+                <div class="navbar-right">
+                    <form id="navbar-search" class="navbar-form search-form">
+                        <input value="" class="form-control" placeholder="Search here..." type="text">
+                        <button type="button" class="btn btn-default"><i class="icon-magnifier"></i></button>
+                    </form>
+
+                    <div id="navbar-menu">
+                        <ul class="nav navbar-nav">
+                            <li class="dropdown">
+                                <a href="javascript:void(0);" class="dropdown-toggle icon-menu" data-toggle="dropdown">
+                                    <i class="fa fa-bell"></i>
+                                    <span class="notification-dot"></span>
+                                </a>
+                                <ul class="dropdown-menu notifications">
+                                    <li class="header"><strong>You have 4 new Notifications</strong></li>
+                                    <li>
+                                        <a href="javascript:void(0);">
+                                            <div class="media">
+                                                <div class="media-left">
+                                                    <i class="icon-info text-warning"></i>
+                                                </div>
+                                                <div class="media-body">
+                                                    <p class="text">Campaign <strong>Holiday Sale</strong> is nearly
+                                                        reach budget limit.</p>
+                                                    <span class="timestamp">10:00 AM Today</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:void(0);">
+                                            <div class="media">
+                                                <div class="media-left">
+                                                    <i class="icon-like text-success"></i>
+                                                </div>
+                                                <div class="media-body">
+                                                    <p class="text">Your New Campaign <strong>Holiday Sale</strong> is
+                                                        approved.</p>
+                                                    <span class="timestamp">11:30 AM Today</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:void(0);">
+                                            <div class="media">
+                                                <div class="media-left">
+                                                    <i class="icon-pie-chart text-info"></i>
+                                                </div>
+                                                <div class="media-body">
+                                                    <p class="text">Website visits from Twitter is 27% higher than last
+                                                        week.</p>
+                                                    <span class="timestamp">04:00 PM Today</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:void(0);">
+                                            <div class="media">
+                                                <div class="media-left">
+                                                    <i class="icon-info text-danger"></i>
+                                                </div>
+                                                <div class="media-body">
+                                                    <p class="text">Error on website analytics configurations</p>
+                                                    <span class="timestamp">Yesterday</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li class="footer"><a href="javascript:void(0);" class="more">See all
+                                            notifications</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="page-login.html" class="icon-menu"><i class="fa fa-power-off"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- main left menu -->
+        <div id="left-sidebar" class="sidebar">
+            <button type="button" class="btn-toggle-offcanvas"><i class="fa fa-arrow-left"></i></button>
+            <div class="sidebar-scroll">
+                <div class="user-account">
+                    <img src="../dist/assets/images/user.png" class="rounded-circle user-photo" alt="User Profile Picture">
+                    <div class="dropdown">
+                        <span>Welcome,</span>
+                        <a href="javascript:void(0);" class="dropdown-toggle user-name"
+                            data-toggle="dropdown"><strong>Dr. Johnson</strong></a>
+                        <ul class="dropdown-menu dropdown-menu-right account">
+                            <li><a href="doctor-profile.html"><i class="icon-user"></i>My Profile</a></li>
+                            <li><a href="app-inbox.html"><i class="icon-envelope-open"></i>Messages</a></li>
+                            <li><a href="javascript:void(0);"><i class="icon-settings"></i>Settings</a></li>
+                            <li class="divider"></li>
+                            <li><a href="page-login.html"><i class="icon-power"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                    <hr>
+                    <ul class="row list-unstyled">
+                        <li class="col-4">
+                            <small>Exp</small>
+                            <h6>14</h6>
+                        </li>
+                        <li class="col-4">
+                            <small>Awards</small>
+                            <h6>13</h6>
+                        </li>
+                        <li class="col-4">
+                            <small>Clients</small>
+                            <h6>213</h6>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs">
+                    <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#menu">Menu</a></li>
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#Chat"><i
+                                class="icon-book-open"></i></a></li>
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#setting"><i
+                                class="icon-settings"></i></a></li>
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#question"><i
+                                class="icon-question"></i></a></li>
+                </ul>
+
+                <!-- Tab panes -->
+                <div class="tab-content padding-0">
+                    <div class="tab-pane active" id="menu">
+                        <nav id="left-sidebar-nav" class="sidebar-nav">
+                            <ul class="metismenu li_animation_delay">
+                                <li><a href="javascript:void(0);" class="has-arrow"><i
+                                            class="fa fa-dashboard"></i><span>Dashboard</span></a>
+                                    <ul>
+                                        <li><a href="index.html">Hospital Analytics</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="javascript:void(0);" class="has-arrow"><i
+                                            class="fa fa-user"></i><span>Patients</span></a>
+                                    <ul>
+                                        <li><a href="patient-all.html">All Patients</a></li>
+                                        <li><a href="patient-add.html">Add Patient</a></li>
+                                        <!-- <li><a href="patient-profile.html">Patient Medical history and records</a></li> -->
+                                        <!-- <li><a href="patient-invoice.html">Invoice</a></li> -->
+                                    </ul>
+                                </li>
+
+                                <li><a href="javascript:void(0);" class="has-arrow"><i
+                                            class="fa fa-folder"></i><span>Appointments</span></a>
+                                    <ul>
+                                        <li><a href="manage-appointment.html">Patient Records</a></li>
+                                        <li><a href="create-prescriptions.html">Create Prescriptions</a></li>
+                                    </ul>
+                                </li>
+
+                                <li class="active"><a href="javascript:void(0);" class="has-arrow"><i
+                                            class="fa fa-tag"></i><span>User
+                                            Management</span></a>
+                                    <ul>
+                                        <li class="active"><a href="create-users.html">Create Users</a></li>
+                                        <li><a href="user-authentication.html">User Authentication</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="javascript:void(0);" class="has-arrow"><i
+                                            class="fa fa-building"></i><span>Room Allotment</span></a>
+                                    <ul>
+                                        <li><a href="manage-beds.html">Manage Beds</a></li>
+
+                                        <li><a href="room-all.html">View Rooms</a></li>
+                                        <li><a href="room-add.html">Add Rooms</a></li>
+                                    </ul>
+                                </li>
+                                <!-- <li><a href="javascript:void(0);" class="has-arrow"><i class="fa fa-users"></i><span>Departments</span></a>
+                                <ul>
+                                    <li><a href="depa-add.html">Add</a></li>
+                                    <li><a href="depa-all.html">All Departments</a></li>
+                                </ul>
+                            </li> -->
+                                <li><a href="javascript:void(0);" class="has-arrow"><i
+                                            class="fa fa-cc-visa"></i><span>Billing</span></a>
+                                    <ul>
+                                        <li><a href="payments.html">Indoor Billing</a></li>
+                                        <li><a href="payments-add.html">OPD patient Billing</a></li>
+                                        <li><a href="payments-invoice.html">Payment Status</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="javascript:void(0);" class="has-arrow"><i
+                                            class="fa fa-globe"></i><span>Reports</span></a>
+                                    <ul>
+                                        <li><a href="report-opd.html">Monthly OPD Report</a></li>
+                                        <li><a href="report-admitted.html">Monthly Admitted Patients</a></li>
+                                        <li><a href="report-cash-coll.html">Daily Cash Collection</a></li>
+                                        <li><a href="report-indoor.html">Indoor Billing Detail</a></li>
+                                    </ul>
+                                </li>
+
+                                <li><a href="javascript:void(0);" class="has-arrow"><i
+                                            class="fa fa-user-md"></i><span>Doctors</span></a>
+                                    <ul>
+                                        <li><a href="doctor-all.html">All Doctors</a></li>
+                                        <li><a href="doctor-add.html">Add/Edit Doctor</a></li>
+                                    </ul>
+                                </li>
+                                <!-- <li><a href="our-centres.html"><i class="fa fa-map"></i>WorldWide Centres</a></li> -->
+                                <li>
+                                    <a href="#Authentication" class="has-arrow"><i
+                                            class="fa fa-lock"></i><span>Authentication</span></a>
+                                    <ul>
+                                        <li><a href="page-login.html">Login</a></li>
+                                        <li><a href="page-register.html">Register</a></li>
+                                        <li><a href="page-lockscreen.html">Lockscreen</a></li>
+                                        <li><a href="page-forgot-password.html">Forgot Password</a></li>
+                                        <li><a href="page-404.html">Page 404</a></li>
+                                        <li><a href="page-403.html">Page 403</a></li>
+                                        <li><a href="page-500.html">Page 500</a></li>
+                                        <li><a href="page-503.html">Page 503</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- rightbar icon div -->
+        <div class="right_icon_bar">
+            <ul>
+                <li><a href="app-inbox.html"><i class="fa fa-envelope"></i></a></li>
+                <li><a href="app-chat.html"><i class="fa fa-comments"></i></a></li>
+                <li><a href="app-calendar.html"><i class="fa fa-calendar"></i></a></li>
+                <li><a href="manage-appointment.html"><i class="fa fa-folder"></i></a></li>
+                <li><a href="app-contact.html"><i class="fa fa-id-card"></i></a></li>
+                <li><a href="blog-list.html"><i class="fa fa-globe"></i></a></li>
+                <li><a href="javascript:void(0);"><i class="fa fa-plus"></i></a></li>
+                <li><a href="javascript:void(0);" class="right_icon_btn"><i class="fa fa-angle-right"></i></a></li>
+            </ul>
+        </div>
+
+        <!-- main page content body part -->
+        <div id="main-content">
+            <div class="container-fluid">
+                <div class="block-header">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <h2>Create New User</h2>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="index.html"><i class="fa fa-dashboard"></i></a>
+                                </li>
+                                <li class="breadcrumb-item">Create User</li>
+                                <li class="breadcrumb-item active">Create New User</li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row clearfix">
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+                        <div class="card mt-4">
+                            <div class="header">
+                                <h2>Create New User</h2>
+                            </div>
+                            <div class="body">
+                                <form action="/create-user" method="post" id="createUserForm" class="needs-validation" novalidate>
+                                    <div class="row clearfix">
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label for="userName" class="form-label">User Name</label>
+                                                <input type="text" class="form-control" id="userName"
+                                                    placeholder="User Name" required>
+                                                <div class="invalid-feedback">
+                                                    Please enter a user name.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label for="firstName" class="form-label">First Name</label>
+                                                <input type="text" class="form-control" id="firstName"
+                                                    placeholder="First Name" required>
+                                                <div class="invalid-feedback">
+                                                    Please enter a first name.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label for="lastName" class="form-label">Last Name</label>
+                                                <input type="text" class="form-control" id="lastName"
+                                                    placeholder="Last Name" required>
+                                                <div class="invalid-feedback">
+                                                    Please enter a last name.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row clearfix">
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label for="dob" class="form-label">Date of Birth</label>
+                                                <input type="date" class="form-control" id="dob"
+                                                    placeholder="Date of Birth" required  max="<%= new Date().toISOString().split('T')[0] %>">
+                                                <div class="invalid-feedback">
+                                                    Please enter a date of birth.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label for="age" class="form-label">Age</label>
+                                            <input type="text" class="form-control" id="age" name="age" readonly>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label for="gender" class="form-label">Gender</label>
+                                                <select class="form-control" id="gender" required>
+                                                    <option value="">- Gender -</option>
+                                                    <option value="male">Male</option>
+                                                    <option value="female">Female</option>
+                                                </select>
+                                                <div class="invalid-feedback">
+                                                    Please select a gender.
+                                                </div>
+                                            </div>
+                                        </div>
+                            </div>
+                            <div class="row clearfix">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="phone" class="form-label">Phone</label>
+                                        <input type="tel" pattern="[0-9]{10}" class="form-control" id="phone"
+                                            name="phone" placeholder="Phone No." required>
+                                        <div class="invalid-feedback">
+                                            Please enter a 10-digit Phone number!
+                                        </div>
+                                    </div>
+                                </div>
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="userType" class="form-label">User Type</label>
+                                            <select class="form-control" id="userType" required>
+                                                <option value="">- Select User Type -</option>
+                                                <option value="doctor">Doctor</option>
+                                                <option value="receptionist">Receptionist</option>
+                                            </select>
+                                            <div class="invalid-feedback">
+                                                Please select a user type.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row clearfix">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label for="permissions" class="form-label">Permissions</label><br>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="patients">
+                                                <label class="form-check-label" for="patients">Patients</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="appointments">
+                                                <label class="form-check-label" for="appointments">Appointments</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="userManagement">
+                                                <label class="form-check-label" for="userManagement">User
+                                                    Management</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="roomAllotment">
+                                                <label class="form-check-label" for="roomAllotment">Room
+                                                    Allotment</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="billing">
+                                                <label class="form-check-label" for="billing">Billing</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="reports">
+                                                <label class="form-check-label" for="reports">Reports</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="doctors">
+                                                <label class="form-check-label" for="doctors">Doctors</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row clearfix">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="password" class="form-label">Password</label>
+                                            <input type="password" class="form-control" id="password" name="password"
+                                                placeholder="Enter the Password" pattern=".{8,15}" required>
+                                            <div class="invalid-feedback">Password must be between 8 and 15 characters
+                                                long!</div>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="confirmPassword" class="form-label">Confirm Password</label>
+                                            <input type="password" class="form-control" id="confirmPassword"
+                                                placeholder="Confirm Password" required>
+                                            <div class="invalid-feedback">
+                                                Please confirm your password.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row clearfix">
+                                    <div class="col-sm-12">
+                                        <button type="submit" class="btn btn-primary" id="submitUser">Submit</button>
+                                        <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+                                    </div>
+                                </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- Javascript -->
+    <script src="../dist/assets/bundles/libscripts.bundle.js"></script>
+    <script src="../dist/assets/bundles/vendorscripts.bundle.js"></script>
+    <script></script>
+
+    <!-- page vendor js file -->
+    <script src="../dist/assets/bundles/apexcharts.bundle.js"></script>
+
+    <!-- page js file -->
+    <script src="../dist/assets/bundles/mainscripts.bundle.js"></script>
+    <script src="../../js/hospital/index.js"></script>
+    <script src="../dist/assets/js/bootstrap.bundle.min.js"></script>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var forms = document.getElementsByClassName('needs-validation');
+           
+            Array.prototype.filter.call(forms, function (form) {
+                
+                form.addEventListener('submit', function (event) {
+                    if (form.checkValidity() === false || !passwordCheck()) {
+                        event.preventDefault(); 
+                        event.stopPropagation(); 
+                    
+                    } else {
+                        event.preventDefault(); 
+                        createUser();
+                        form.reset();
+                        form.classList.remove('was-validated'); 
+                    }
+                    form.classList.add('was-validated');   
+                }, false);
+            });
+        }, false);
+
+        //Age
+        document.getElementById('dob').addEventListener('change', function () {
+            const dob = new Date(this.value);
+            const today = new Date();
+
+            let age = today.getFullYear() - dob.getFullYear();
+            const monthDifference = today.getMonth() - dob.getMonth();
+
+            if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < dob.getDate())) {
+                age--;
+            }
+
+            document.getElementById('age').value = age;
+        });
+        // Passwords match validation
+        function passwordCheck() {
+            var password = document.getElementById('password');
+            var confirmPassword = document.getElementById('confirmPassword');
+            if (password.value !== confirmPassword.value) {
+                confirmPassword.setCustomValidity('Passwords do not match');
+                confirmPassword.classList.add('is-invalid');
+                confirmPassword.classList.remove('is-valid');
+                return false;
+            } else {
+                confirmPassword.setCustomValidity('');
+                confirmPassword.classList.remove('is-invalid');
+                confirmPassword.classList.add('is-valid');
+                return true;
+            }
+        }
+
+        // Auto tick checkboxes when "Doctor" is selected
+        document.getElementById('userType').addEventListener('change', function () {
+            var checkboxes = document.querySelectorAll('.form-check-input');
+            if (this.value === 'doctor') {
+                checkboxes.forEach(function (checkbox) {
+                    checkbox.checked = true;
+                });
+            } else {
+                checkboxes.forEach(function (checkbox) {
+                    checkbox.checked = false;
+                });
+            }
+        });
+
+      
+        document.getElementById('confirmPassword').addEventListener('input', passwordCheck);
+        document.getElementById('password').addEventListener('input', passwordCheck);
+
+
+        function createUser() {
+            
+            const userName = document.getElementById('userName').value;
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const dob = document.getElementById('dob').value;
+            const age = document.getElementById('age').value;
+            const gender = document.getElementById('gender').value;
+            const phone = document.getElementById('phone').value;
+            const userType = document.getElementById('userType').value;
+        
+            const permissions = [];
+            if (document.getElementById('patients').checked) permissions.push('patients');
+            if (document.getElementById('appointments').checked) permissions.push('appointments');
+            if (document.getElementById('userManagement').checked) permissions.push('user_management');
+            if (document.getElementById('roomAllotment').checked) permissions.push('room_allotment');
+            if (document.getElementById('billing').checked) permissions.push('billing');
+            if (document.getElementById('reports').checked) permissions.push('reports');
+            if (document.getElementById('doctors').checked) permissions.push('doctors');
+        
+           
+            const formData = {
+                userName,
+                firstName,
+                lastName,
+                dob,
+                age,
+                gender,
+                phone,
+                userType,
+                permissions
+            };
+        
+            fetch('/create-user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('User created successfully:', data);
+                document.getElementById('createUserForm').reset();
+                alert('User created successfully!'); 
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to create user.');
+            });
+        }
+
+    </script>
+</body>
+
+</html>
