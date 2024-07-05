@@ -66,7 +66,7 @@ app.post('/create-user', async (req, res) => {
     }
 });
 
-//usre-authentication
+//user-authentication
 app.get('/showUsers', async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM users');
@@ -76,6 +76,22 @@ app.get('/showUsers', async (req, res) => {
         res.status(500).send('Server Error');
     }
 });
+
+//delete user
+app.delete('/delete-user/:id', async (req, res) => {
+    const id = req.params.id; 
+
+    try {
+        const client = await pool.connect();
+        const result = await client.query('DELETE FROM users WHERE user_id = $1', [id]);
+        res.json({ message: 'User deleted successfully' });
+        client.release();
+    } catch (err) {
+        console.error('Error deleting data from PostgreSQL', err);
+        res.status(500).json({ error: 'Error deleting data from PostgreSQL' });
+    }
+});
+
 const PORT = process.env.SERVER_PORT;
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);

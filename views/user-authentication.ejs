@@ -527,11 +527,20 @@
                             // Show edit modal
                             var editModal = new bootstrap.Modal(document.getElementById('editUserModal'));
                             editModal.show();
-                        } else if (e.target.classList.contains('delete-btn')) {
-                            // Show delete confirmation modal
+                        }else if (e.target.classList.contains('delete-btn')) {
+                            
                             var deleteModal = new bootstrap.Modal(document.getElementById('deleteUserModal'));
                             deleteModal.show();
-                        } else if (e.target.classList.contains('change-password-btn')) {
+
+                            function handleConfirmDelete() {
+                                
+                                deleteModal.hide();
+                                deleteUsers(data.user_id);
+                                document.getElementById('confirmDeleteBtn').removeEventListener('click', handleConfirmDelete);
+                            }
+                            document.getElementById('confirmDeleteBtn').addEventListener('click', handleConfirmDelete);
+                            
+                        }else if (e.target.classList.contains('change-password-btn')) {
                             // Show change password modal
                             var changePasswordModal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
                             changePasswordModal.show();
@@ -541,15 +550,36 @@
             ]
         });
 
-        // Fetch users data from server
-        fetch('/showUsers')
-            .then(response => response.json())
-            .then(data => {
-                table.setData(data);
+        function deleteUsers(userId) {
+            fetch(`/delete-user/${userId}`, {
+                method: 'DELETE'
             })
-            .catch(error => console.error('Error fetching user data:', error));
-    });
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('User deleted successfully!');
+                fetchUsers(); 
+            })
+            .catch(error => {
+                console.error('Error deleting user:', error);
+                alert('Failed to delete user.');
+            });
+        }
 
+        function fetchUsers() {
+            fetch('/showUsers')
+                .then(response => response.json())
+                .then(data => {
+                    table.setData(data);
+                })
+                .catch(error => console.error('Error fetching user data:', error));
+        }
+        fetchUsers();
+    });
     </script>
     
 </body>
