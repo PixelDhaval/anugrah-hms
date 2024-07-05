@@ -10,13 +10,13 @@
     <link rel="icon" href="favicon.ico" type="image/x-icon">
 
     <!-- VENDOR CSS -->
-    <link rel="stylesheet" href="../public/dist/assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../public/dist/assets/vendor/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../public/dist/assets/vendor/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../dist/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../dist/assets/vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../dist/assets/vendor/font-awesome/css/font-awesome.min.css">
 
     <!-- MAIN Project CSS file -->
-    <link rel="stylesheet" href="../public/dist/assets/css/main.css">
-    <link rel="stylesheet" href="../public/dist/assets/css/tabulator_bootstrap5.css">
+    <link rel="stylesheet" href="../dist/assets/css/main.css">
+    <link rel="stylesheet" href="../dist/assets/css/tabulator_bootstrap5.css">
     <style>
         .tabulator {
             font-size: 12px;
@@ -31,7 +31,7 @@
         <!-- Page Loader -->
         <div class="page-loader-wrapper">
             <div class="loader">
-                <div class="m-t-30"><img src="../public/dist/assets/images/logo-icon.svg" width="48" height="48" alt="Iconic"></div>
+                <div class="m-t-30"><img src="../dist/assets/images/logo-icon.svg" width="48" height="48" alt="Iconic"></div>
                 <p>Please wait...</p>
             </div>
         </div>
@@ -133,7 +133,7 @@
             <button type="button" class="btn-toggle-offcanvas"><i class="fa fa-arrow-left"></i></button>
             <div class="sidebar-scroll">
                 <div class="user-account">
-                    <img src="../public/dist/assets/images/user.png" class="rounded-circle user-photo" alt="User Profile Picture">
+                    <img src="../dist/assets/images/user.png" class="rounded-circle user-photo" alt="User Profile Picture">
                     <div class="dropdown">
                         <span>Welcome,</span>
                         <a href="javascript:void(0);" class="dropdown-toggle user-name"
@@ -460,46 +460,39 @@
 
     </div>
     <!-- Javascript -->
-    <script src="../public/dist/assets/bundles/libscripts.bundle.js"></script>
-    <script src="../public/dist/assets/bundles/vendorscripts.bundle.js"></script>
+    <script src="../dist/assets/bundles/libscripts.bundle.js"></script>
+    <script src="../dist/assets/bundles/vendorscripts.bundle.js"></script>
     <!-- page vendor js file -->
-    <script src="../public/dist/assets/bundles/apexcharts.bundle.js"></script>
+    <script src="../dist/assets/bundles/apexcharts.bundle.js"></script>
     <!-- page js file -->
-    <script src="../public/dist/assets/bundles/mainscripts.bundle.js"></script>
-    <script src="../../public/dist/assets/js/hospital/index.js"></script>
-    <script src="../public/dist/assets/js/bootstrap.bundle.min.js"></script>
-    <script src="../public/dist/assets/js/tabulator.min.js"></script>
-
-    <script>
-        const tableData = [
-            { id: 1, name: "Dr. John", uname: "john", type: "Doctor", permissions: { patients: true, appointments: true, user_management: true, room_allotment: true, billing: true, reports: true, doctors: true }, actions: "" },
-            { id: 2, name: "Daniel", uname: "daniel", type: "Receptionist", permissions: { patients: false, appointments: true, user_management: true, room_allotment: false, billing: true, reports: false, doctors: true }, actions: "" },
-            { id: 3, name: "Dr. Joe", uname: "joe", type: "Doctor", permissions: { patients: true, appointments: true, user_management: true, room_allotment: true, billing: true, reports: true, doctors: true }, actions: "" },
-            { id: 4, name: "Dr. Richard", uname: "richard", type: "Doctor", permissions: { patients: true, appointments: true, user_management: true, room_allotment: true, billing: true, reports: true, doctors: true }, actions: "" },
-            { id: 5, name: "Alexander", uname: "alexander", type: "Receptionist", permissions: { patients: false, appointments: false, user_management: true, room_allotment: true, billing: true, reports: true, doctors: true }, actions: "" },
-        ];
-
-        // Initialize Tabulator
+    <script src="../dist/assets/bundles/mainscripts.bundle.js"></script>
+    <script src="../../dist/assets/js/hospital/index.js"></script>
+    <script src="../dist/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="../dist/assets/js/tabulator.min.js"></script>
+   <!-- Frontend script -->
+<script>
+        
+    document.addEventListener('DOMContentLoaded', function () {
         const table = new Tabulator("#user-table", {
-            data: tableData,
             layout: "fitDataFill",
             columns: [
-                { title: "#", field: "id" },
-                { title: "Name", field: "name", headerFilter: "input", headerHozAlign: "center" },
-                { title: "Username", field: "uname", headerFilter: "input", headerHozAlign: "center" },
-                { title: "Type of User", field: "type", headerHozAlign: "center" },
+                { title: "#", field: "user_id" },
+                { title: "Username", field: "username", headerFilter: "input", headerHozAlign: "center" },
+                { title: "First Name", field: "firstname", headerFilter: "input", headerHozAlign: "center" },
+                { title: "Last Name", field: "lastname", headerFilter: "input", headerHozAlign: "center" },
+                { title: "Role", field: "role", headerHozAlign: "center" },
                 {
                     title: "Permissions",
                     field: "permissions",
                     headerHozAlign: "center",
                     columns: [
-                        { title: "Patients", field: "permissions.patients", formatter: "tickCross" },
-                        { title: "Appointments", field: "permissions.appointments", formatter: "tickCross" },
-                        { title: "User Management", field: "permissions.user_management", formatter: "tickCross" },
-                        { title: "Room Allotment", field: "permissions.room_allotment", formatter: "tickCross" },
-                        { title: "Billing", field: "permissions.billing", formatter: "tickCross" },
-                        { title: "Reports", field: "permissions.reports", formatter: "tickCross" },
-                        { title: "Doctors", field: "permissions.doctors", formatter: "tickCross" },
+                        { title: "Patients", field: "patient", formatter: "tickCross" },
+                        { title: "Appointments", field: "appointment", formatter: "tickCross" },
+                        { title: "User Management", field: "user_management", formatter: "tickCross" },
+                        { title: "Room Allotment", field: "room_allotment", formatter: "tickCross" },
+                        { title: "Billing", field: "billing", formatter: "tickCross" },
+                        { title: "Reports", field: "reports", formatter: "tickCross" },
+                        { title: "Doctors", field: "doctor", formatter: "tickCross" }
                     ]
                 },
                 {
@@ -507,117 +500,58 @@
                     headerHozAlign: "center",
                     formatter: function (cell, formatterParams, onRendered) {
                         return `
-                        <button class="btn btn-sm btn-primary edit-btn"><i class="fa fa-pencil"></i> Edit</button>
-                        <button class="btn btn-sm btn-primary change-password-btn"><i class="fa fa-pencil"></i> Password</button>
-                        <button class="btn btn-sm btn-danger delete-btn"><i class="fa fa-trash"></i> Delete</button>`;
+                            <button class="btn btn-sm btn-primary edit-btn"><i class="fa fa-pencil"></i> Edit</button>
+                            <button class="btn btn-sm btn-primary change-password-btn"><i class="fa fa-pencil"></i> Password</button>
+                            <button class="btn btn-sm btn-danger delete-btn"><i class="fa fa-trash"></i> Delete</button>`;
                     },
-
                     cellClick: function (e, cell) {
                         var data = cell.getRow().getData();
                         if (e.target.classList.contains('edit-btn')) {
+                            // Populate edit modal fields
+                            document.getElementById('editFullname').value = data.firstname + ' ' + data.lastname;
+                            document.getElementById('editUsername').value = data.username;
+                            document.getElementById('editUserType').value = data.role;
 
-                            //Populate the modal fields
-                            document.getElementById('editFullname').value = data.name;
-                            document.getElementById('editUsername').value = data.uname;
-                            document.getElementById('editUserType').value = data.type;
+                            // Checkboxes for permissions
+                            document.getElementById('editPatients').checked = data.patient;
+                            document.getElementById('editAppointments').checked = data.appointment;
+                            document.getElementById('editUserMgt').checked = data.user_management;
+                            document.getElementById('editRollAllot').checked = data.room_allotment;
+                            document.getElementById('editBilling').checked = data.billing;
+                            document.getElementById('editReports').checked = data.reports;
+                            document.getElementById('editDoctors').checked = data.doctor;
 
-                            //Checkboxes for permissions
-                            document.getElementById('editPatients').checked = data.permissions.patients;
-                            document.getElementById('editAppointments').checked = data.permissions.appointments;
-                            document.getElementById('editUserMgt').checked = data.permissions.user_management;
-                            document.getElementById('editRollAllot').checked = data.permissions.room_allotment;
-                            document.getElementById('editBilling').checked = data.permissions.billing;
-                            document.getElementById('editReports').checked = data.permissions.reports;
-                            document.getElementById('editDoctors').checked = data.permissions.doctors;
+                            // Store row ID to update
+                            document.getElementById('editUserForm').dataset.rowId = data.user_id;
 
-                            //Store the row ID to update
-                            document.getElementById('editUserForm').dataset.rowId = data.id;
-
-                            //Edit modal
+                            // Show edit modal
                             var editModal = new bootstrap.Modal(document.getElementById('editUserModal'));
                             editModal.show();
-
                         } else if (e.target.classList.contains('delete-btn')) {
+                            // Show delete confirmation modal
                             var deleteModal = new bootstrap.Modal(document.getElementById('deleteUserModal'));
                             deleteModal.show();
-
                         } else if (e.target.classList.contains('change-password-btn')) {
+                            // Show change password modal
                             var changePasswordModal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
                             changePasswordModal.show();
                         }
                     }
-
                 }
             ]
         });
-        //Save changes button
-        document.getElementById('saveChangesBtn').addEventListener('click', function () {
-            var editUserForm = document.getElementById('editUserForm');
-            if (editUserForm.checkValidity() === false) {
-                editUserForm.classList.add('was-validated');
-            } else {
-                var rowId = editUserForm.dataset.rowId;
-                var updatedData = {
-                    id: rowId,
-                    name: document.getElementById('editFullname').value,
-                    uname: document.getElementById('editUsername').value,
-                    type: document.getElementById('editUserType').value,
-                    permissions: {
-                        patients: document.getElementById('editPatients').checked,
-                        appointments: document.getElementById('editAppointments').checked,
-                        user_management: document.getElementById('editUserMgt').checked,
-                        room_allotment: document.getElementById('editRollAllot').checked,
-                        billing: document.getElementById('editBilling').checked,
-                        reports: document.getElementById('editReports').checked,
-                        doctors: document.getElementById('editDoctors').checked,
-                    }
-                };
-                table.updateRow(rowId, updatedData);
-                var editModal = bootstrap.Modal.getInstance(document.getElementById('editUserModal'));
-                editModal.hide();
-            }
-        });
 
-        //Password button
-        document.getElementById('savePasswordBtn').addEventListener('click', function () {
-            var changePasswordForm = document.getElementById('changePasswordForm');
-            var newPassword = document.getElementById('newPassword').value;
-            var confirmPassword = document.getElementById('confirmPassword').value;
-            var passwordMismatchFeedback = document.querySelector('.password-mismatch-feedback');
-
-            if (changePasswordForm.checkValidity() === false) {
-                changePasswordForm.classList.add('was-validated');
-            } else {
-                if (newPassword !== confirmPassword) {
-                    passwordMismatchFeedback.style.display = 'block';
-                } else {
-                    passwordMismatchFeedback.style.display = 'none';
-                    alert('Password changed successfully!');
-                    // Close the modal
-                    var changePasswordModal = bootstrap.Modal.getInstance(document.getElementById('changePasswordModal'));
-                    changePasswordModal.hide();
-                }
-            }
-        });
-
-        //Confirm delete button
-        document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
-            var userId = this.dataset.userId;
-            table.deleteRow(userId);
-            var deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteUserModal'));
-            deleteModal.hide();
-        });
-
-        //Clear validation feedback on modal hide
-        document.getElementById('changePasswordModal').addEventListener('hidden.bs.modal', function () {
-            var changePasswordForm = document.getElementById('changePasswordForm');
-            changePasswordForm.classList.remove('was-validated');
-            document.getElementById('newPassword').value = '';
-            document.getElementById('confirmPassword').value = '';
-            document.querySelector('.password-mismatch-feedback').style.display = 'none';
-        });
+        // Fetch users data from server
+        fetch('/showUsers')
+            .then(response => response.json())
+            .then(data => {
+                table.setData(data);
+            })
+            .catch(error => console.error('Error fetching user data:', error));
+    });
 
     </script>
+    
 </body>
 
 </html>

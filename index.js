@@ -37,18 +37,22 @@ app.get('/create-users', (req, res) => {
     res.render('create-users');
 });
 
+app.get('/user-authentication', (req, res) => {
+    res.render('user-authentication');
+});
+
 // POST route to handle form submission
 app.post('/create-user', async (req, res) => {
-    const { userName, firstName, lastName, dob, age, gender, phone, userType, permissions } = req.body;
+    const { userName, firstName, lastName,pwd, dob, age, gender, phone, userType, permissions } = req.body;
 
     try {
         const client = await pool.connect();
         const result = await client.query(`
-            INSERT INTO users (username, firstname, lastname, dob, age, gender, mobile,
-                patient, appointment, user_management, room_allotment, billing, reports, doctor)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+            INSERT INTO users (username, firstname, lastname, password, dob, age, gender, mobile, role,
+                               patient, appointment, user_management, room_allotment, billing, reports, doctor)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
         `, [
-            userName, firstName, lastName, dob, age, gender, phone,
+            userName, firstName, lastName, pwd, dob, age, gender, phone, userType,
             permissions.includes('patients'), permissions.includes('appointments'),
             permissions.includes('user_management'), permissions.includes('room_allotment'),
             permissions.includes('billing'), permissions.includes('reports'), permissions.includes('doctors')
@@ -62,7 +66,17 @@ app.post('/create-user', async (req, res) => {
     }
 });
 
-const PORT = 3000;
+//usre-authentication
+app.get('/showUsers', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM users');
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+const PORT = process.env.SERVER_PORT;
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
