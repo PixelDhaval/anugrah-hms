@@ -66,7 +66,8 @@ app.post('/create-user', async (req, res) => {
     }
 });
 
-//user-authentication
+//user-authentication page
+
 app.get('/showUsers', async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM users');
@@ -91,6 +92,52 @@ app.delete('/delete-user/:id', async (req, res) => {
         res.status(500).json({ error: 'Error deleting data from PostgreSQL' });
     }
 });
+
+//update user
+app.put('/updateUser', async (req, res) => {
+    const {
+        user_id,
+        username,
+        firstname,
+        lastname,
+        role,
+        patient,
+        appointment,
+        user_management,
+        room_allotment,
+        billing,
+        reports,
+        doctor
+    } = req.body;
+
+    try {
+        const result = await pool.query(
+            `UPDATE users SET username = $1,firstname = $2,lastname = $3,role = $4,patient = $5,appointment = $6,user_management = $7,room_allotment = $8,billing = $9,reports = $10,doctor = $11
+            WHERE user_id = $12`,
+            [username,firstname,lastname,role,patient,appointment,user_management,room_allotment,billing,reports,doctor,user_id]
+        );
+        res.json({ success: true });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Error updating user' });
+    }
+});
+
+//change password
+app.put('/changePassword', async (req, res) => {
+    const { userId, newPassword } = req.body;
+    try {
+      const client = await pool.connect();
+      const query = 'UPDATE users SET password = $1 WHERE user_id = $2';
+      const values = [newPassword, userId];
+      await client.query(query, values);
+      client.release();
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error changing password:', error);
+      res.status(500).json({ success: false, message: 'Error changing password' });
+    }
+  });
 
 const PORT = process.env.SERVER_PORT;
 app.listen(PORT, () => {

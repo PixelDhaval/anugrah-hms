@@ -348,15 +348,19 @@
                         <form id="editUserForm" novalidate>
                             <div class="mb-3">
                                 <label for="editFullname" class="form-label">Name</label>
-                                <input type="text" class="form-control" id="editFullname" readonly>
+                                <input type="text" class="form-control" id="editFullname">
                             </div>
                             <div class="mb-3">
                                 <label for="editUsername" class="form-label">Username</label>
-                                <input type="text" class="form-control" id="editUsername" readonly>
+                                <input type="text" class="form-control" id="editUsername">
                             </div>
                             <div class="mb-3">
                                 <label for="editUserType" class="form-label">Type of User</label>
-                                <input type="text" class="form-control" id="editUserType" readonly>
+                                <select class="form-control" id="editUserType" required>
+                                    <option value="Doctor">Doctor</option>
+                                    <option value="Receptionist">Receptionist</option>
+                                </select>
+                                <div class="invalid-feedback">Please select a user type.</div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Permissions</label><br>
@@ -419,7 +423,7 @@
                             </div>
                             <div class="mb-3">
                                 <label for="confirmPassword" class="form-label">Confirm Password</label>
-                                <input type="password" class="form-control" id="confirmPassword" required>
+                                <input type="password" class="form-control" id="newConfirmPassword" required>
                                 <div class="invalid-feedback">
                                     Please confirm your new password.
                                 </div>
@@ -470,8 +474,10 @@
     <script src="../dist/assets/js/bootstrap.bundle.min.js"></script>
     <script src="../dist/assets/js/tabulator.min.js"></script>
    <!-- Frontend script -->
+
 <script>
-        
+    
+    let user_id = null;
     document.addEventListener('DOMContentLoaded', function () {
         const table = new Tabulator("#user-table", {
             layout: "fitDataFill",
@@ -506,13 +512,21 @@
                     },
                     cellClick: function (e, cell) {
                         var data = cell.getRow().getData();
+                        user_id = data.user_id; // Set user_id globally
                         if (e.target.classList.contains('edit-btn')) {
                             // Populate edit modal fields
                             document.getElementById('editFullname').value = data.firstname + ' ' + data.lastname;
                             document.getElementById('editUsername').value = data.username;
-                            document.getElementById('editUserType').value = data.role;
+                            var editUserType = document.getElementById('editUserType');
+                            var roleValue = data.role.trim().toLowerCase();
 
-                            // Checkboxes for permissions
+                            for (var i = 0; i < editUserType.options.length; i++) {
+                                if (editUserType.options[i].value.trim().toLowerCase() === roleValue) {
+                                    editUserType.selectedIndex = i;
+                                    break;
+                                }
+                            }
+
                             document.getElementById('editPatients').checked = data.patient;
                             document.getElementById('editAppointments').checked = data.appointment;
                             document.getElementById('editUserMgt').checked = data.user_management;
@@ -524,24 +538,22 @@
                             // Store row ID to update
                             document.getElementById('editUserForm').dataset.rowId = data.user_id;
 
-                            // Show edit modal
                             var editModal = new bootstrap.Modal(document.getElementById('editUserModal'));
                             editModal.show();
-                        }else if (e.target.classList.contains('delete-btn')) {
-                            
+                        } else if (e.target.classList.contains('delete-btn')) {
+
                             var deleteModal = new bootstrap.Modal(document.getElementById('deleteUserModal'));
                             deleteModal.show();
 
                             function handleConfirmDelete() {
-                                
                                 deleteModal.hide();
                                 deleteUsers(data.user_id);
                                 document.getElementById('confirmDeleteBtn').removeEventListener('click', handleConfirmDelete);
                             }
+
                             document.getElementById('confirmDeleteBtn').addEventListener('click', handleConfirmDelete);
-                            
-                        }else if (e.target.classList.contains('change-password-btn')) {
-                            // Show change password modal
+                        } else if (e.target.classList.contains('change-password-btn')) {
+
                             var changePasswordModal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
                             changePasswordModal.show();
                         }
@@ -550,6 +562,115 @@
             ]
         });
 
+        function fetchUsers() {
+            fetch('/showUsers')
+                .then(response => response.json())
+                .then(data => {
+                    table.setData(data);
+                })
+                .catch(error => console.error('Error fetching user data:', error));
+        }
+
+        //function to update user
+        function updateUser() {
+            
+            var form = document.getElementById('editUserForm');
+            var rowId = form.dataset.rowId;
+            var fullname = document.getElementById('editFullname').value.split(' ');
+            var firstname = fullname[0];
+            var lastname = fullname.length > 1 ? fullname.slice(1).join(' ') : '';
+            var username = document.getElementById('editUsername').value;
+            var role = document.getElementById('editUserType').value.toLowerCase();
+            var patient = document.getElementById('editPatients').checked;
+            var appointment = document.getElementById('editAppointments').checked;
+            var userManagement = document.getElementById('editUserMgt').checked;
+            var roomAllotment = document.getElementById('editRollAllot').checked;
+            var billing = document.getElementById('editBilling').checked;
+            var reports = document.getElementById('editReports').checked;
+            var doctor = document.getElementById('editDoctors').checked;
+
+            var payload = {
+                user_id: rowId,
+                username: username,
+                firstname: firstname,
+                lastname: lastname,
+                role: role,
+                patient: patient,
+                appointment: appointment,
+                user_management: userManagement,
+                room_allotment: roomAllotment,
+                billing: billing,
+                reports: reports,
+                doctor: doctor
+            };
+            var editModal = bootstrap.Modal.getInstance(document.getElementById('editUserModal'));
+            editModal.hide();
+            
+            fetch('/updateUser', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("User Updated Successfully!");
+                    fetchUsers();
+                } else {
+                    alert("Failed to Update User!");
+                    console.error('Failed to update user:', data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+        document.getElementById('saveChangesBtn').addEventListener('click', updateUser);
+
+        //function to change password
+        function changePassword() {
+            var form = document.getElementById('changePasswordForm');
+            var newPassword = document.getElementById('newPassword').value;
+            var confirmPassword = document.getElementById('newConfirmPassword').value;
+
+            if (newPassword !== confirmPassword) {
+                document.getElementById('newConfirmPassword').classList.add('is-invalid');
+                document.querySelector('.password-mismatch-feedback').style.display = 'block';
+                return;
+            } else {
+                document.getElementById('newConfirmPassword').classList.remove('is-invalid');
+                document.querySelector('.password-mismatch-feedback').style.display = 'none';
+            }
+
+            var payload = {
+                userId: user_id,
+                newPassword: newPassword
+            };
+            var changePasswordModal = bootstrap.Modal.getInstance(document.getElementById('changePasswordModal'));
+            changePasswordModal.hide();
+
+            fetch('/changePassword', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Password changed successfully!');
+                } else {
+                    console.error('Failed to change password:', data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        document.getElementById('savePasswordBtn').addEventListener('click', changePassword);
+
+
+        // Function to delete user
         function deleteUsers(userId) {
             fetch(`/delete-user/${userId}`, {
                 method: 'DELETE'
@@ -570,17 +691,10 @@
             });
         }
 
-        function fetchUsers() {
-            fetch('/showUsers')
-                .then(response => response.json())
-                .then(data => {
-                    table.setData(data);
-                })
-                .catch(error => console.error('Error fetching user data:', error));
-        }
+        // Initial fetchUsers call
         fetchUsers();
     });
-    </script>
+</script>
     
 </body>
 
