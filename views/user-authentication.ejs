@@ -404,6 +404,7 @@
         </div>
 
         <!--Change Password Modal-->
+        <!--Change Password Modal-->
         <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel"
             aria-hidden="true">
             <div class="modal-dialog">
@@ -416,20 +417,18 @@
                         <form id="changePasswordForm" class="needs-validation" novalidate>
                             <div class="mb-3">
                                 <label for="newPassword" class="form-label">New Password</label>
-                                <input type="password" class="form-control" id="newPassword" required>
-                                <div class="invalid-feedback">
-                                    Please enter a new password.
-                                </div>
+                                <input type="password" class="form-control" id="newPassword" name="password"
+                                    placeholder="Enter new password" pattern=".{8,15}" required>
+                                <div class="invalid-feedback">Password must be between 8 and 15 characters long!</div>
                             </div>
                             <div class="mb-3">
-                                <label for="confirmPassword" class="form-label">Confirm Password</label>
-                                <input type="password" class="form-control" id="newConfirmPassword" required>
-                                <div class="invalid-feedback">
-                                    Please confirm your new password.
-                                </div>
-                                <div class="password-mismatch-feedback text-danger" style="display: none;">
-                                    Passwords do not match.
-                                </div>
+                                <label for="confirmNewPassword" class="form-label">Confirm Password</label>
+                                <input type="password" class="form-control" id="confirmNewPassword"
+                                    placeholder="Confirm Password" required>
+                                <div class="invalid-feedback">Please confirm your password.</div>
+                            </div>
+                            <div class="invalid-feedback d-none password-mismatch-feedback">
+                                Passwords do not match!
                             </div>
                         </form>
                     </div>
@@ -440,7 +439,6 @@
                 </div>
             </div>
         </div>
-
         <!--Delete User Modal -->
         <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel"
             aria-hidden="true">
@@ -628,48 +626,67 @@
         document.getElementById('saveChangesBtn').addEventListener('click', updateUser);
 
         //function to change password
-        function changePassword() {
-            var form = document.getElementById('changePasswordForm');
-            var newPassword = document.getElementById('newPassword').value;
-            var confirmPassword = document.getElementById('newConfirmPassword').value;
+        // Password button
+    const newPassword = document.getElementById('newPassword');
+    const confirmNewPassword = document.getElementById('confirmNewPassword');
+    const passwordMismatchFeedback = document.querySelector('.password-mismatch-feedback');
+    const changePasswordForm = document.getElementById('changePasswordForm');
+    const savePasswordBtn = document.getElementById('savePasswordBtn');
 
-            if (newPassword !== confirmPassword) {
-                document.getElementById('newConfirmPassword').classList.add('is-invalid');
-                document.querySelector('.password-mismatch-feedback').style.display = 'block';
-                return;
-            } else {
-                document.getElementById('newConfirmPassword').classList.remove('is-invalid');
-                document.querySelector('.password-mismatch-feedback').style.display = 'none';
-            }
+    // Passwords match validation
+    function passwordCheck() {
+        if (newPassword.value !== confirmNewPassword.value) {
+            confirmNewPassword.setCustomValidity('Passwords do not match');
+            confirmNewPassword.classList.add('is-invalid');
+            confirmNewPassword.classList.remove('is-valid');
+            passwordMismatchFeedback.classList.remove('d-none');
+        } else {
+            confirmNewPassword.setCustomValidity('');
+            confirmNewPassword.classList.remove('is-invalid');
+            confirmNewPassword.classList.add('is-valid');
+            passwordMismatchFeedback.classList.add('d-none');
+        }
+    }
 
-            var payload = {
-                userId: user_id,
-                newPassword: newPassword
-            };
-            var changePasswordModal = bootstrap.Modal.getInstance(document.getElementById('changePasswordModal'));
-            changePasswordModal.hide();
+    // Form input changes for confirm password
+    confirmNewPassword.addEventListener('input', passwordCheck);
+    newPassword.addEventListener('input', passwordCheck);
 
-            fetch('/changePassword', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Password changed successfully!');
-                } else {
-                    console.error('Failed to change password:', data.message);
-                }
-            })
-            .catch(error => console.error('Error:', error));
+    // Function to change password
+    function changePassword() {
+        if (changePasswordForm.checkValidity() === false) {
+            changePasswordForm.classList.add('was-validated');
+            return; // Early return if form is not valid
         }
 
-        document.getElementById('savePasswordBtn').addEventListener('click', changePassword);
+        var payload = {
+            userId: user_id,  // Ensure 'user_id' is defined and available
+            newPassword: newPassword.value
+        };
 
+        var changePasswordModal = bootstrap.Modal.getInstance(document.getElementById('changePasswordModal'));
+        changePasswordModal.hide();
 
+        fetch('/changePassword', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Password changed successfully!');
+            } else {
+                console.error('Failed to change password:', data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    // Save Password button
+    savePasswordBtn.addEventListener('click', changePassword);
         // Function to delete user
         function deleteUsers(userId) {
             fetch(`/delete-user/${userId}`, {

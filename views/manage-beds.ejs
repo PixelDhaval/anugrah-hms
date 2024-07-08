@@ -1,0 +1,626 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>AHMS :: Manage Beds</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Iconic Bootstrap 4.5.0 Admin Template">
+    <meta name="author" content="WrapTheme, design by: ThemeMakker.com">
+
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <!-- VENDOR CSS -->
+    <link rel="stylesheet" href="../dist/assets/vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../dist/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../dist/assets/vendor/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../dist/assets/vendor/bootstrap-datepicker/css/bootstrap-datepicker3.min.css">
+
+    <!-- MAIN CSS -->
+    <link rel="stylesheet" href="../dist/assets/css/main.css">
+    <link rel="stylesheet" href="../dist/assets/css/tabulator_bootstrap5.css">
+
+    <style>
+        .tabulator {
+            font-size: 12px;
+            text-align: center;
+        }
+    </style>
+
+</head>
+
+<body data-theme="light" class="font-nunito">
+
+    <div id="wrapper" class="theme-cyan">
+
+        <!-- Page Loader -->
+        <div class="page-loader-wrapper">
+            <div class="loader">
+                <div class="m-t-30"><img src="../dist/assets/images/logo-icon.svg" width="48" height="48" alt="Iconic"></div>
+                <p>Please wait...</p>
+            </div>
+        </div>
+
+        <!-- Top navbar div start -->
+        <nav class="navbar navbar-fixed-top">
+            <div class="container-fluid">
+                <div class="navbar-brand">
+                    <button type="button" class="btn-toggle-offcanvas"><i class="fa fa-bars"></i></button>
+                    <button type="button" class="btn-toggle-fullwidth"><i class="fa fa-bars"></i></button>
+                    <a href="index.html">ICONIC</a>
+                </div>
+
+                <div class="navbar-right">
+                    <form id="navbar-search" class="navbar-form search-form">
+                        <input value="" class="form-control" placeholder="Search here..." type="text">
+                        <button type="button" class="btn btn-default"><i class="icon-magnifier"></i></button>
+                    </form>
+
+                    <div id="navbar-menu">
+                        <ul class="nav navbar-nav">
+                            <li class="dropdown">
+                                <a href="javascript:void(0);" class="dropdown-toggle icon-menu" data-toggle="dropdown">
+                                    <i class="fa fa-bell"></i>
+                                    <span class="notification-dot"></span>
+                                </a>
+                                <ul class="dropdown-menu notifications">
+                                    <li class="header"><strong>You have 4 new Notifications</strong></li>
+                                    <li>
+                                        <a href="javascript:void(0);">
+                                            <div class="media">
+                                                <div class="media-left">
+                                                    <i class="icon-info text-warning"></i>
+                                                </div>
+                                                <div class="media-body">
+                                                    <p class="text">Campaign <strong>Holiday Sale</strong> is nearly
+                                                        reach budget limit.</p>
+                                                    <span class="timestamp">10:00 AM Today</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:void(0);">
+                                            <div class="media">
+                                                <div class="media-left">
+                                                    <i class="icon-like text-success"></i>
+                                                </div>
+                                                <div class="media-body">
+                                                    <p class="text">Your New Campaign <strong>Holiday Sale</strong> is
+                                                        approved.</p>
+                                                    <span class="timestamp">11:30 AM Today</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:void(0);">
+                                            <div class="media">
+                                                <div class="media-left">
+                                                    <i class="icon-pie-chart text-info"></i>
+                                                </div>
+                                                <div class="media-body">
+                                                    <p class="text">Website visits from Twitter is 27% higher than last
+                                                        week.</p>
+                                                    <span class="timestamp">04:00 PM Today</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:void(0);">
+                                            <div class="media">
+                                                <div class="media-left">
+                                                    <i class="icon-info text-danger"></i>
+                                                </div>
+                                                <div class="media-body">
+                                                    <p class="text">Error on website analytics configurations</p>
+                                                    <span class="timestamp">Yesterday</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li class="footer"><a href="javascript:void(0);" class="more">See all
+                                            notifications</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="page-login.html" class="icon-menu"><i class="fa fa-power-off"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- main left menu -->
+        <div id="left-sidebar" class="sidebar">
+            <button type="button" class="btn-toggle-offcanvas"><i class="fa fa-arrow-left"></i></button>
+            <div class="sidebar-scroll">
+                <div class="user-account">
+                    <img src="../dist/assets/images/user.png" class="rounded-circle user-photo" alt="User Profile Picture">
+                    <div class="dropdown">
+                        <span>Welcome,</span>
+                        <a href="javascript:void(0);" class="dropdown-toggle user-name"
+                            data-toggle="dropdown"><strong>Dr. Johnson</strong></a>
+                        <ul class="dropdown-menu dropdown-menu-right account">
+                            <li><a href="doctor-profile.html"><i class="icon-user"></i>My Profile</a></li>
+                            <li><a href="app-inbox.html"><i class="icon-envelope-open"></i>Messages</a></li>
+                            <li><a href="javascript:void(0);"><i class="icon-settings"></i>Settings</a></li>
+                            <li class="divider"></li>
+                            <li><a href="page-login.html"><i class="icon-power"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                    <hr>
+                    <ul class="row list-unstyled">
+                        <li class="col-4">
+                            <small>Exp</small>
+                            <h6>14</h6>
+                        </li>
+                        <li class="col-4">
+                            <small>Awards</small>
+                            <h6>13</h6>
+                        </li>
+                        <li class="col-4">
+                            <small>Clients</small>
+                            <h6>213</h6>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs">
+                    <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#menu">Menu</a></li>
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#Chat"><i
+                                class="icon-book-open"></i></a></li>
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#setting"><i
+                                class="icon-settings"></i></a></li>
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#question"><i
+                                class="icon-question"></i></a></li>
+                </ul>
+
+                <!-- Tab panes -->
+                <div class="tab-content padding-0">
+                    <div class="tab-pane active" id="menu">
+                        <nav id="left-sidebar-nav" class="sidebar-nav">
+                            <ul class="metismenu li_animation_delay">
+                                <li><a href="javascript:void(0);" class="has-arrow"><i
+                                            class="fa fa-dashboard"></i><span>Dashboard</span></a>
+                                    <ul>
+                                        <li><a href="index.html">Hospital Analytics</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="javascript:void(0);" class="has-arrow"><i
+                                            class="fa fa-user"></i><span>Patients</span></a>
+                                    <ul>
+                                        <li><a href="patient-all.html">All Patients</a></li>
+                                        <li><a href="patient-add.html">Add Patient</a></li>
+                                        <!-- <li><a href="patient-profile.html">Patient Medical history and records</a></li> -->
+                                        <!-- <li><a href="patient-invoice.html">Invoice</a></li> -->
+                                    </ul>
+                                </li>
+
+                                <li><a href="javascript:void(0);" class="has-arrow"><i
+                                            class="fa fa-folder"></i><span>Appointments</span></a>
+                                    <ul>
+                                        <li><a href="manage-appointment.html">Patient Records</a></li>
+                                        <li><a href="create-prescriptions.html">Create Prescriptions</a></li>
+                                    </ul>
+                                </li>
+
+                                <li><a href="javascript:void(0);" class="has-arrow"><i class="fa fa-tag"></i><span>User
+                                            Management</span></a>
+                                    <ul>
+                                        <li><a href="create-users.html">Create Users</a></li>
+                                        <li><a href="user-authentication.html">User Authentication</a></li>
+                                    </ul>
+                                </li>
+                                <li class="active"><a href="javascript:void(0);" class="has-arrow"><i
+                                            class="fa fa-building"></i><span>Room Allotment</span></a>
+                                    <ul>
+                                        <li class="active"><a href="manage-beds.html">Manage Beds</a></li>
+                                        <li><a href="room-all.html">View Rooms</a></li>
+                                        <li><a href="room-allot.html">Allot Room</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="javascript:void(0);" class="has-arrow"><i
+                                            class="fa fa-cc-visa"></i><span>Billing</span></a>
+                                    <ul>
+                                        <li><a href="payments.html">Indoor Billing</a></li>
+                                        <li><a href="payments-add.html">OPD patient Billing</a></li>
+                                        <li><a href="payments-invoice.html">Payment Status</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="javascript:void(0);" class="has-arrow"><i
+                                            class="fa fa-globe"></i><span>Reports</span></a>
+                                    <ul>
+                                        <li><a href="report-opd.html">Monthly OPD Report</a></li>
+                                        <li><a href="report-admitted.html">Monthly Admitted Patients</a></li>
+                                        <li><a href="report-cash-coll.html">Daily Cash Collection</a></li>
+                                        <li><a href="report-indoor.html">Indoor Billing Detail</a></li>
+                                    </ul>
+                                </li>
+
+                                <li><a href="javascript:void(0);" class="has-arrow"><i
+                                            class="fa fa-user-md"></i><span>Doctors</span></a>
+                                    <ul>
+                                        <li><a href="doctor-all.html">All Doctors</a></li>
+                                        <li><a href="doctor-add.html">Add/Edit Doctor</a></li>
+                                    </ul>
+                                </li>
+                                <!-- <li><a href="our-centres.html"><i class="fa fa-map"></i>WorldWide Centres</a></li> -->
+                                <li>
+                                    <a href="#Authentication" class="has-arrow"><i
+                                            class="fa fa-lock"></i><span>Authentication</span></a>
+                                    <ul>
+                                        <li><a href="page-login.html">Login</a></li>
+                                        <li><a href="page-register.html">Register</a></li>
+                                        <li><a href="page-lockscreen.html">Lockscreen</a></li>
+                                        <li><a href="page-forgot-password.html">Forgot Password</a></li>
+                                        <li><a href="page-404.html">Page 404</a></li>
+                                        <li><a href="page-403.html">Page 403</a></li>
+                                        <li><a href="page-500.html">Page 500</a></li>
+                                        <li><a href="page-503.html">Page 503</a></li>
+                                    </ul>
+                                </li>
+                                <!-- <li>
+                                    <a href="#Pages" class="has-arrow"><i class="fa fa-tag"></i><span>Extra
+                                            Pages</span></a>
+                                    <ul>
+                                        <li><a href="page-blank.html">Blank Page</a></li>
+                                        <li><a href="page-profile.html">Profile</a></li>
+                                        <li><a href="page-gallery.html">Image Gallery</a></li>
+                                        <li><a href="page-timeline.html">Timeline</a></li>
+                                        <li><a href="page-pricing.html">Pricing</a></li>
+                                        <li><a href="page-search-results.html">Search Results</a></li>
+                                        <li><a href="page-maintenance.html">Maintenance</a></li>
+                                        <li><a href="page-testimonials.html">Testimonials</a></li>
+                                        <li><a href="page-faq.html">FAQs</a></li>
+                                    </ul>
+                                </li> -->
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- rightbar icon div -->
+        <div class="right_icon_bar">
+            <ul>
+                <li><a href="app-inbox.html"><i class="fa fa-envelope"></i></a></li>
+                <li><a href="app-chat.html"><i class="fa fa-comments"></i></a></li>
+                <li><a href="app-calendar.html"><i class="fa fa-calendar"></i></a></li>
+                <li><a href="manage-appointment.html"><i class="fa fa-folder"></i></a></li>
+                <li><a href="app-contact.html"><i class="fa fa-id-card"></i></a></li>
+                <li><a href="blog-list.html"><i class="fa fa-globe"></i></a></li>
+                <li><a href="javascript:void(0);"><i class="fa fa-plus"></i></a></li>
+                <li><a href="javascript:void(0);" class="right_icon_btn"><i class="fa fa-angle-right"></i></a></li>
+            </ul>
+        </div>
+
+        <!-- main page content body part -->
+        <div id="main-content">
+            <div class="container-fluid">
+                <div class="block-header">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <h2>Manage Beds</h2>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="index.html"><i class="fa fa-dashboard"></i></a>
+                                </li>
+                                <li class="breadcrumb-item">Room Allotment</li>
+                                <li class="breadcrumb-item active">Manage Beds</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row clearfix">
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+                        <div class="card mt-4">
+                            <div class="header">
+                                <h2>Add Bed</h2>
+                            </div>
+                            <div class="body">
+                                <form id="addBedForm" novalidate>
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="roomNumber" class="form-label">Room Number</label>
+                                            <input type="text" class="form-control" id="roomNumber" required>
+                                            <div class="invalid-feedback">Please provide a room number.</div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="bedNumber" class="form-label">Bed Number</label>
+                                            <input type="text" class="form-control" id="bedNumber" required>
+                                            <div class="invalid-feedback">Please provide a bed number.</div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="roomType" class="form-label">Select Room Type</label>
+                                            <select class="form-control" id="roomType" required>
+                                                <option value="">-Select Room Type-</option>
+                                                <option value="Deluxe">Deluxe</option>
+                                                <option value="Super Deluxe">Super Deluxe</option>
+                                                <option value="ICU">ICU</option>
+                                            </select>
+                                            <div class="invalid-feedback">Please select a room type.</div>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                    <button type="reset" class="btn btn-secondary">Cancel</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row clearfix">
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+                        <div class="card mt-4">
+                            <div class="header">
+                                <h2>Manage Beds</h2>
+                            </div>
+                            <div class="body">
+                                <div id="bed-table"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--Edit Bed Modal-->
+            <div class="modal fade" id="editBedModal" tabindex="-1" aria-labelledby="editBedModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editBedModalLabel">Edit Bed Details</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="editBedForm" novalidate>
+                                <div class="mb-3">
+                                    <label for="editRoomNumber" class="form-label">Room Number</label>
+                                    <input type="text" class="form-control" id="editRoomNumber" required>
+                                    <div class="invalid-feedback">Please provide a room number.</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editBedNumber" class="form-label">Bed Number</label>
+                                    <input type="text" class="form-control" id="editBedNumber" required>
+                                    <div class="invalid-feedback">Please provide a bed number.</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editRoomType" class="form-label">Room Type</label>
+                                    <select class="form-control" id="editRoomType" required>
+                                        <option value="">- Select -</option>
+                                        <option value="Deluxe">Deluxe</option>
+                                        <option value="Super Deluxe">Super Deluxe</option>
+                                        <option value="ICU">ICU</option>
+                                    </select>
+                                    <div class="invalid-feedback">Please select a room type.</div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" id="saveEditChangesBtn">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--Delete Bed Modal-->
+            <div class="modal fade" id="deleteBedModal" tabindex="-1" aria-labelledby="deleteBedModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteBedModalLabel">Delete Bed</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure you want to delete this bed?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Javascript -->
+    <script src="../dist/assets/bundles/libscripts.bundle.js"></script>
+    <script src="../dist/assets/bundles/vendorscripts.bundle.js"></script>
+
+    <script src="../dist/assets/vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+
+    <!-- page js file -->
+    <script src="../dist/assets/bundles/mainscripts.bundle.js"></script>
+    <script src="../dist/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="../dist/assets/js/tabulator.min.js"></script>
+
+    <script>
+
+        const roomData = [
+            // Initial room data can be added here
+        ];
+
+        const table = new Tabulator("#bed-table", {
+            data: roomData,
+            layout: "fitColumns",
+            columns: [
+                { title: "Room Number", field: "roomNumber", headerFilter: "input", headerHozAlign: "center" },
+                { title: "Bed Number", field: "bedNumber", headerFilter: "input", headerHozAlign: "center" },
+                { title: "Room Type", field: "roomType", headerFilter: "input", headerHozAlign: "center" },
+                {
+                    title: "Actions",
+                    field: "actions",
+                    headerHozAlign: "center",
+                    formatter: function (cell, formatterParams, onRendered) {
+                        return `<button class="btn btn-sm btn-primary edit-btn"><i class="fa fa-pencil"></i> Edit</button>
+                                <button class="btn btn-sm btn-danger delete-btn"><i class="fa fa-trash"></i> Delete</button>`;
+                    },
+
+                    cellClick: function (e, cell) {
+                        var data = cell.getRow().getData();
+                        if (e.target.classList.contains('edit-btn')) {
+                            document.getElementById('editRoomNumber').value = data.roomNumber;
+                            document.getElementById('editBedNumber').value = data.bedNumber;
+                            document.getElementById('editRoomType').value = data.roomType;
+
+                            document.getElementById('editBedForm').dataset.rowId = data.roomNumber;
+
+                            var editModal = new bootstrap.Modal(document.getElementById('editBedModal'));
+                            editModal.show();
+                        } else if (e.target.classList.contains('delete-btn')) {
+                            var deleteModal = new bootstrap.Modal(document.getElementById('deleteBedModal'));
+                            deleteModal.show();
+                        }
+                    }
+                }
+            ]
+        });
+
+
+        //Add Bed Form Submit
+        document.getElementById('addBedForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const form = event.target;
+
+            form.classList.add('was-validated');
+
+            if (form.checkValidity() === false) {
+                event.stopPropagation();
+            } else {
+                const roomNumber = document.getElementById('roomNumber').value;
+                const bedNumber = document.getElementById('bedNumber').value;
+                const roomType = document.getElementById('roomType').value;
+
+                //Add the new bed data to the Tabulator
+                table.addRow({ roomNumber, bedNumber, roomType });
+
+                //Reset form
+                form.reset();
+                form.classList.remove('was-validated');
+            }
+        });
+
+        //Room No. input change event listener for Add Bed Form
+        document.getElementById('roomNumber').addEventListener('input', function () {
+            const roomNumber = parseInt(this.value);
+            const roomTypeField = document.getElementById('roomType');
+            const bedNumberField = document.getElementById('bedNumber');
+
+            if (roomNumber >= 101 && roomNumber <= 103) {
+                roomTypeField.value = "Deluxe";
+                bedNumberField.disabled = false;
+            } else if (roomNumber >= 201 && roomNumber <= 205) {
+                roomTypeField.value = "Super Deluxe";
+                bedNumberField.disabled = false;
+            } else if (roomNumber >= 301 && roomNumber <= 302) {
+                roomTypeField.value = "ICU";
+                bedNumberField.disabled = false;
+            } else {
+                roomTypeField.value = "";
+                bedNumberField.disabled = false;
+            }
+        });
+
+        //------------------------------------------------------------------------------------------
+        //Edit Bed Form Submit
+        document.getElementById('editBedForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const form = event.target;
+
+            if (form.checkValidity() === false) {
+                event.stopPropagation();
+            } else {
+                const rowId = form.dataset.rowId;
+                const updatedData = {
+                    roomNumber: document.getElementById('editRoomNumber').value,
+                    bedNumber: document.getElementById('editBedNumber').value,
+                    roomType: document.getElementById('editRoomType').value
+                };
+
+                // Update the Tabulator row with new data
+                row.update(updatedData);
+
+                // Hide the edit modal
+                const editModal = bootstrap.Modal.getInstance(document.getElementById('editBedModal'));
+                editModal.hide();
+
+                // Reset the form
+                form.reset();
+                form.classList.remove('was-validated');
+            }
+
+            form.classList.add('was-validated');
+        });
+
+        //Room No. input change event listener for Edit Bed Form
+        document.getElementById('editRoomNumber').addEventListener('input', function () {
+            const roomNumber = this.value;
+            const bedNumberField = document.getElementById('editBedNumber');
+            const roomTypeField = document.getElementById('editRoomType');
+
+            if (roomNumber >= 101 && roomNumber <= 103) {
+                roomTypeField.value = "Deluxe";
+                bedNumberField.disabled = false;
+            } else if (roomNumber >= 201 && roomNumber <= 205) {
+                roomTypeField.value = "Super Deluxe";
+                bedNumberField.disabled = false;
+            } else if (roomNumber >= 301 && roomNumber <= 302) {
+                roomTypeField.value = "ICU";
+                bedNumberField.disabled = false;
+            } else {
+                roomTypeField.value = "";
+                bedNumberField.disabled = false;
+            }
+
+            if (roomTypeField.value === "Super Deluxe" || roomTypeField.value === "ICU") {
+                bedNumberField.disabled = false;
+                bedNumberField.value = "";//Remove Bed No.
+            } else {
+                bedNumberField.disabled = false;
+            }
+        });
+
+        //Save changes button
+        document.getElementById('saveEditChangesBtn').addEventListener('click', function () {
+            var editBedForm = document.getElementById('editBedForm');
+            if (editBedForm.checkValidity() === false) {
+                editBedForm.classList.add('was-validated');
+            } else {
+                var rowId = editBedForm.dataset.rowId;
+                var updatedData = {
+                    id: rowId,
+                    roomNumber: document.getElementById('editRoomNumber').value,
+                    bedNumber: document.getElementById('editBedNumber').value,
+                    roomType: document.getElementById('editRoomType').value,
+                };
+                table.updateRow(rowId, updatedData);
+                var editModal = bootstrap.Modal.getInstance(document.getElementById('editBedModal'));
+                editModal.hide();
+            }
+        });
+
+        //Delete button
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+            const rowId = this.dataset.rowId;
+            const row = table.getRow(rowId);
+
+            if (row) {
+                row.delete();
+                const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteBedModal'));
+                deleteModal.hide();
+            }
+        });
+
+    </script>
+
+</body>
+
+</html>

@@ -41,6 +41,39 @@ app.get('/user-authentication', (req, res) => {
     res.render('user-authentication');
 });
 
+app.get('/add-doctor', (req, res) => {
+    res.render('doctor-add');
+});
+
+app.get('/all-doctors', (req, res) => {
+    res.render('doctor-all');
+});
+
+app.get('/manage-beds', (req, res) => {
+    res.render('manage-beds');
+});
+
+app.get('/allot-room', (req, res) => {
+    res.render('room-allot');
+});
+
+app.get('/all-room', (req, res) => {
+    res.render('room-all');
+});
+
+app.get('/all-patients', (req, res) => {
+    res.render('patient-all');
+});
+
+app.get('/add-patient', (req, res) => {
+    res.render('patient-add');
+});
+
+app.get('/complaints', (req, res) => {
+    res.render('patient-complaints');
+});
+
+
 // POST route to handle form submission
 app.post('/create-user', async (req, res) => {
     const { userName, firstName, lastName,pwd, dob, age, gender, phone, userType, permissions } = req.body;
