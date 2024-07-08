@@ -32,7 +32,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Route to render create-users.ejs
+// Routes
 app.get('/create-users', (req, res) => {
     res.render('create-users');
 });
