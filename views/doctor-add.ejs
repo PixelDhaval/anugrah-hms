@@ -538,6 +538,7 @@
                                 <form id="doctorForm" class="needs-validation" novalidate>
                                     <div class="row mb-3">
                                         <div class="col-md-6">
+                                            <input type="hidden" id="userId" name="userId" value=26>
                                             <label for="Fname" class="form-label">First Name</label>
                                             <input type="text" class="form-control" id="Fname" name="Fname" required>
                                             <div class="invalid-feedback">Please enter the first name.</div>
@@ -565,22 +566,22 @@
                                             <label for="gender" class="form-label">Gender</label>
                                             <select class="form-control" id="gender" name="gender" required>
                                                 <option value="" disabled selected>Select Gender</option>
-                                                <option value="Male">Male</option>
-                                                <option value="Female">Female</option>
-                                                <option value="Other">Other</option>
+                                                <option value="male">Male</option>
+                                                <option value="female">Female</option>
+                                                <option value="other">Other</option>
                                             </select>
                                             <div class="invalid-feedback">Please select the gender.</div>
                                         </div>
                                         <div class="col-md-4">
                                             <label for="speciality" class="form-label">Speciality</label>
-                                            <input type="text" class="form-control" placeholder="Speciality"
+                                            <input type="text" class="form-control" name="speciality" id="speciality"
                                                 id="speciality" required>
                                             <div class="invalid-feedback">Please select the speciality.</div>
                                         </div>
                                         <div class="col-md-4">
                                             <label for="phoneno" class="form-label">Phone No.</label>
                                             <input type="tel" pattern="[0-9]{10}" class="form-control"
-                                                placeholder="Phone No." id="phoneno" required>
+                                                placeholder="Phone No." name="phoneno" id="phoneno" required>
                                             <div class="invalid-feedback">Please enter a 10 digit phone no.</div>
                                         </div>
                                     </div>
@@ -588,13 +589,13 @@
                                         <div class="col-md-6">
                                             <label for="email" class="form-label">Email</label>
                                             <input type="email" class="form-control" placeholder="Enter Your Email"
-                                                id="email" required>
+                                                name="email" id="email" required>
                                             <div class="invalid-feedback">Please enter the email address.</div>
                                         </div>
                                         <div class="col-md-6">
                                             <label for="weburl" class="form-label">Website URL</label>
                                             <input type="url" class="form-control" placeholder="Website URL"
-                                                id="weburl">
+                                                name="weburl" id="weburl">
                                         </div>
                                     </div>
                                     <div class="row mb-3">
@@ -687,7 +688,76 @@
     <script src="../dist/assets/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', (event) => {
+
+        let userId;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            userId = urlParams.get('userId');
+    
+            // Populate form fields with fetched data
+            fetch(`/getUserDetails/${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('Fname').value = data.firstname;
+                    document.getElementById('Lname').value = data.lastname;
+    
+                    const isoDate = new Date(data.dob);
+                    const dob = isoDate.toISOString().split('T')[0];
+                    document.getElementById('birthdate').value = dob;
+    
+                    document.getElementById('age').value = data.age;
+                    document.getElementById('phoneno').value = data.mobile;
+    
+                    const genderSelect = document.getElementById('gender');
+                    if (data.gender) {
+                        for (let i = 0; i < genderSelect.options.length; i++) {
+                            if (genderSelect.options[i].value === data.gender) {
+                                genderSelect.options[i].selected = true;
+                                break;
+                            }
+                        }
+                    }
+    
+                    document.getElementById('speciality').value = data.speciality;
+                    document.getElementById('weburl').value = data.website;
+                    document.getElementById('email').value = data.email;
+    
+                    if (data.doctor_img) {
+                        const imageUrl = `data:image/jpeg;base64,${data.doctor_img.toString('base64')}`;
+                        const imagePreview = document.createElement('img');
+                        imagePreview.src = imageUrl;
+                        imagePreview.alt = 'Doctor Image';
+                        document.getElementById('imagePreview').appendChild(imagePreview);
+                    }
+                })
+                .catch(error => console.error('Error fetching user details:', error));
+        });
+    
+        document.getElementById('doctorForm').addEventListener('submit', updateDoctorDetails);
+    
+        async function updateDoctorDetails(event) {
+            event.preventDefault();
+            const formData = new FormData(document.getElementById('doctorForm'));
+    
+            try {
+                const response = await fetch(`/updateUserAndDoctor/${userId}`, {
+                    method: 'POST',
+                    body: formData,
+                });
+    
+                const result = await response.json();
+    
+                if (response.ok) {
+                    document.getElementById('result').innerText = 'Doctor details updated successfully!';
+                } else {
+                    document.getElementById('result').innerText = `Error updating doctor details: ${result.error}`;
+                }
+            } catch (error) {
+                console.error('Error updating doctor details:', error);
+                document.getElementById('result').innerText = 'Error updating doctor details';
+            }
+        }        
             //Calculate age based on birthdate
             document.getElementById('birthdate').addEventListener('change', function () {
                 const birthdate = new Date(this.value);
@@ -750,8 +820,7 @@
                 // Display the selected file (for demonstration purposes)
                 document.getElementById('result').innerText = `Selected file: ${selectedFile.name || selectedFile}`;
             }
-        });
-
+       
         //Passwords match validation
         function passwordCheck() {
             const password = document.getElementById('password');

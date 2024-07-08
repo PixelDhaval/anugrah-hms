@@ -1,8 +1,23 @@
 const express = require('express');
+const bodyParser=require('body-parser');
 const app = express();
 const { Pool } = require('pg');
+const multer = require('multer');
 const path = require('path');
+
+
 require('dotenv').config();
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
+
+app.use((err, req, res, next) => {
+    if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+        console.error('Bad JSON:', err.message);
+        res.status(400).send('Bad request: Invalid JSON');
+    }
+});
 
 const pool = new Pool({
     user: process.env.USER_NAME,
@@ -45,9 +60,9 @@ app.get('/add-doctor', (req, res) => {
     res.render('doctor-add');
 });
 
-app.get('/all-doctors', (req, res) => {
-    res.render('doctor-all');
-});
+// app.get('/all-doctors', (req, res) => {
+//     res.render('doctor-all');
+// });
 
 app.get('/manage-beds', (req, res) => {
     res.render('manage-beds');
@@ -73,7 +88,29 @@ app.get('/complaints', (req, res) => {
     res.render('patient-complaints');
 });
 
+app.get('/all-doctors', async (req, res) => {
+    try {
+        const client = await pool.connect();
+        const result = await client.query(`
+            SELECT name, specialization, website, encode(doctor_img, 'base64') AS doctor_img, user_id
+            FROM doctors
+        `);
+        client.release();
 
+        // Convert BYTEA data to base64 string
+        result.rows.forEach(row => {
+            if (row.doctor_img) {
+                row.doctor_img = Buffer.from(row.doctor_img, 'base64').toString('base64');
+            }
+        });
+
+        // Render doctor-all.ejs and pass fetched data
+        res.render('doctor-all', { doctors: result.rows });
+    } catch (error) {
+        console.error('Error fetching doctors:', error);
+        res.status(500).send('Internal server error');
+    }
+});
 // POST route to handle form submission
 app.post('/create-user', async (req, res) => {
     const { userName, firstName, lastName,pwd, dob, age, gender, phone, userType, permissions } = req.body;
@@ -241,6 +278,81 @@ app.put('/changePassword', async (req, res) => {
 
 
 
+//DOCTOR
+//POPULATE DATA IN DOCTORS FORM
+app.get('/getUserDetails/:userId', async (req, res) => {
+    const userId = req.params.userId;
+    try {
+      const client = await pool.connect();
+      const result = await client.query(`
+        SELECT u.user_id, u.firstname, u.lastname, u.dob, u.age, u.gender, u.mobile, 
+                   d.website, d.email, d.specialization as speciality, d.doctor_img
+            FROM users u
+            LEFT JOIN doctors d ON u.user_id = d.user_id
+            WHERE u.user_id = $1`, [userId]);
+
+      const user = result.rows[0];
+      client.release();
+      res.json(user); 
+    } catch (err) {
+      console.error('Error fetching user details', err);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+
+  //update doctors
+  app.post('/updateUserAndDoctor/:userId', upload.single('imageUpload'), async (req, res) => {
+    const userId = req.params.userId;
+    const { Fname, Lname, birthdate, age, gender, phoneno, email, speciality, weburl } = req.body;
+    const image = req.file; 
+    try {
+        const client = await pool.connect();
+        await client.query('BEGIN'); 
+
+        // Update users table
+        const userUpdateQuery = `
+            UPDATE users
+            SET firstname = $1, lastname = $2, dob = $3, age = $4, gender = $5, mobile = $6
+            WHERE user_id = $7
+        `;
+        const userUpdateValues = [
+            Fname,
+            Lname,
+            birthdate,
+            age,
+            gender,
+            phoneno,
+            userId
+        ];
+        await client.query(userUpdateQuery, userUpdateValues);
+
+        // Update doctors table
+        const doctorUpdateQuery = `
+            UPDATE doctors
+            SET name = $1, specialization = $2, website = $3, doctor_img = $4
+            WHERE user_id = $5
+        `;
+        const doctorUpdateValues = [
+            `${Fname} ${Lname}`, 
+            speciality,
+            weburl,
+            image ? image.buffer : null, // Store the image buffer if provided
+            userId
+        ];
+        await client.query(doctorUpdateQuery, doctorUpdateValues);
+
+        await client.query('COMMIT'); 
+        client.release();
+
+        res.status(200).json({ message: 'Records updated successfully' });
+    } catch (error) {
+        console.error('Error updating records:', error);
+        await client.query('ROLLBACK'); 
+        client.release();
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 const PORT = process.env.SERVER_PORT;
 app.listen(PORT, () => {
