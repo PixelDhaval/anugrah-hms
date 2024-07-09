@@ -60,9 +60,6 @@ app.get('/add-doctor', (req, res) => {
     res.render('doctor-add');
 });
 
-// app.get('/all-doctors', (req, res) => {
-//     res.render('doctor-all');
-// });
 
 app.get('/manage-beds', (req, res) => {
     res.render('manage-beds');
@@ -168,6 +165,7 @@ app.delete('/delete-user/:id', async (req, res) => {
 
     try {
         const client = await pool.connect();
+        await client.query('DELETE FROM doctors WHERE user_id = $1', [id]);
         const result = await client.query('DELETE FROM users WHERE user_id = $1', [id]);
         res.json({ message: 'User deleted successfully' });
         client.release();
@@ -285,7 +283,7 @@ app.get('/getUserDetails/:userId', async (req, res) => {
     try {
       const client = await pool.connect();
       const result = await client.query(`
-        SELECT u.user_id, u.firstname, u.lastname, u.dob, u.age, u.gender, u.mobile, 
+        SELECT u.user_id,u.username,u.firstname, u.lastname, u.dob, u.age, u.gender, u.mobile, 
                    d.website, d.email, d.specialization as speciality, d.doctor_img
             FROM users u
             LEFT JOIN doctors d ON u.user_id = d.user_id
@@ -328,18 +326,38 @@ app.get('/getUserDetails/:userId', async (req, res) => {
         await client.query(userUpdateQuery, userUpdateValues);
 
         // Update doctors table
-        const doctorUpdateQuery = `
-            UPDATE doctors
-            SET name = $1, specialization = $2, website = $3, doctor_img = $4
-            WHERE user_id = $5
-        `;
-        const doctorUpdateValues = [
-            `${Fname} ${Lname}`, 
-            speciality,
-            weburl,
-            image ? image.buffer : null, // Store the image buffer if provided
-            userId
-        ];
+        let doctorUpdateQuery;
+        let doctorUpdateValues;
+    
+        if (image) {
+            doctorUpdateQuery = `
+                UPDATE doctors
+                SET name = $1, specialization = $2, website = $3, doctor_img = $4,email=$5
+                WHERE user_id = $6
+            `;
+            doctorUpdateValues = [
+                `${Fname} ${Lname}`, 
+                speciality,
+                weburl,
+                image.buffer, 
+                email,
+                userId
+            ];
+        } else {
+            doctorUpdateQuery = `
+                UPDATE doctors
+                SET name = $1, specialization = $2, website = $3,email=$4
+                WHERE user_id = $5
+            `;
+            doctorUpdateValues = [
+                `${Fname} ${Lname}`, 
+                speciality,
+                weburl,
+                email,
+                userId
+            ];
+        }
+    
         await client.query(doctorUpdateQuery, doctorUpdateValues);
 
         await client.query('COMMIT'); 
@@ -349,6 +367,32 @@ app.get('/getUserDetails/:userId', async (req, res) => {
     } catch (error) {
         console.error('Error updating records:', error);
         await client.query('ROLLBACK'); 
+        client.release();
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
+
+app.post('/updateDoctorCred/:userId', upload.none(), async (req, res) => {
+    const { uname, password } = req.body;
+    const { userId } = req.params;
+
+    try {
+        const client = await pool.connect();
+        await client.query('BEGIN');
+
+        const upd_query = 'UPDATE users SET username = $1, password = $2 WHERE user_id = $3';
+        const upd_values = [uname, password, userId];
+
+        await client.query(upd_query, upd_values);
+        await client.query('COMMIT');
+        client.release();
+
+        res.status(200).json({ message: 'Password updated successfully' });
+    } catch (error) {
+        console.error('Error updating Credentials:', error);
+        await client.query('ROLLBACK');
         client.release();
         res.status(500).json({ error: 'Internal server error' });
     }
