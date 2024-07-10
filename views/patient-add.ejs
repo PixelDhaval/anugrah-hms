@@ -586,12 +586,11 @@
                                         </div>
                                         <div class="col-md-4">
                                             <label for="doctorAssigned" class="form-label">Assign Doctor</label>
-                                            <select class="form-control" id="doctorAssigned" name="doctor_assigned"
-                                                required>
+                                            <select class="form-control" id="doctorAssigned" name="doctor_assigned" required>
                                                 <option value="" disabled selected>Assign Doctor</option>
-                                                <option value="Dr. John">Dr. John</option>
-                                                <option value="Dr. Joe">Dr. Joe</option>
-                                                <option value="Dr. Richard">Dr. Richard</option>
+                                                <% doctors.forEach(doctor => { %>
+                                                    <option value="<%= doctor %>"><%= doctor %></option>
+                                                <% }); %>
                                             </select>
                                             <div class="invalid-feedback">Please assign the doctor.</div>
                                         </div>
@@ -694,6 +693,8 @@
                 form.classList.add('was-validated');
             });
         });
+
+            
     </script>
 
 </body>
