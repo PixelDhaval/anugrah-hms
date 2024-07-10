@@ -332,6 +332,7 @@
                                         <button class="btn btn-outline-secondary mb-2" onclick="removeButton('<%= complaint.complaint_id %>')">
                                             <%= complaint.complaint %> <span class="close ms-1">&times;</span>
                                         </button>
+                                        
                                     <% }); %>
                                 </div>
                             </div>
@@ -477,7 +478,6 @@
             console.log('DOMContentLoaded event fired');
             fetchMostCommonComplaints();
         });
-
         function removeButton(complaintId) {
             fetch(`/api/remove-complaint/${complaintId}`, {
                 method: 'DELETE'
@@ -487,14 +487,31 @@
                     throw new Error('Failed to remove complaint');
                 }
                 console.log('Complaint removed successfully');
-                fetchMostCommonComplaints(); // Update the most common complaints list
+                return response.json(); 
+            })
+            .then(data => {
+                updateUIAfterDeletion(data.complaints); // Update UI based on updated complaints
             })
             .catch(error => {
                 console.error('Error removing complaint:', error.message);
-                alert('Failed to remove complaint. Please try again.');
+                
             });
         }
-
+        
+        function updateUIAfterDeletion(complaints) {
+            const container = document.getElementById('mostCommonButtons');
+            container.innerHTML = '';
+        
+            complaints.forEach(complaint => {
+                const buttonElement = document.createElement('button');
+                buttonElement.classList.add('btn', 'btn-outline-secondary', 'mb-2');
+                buttonElement.innerText = complaint.complaint;
+                buttonElement.innerHTML += `<span class="close ms-1" onclick="removeButton('${complaint.complaint_id}')">&times;</span>`;
+                container.appendChild(buttonElement);
+            });
+        }
+        
+        
         function addCustom(inputId, containerId) {
             const inputElement = document.getElementById(inputId);
             const complaint = inputElement.value.trim();
@@ -536,7 +553,6 @@
             })
             .catch(error => {
                 console.error('Error adding complaint:', error);
-                alert('Failed to add complaint. Please try again.');
             });
         }
 
@@ -556,7 +572,6 @@
         }
 
         function fetchMostCommonComplaints() {
-            console.log('Fetching most common complaints');
             fetch('/api/most-common-complaints')
             .then(response => {
                 if (!response.ok) {
@@ -565,23 +580,13 @@
                 return response.json();
             })
             .then(data => {
-                console.log('Most common complaints:', data);
-                const container = document.getElementById('mostCommonButtons');
-                container.innerHTML = ''; // Clear existing buttons
-
-                data.forEach(complaint => {
-                    const buttonElement = document.createElement('button');
-                    buttonElement.classList.add('btn', 'btn-outline-secondary', 'mb-2');
-                    buttonElement.innerText = complaint.complaint;
-                    buttonElement.innerHTML += `<span class="close ms-1" onclick="removeButton('${complaint.complaint_id}')">&times;</span>`;
-                    container.appendChild(buttonElement);
-                });
+                updateUIAfterDeletion(data); 
             })
             .catch(error => {
                 console.error('Error fetching most common complaints:', error);
-                
             });
         }
+          
     </script>
      
 </body>

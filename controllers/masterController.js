@@ -1,6 +1,4 @@
-// masterController.js
-
-const pool = require('../config/db'); // Assuming you have a connection pool set up
+const pool = require('../config/db'); 
 
 const getMostCommonComplaints = async () => {
     try {
@@ -14,7 +12,7 @@ const getMostCommonComplaints = async () => {
         return rows;
     } catch (error) {
         console.error('Error fetching most common complaints:', error);
-        throw error; // Re-throw the error to be handled in the route
+        throw error;
     }
 };
 
@@ -29,16 +27,22 @@ const addComplaint = async (req, res) => {
             throw new Error('Failed to add complaint');
         }
 
-        res.status(201).json(rows[0]);
+        const updatedComplaints = await getMostCommonComplaints(); 
+        res.status(201).json({ complaint: rows[0], complaints: updatedComplaints });
     } catch (error) {
         console.error('Error adding complaint:', error);
         res.status(500).json({ error: 'Failed to add complaint' });
     }
 };
+
 const removeComplaint = async (req, res) => {
     const { complaintId } = req.params;
 
     try {
+        if (!complaintId) {
+            return res.status(400).json({ error: 'Invalid complaint ID' });
+        }
+
         const queryText = 'DELETE FROM complaints WHERE complaint_id = $1';
         const result = await pool.query(queryText, [complaintId]);
 
@@ -46,15 +50,17 @@ const removeComplaint = async (req, res) => {
             return res.status(404).json({ error: 'Complaint not found' });
         }
 
-        res.status(200).json({ message: 'Complaint removed successfully' });
+        const updatedComplaints = await getMostCommonComplaints(); 
+        res.status(200).json({ message: 'Complaint removed successfully', complaints: updatedComplaints });
     } catch (error) {
         console.error('Error removing complaint:', error);
         res.status(500).json({ error: 'Failed to remove complaint' });
     }
 };
 
+
 module.exports = {
-    getMostCommonComplaints,
     addComplaint,
+    getMostCommonComplaints,
     removeComplaint
 };

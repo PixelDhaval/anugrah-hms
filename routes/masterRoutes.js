@@ -10,10 +10,12 @@ router.get('/master', async (req, res) => {
         console.error('Error fetching most common complaints:', error);
         res.status(500).send('Failed to load complaints');
     }
+
 });
 
 router.post('/api/add-complaint', masterController.addComplaint);
 router.delete('/api/remove-complaint/:complaintId', masterController.removeComplaint);
 router.get('/api/most-common-complaints', masterController.getMostCommonComplaints);
+
 
 module.exports = router;
