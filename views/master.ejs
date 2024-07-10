@@ -312,11 +312,9 @@
                             </div>
                             <div class="body">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Enter New Complaint"
-                                        id="customComplaint">
+                                    <input type="text" class="form-control" placeholder="Enter New Complaint" id="customComplaint">
                                     <div class="input-group-append">
-                                        <button class="btn btn-outline-secondary" type="button"
-                                            onclick="addCustom('customComplaint', 'selected-buttons-complaint')">Add</button>
+                                        <button class="btn btn-outline-secondary" type="button" onclick="addCustom('customComplaint', 'selected-buttons-complaint')">Add</button>
                                     </div>
                                 </div>
                             </div>
@@ -326,25 +324,22 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="icon-magnifier"></i></span>
                                     </div>
-                                    <input type="text" class="form-control" placeholder="Search Complaint"
-                                        id="searchInput" onkeyup="searchItems('searchInput', 'mostCommonButtons')">
+                                    <input type="text" class="form-control" placeholder="Search Complaint" id="searchInput" onkeyup="searchItems('searchInput', 'mostCommonButtons')">
                                 </div>
                                 <div class="selected-buttons mb-3" id="selected-buttons-complaint"></div>
                                 <div class="most-common mb-3" id="mostCommonButtons">
-                                    <button class="btn btn-outline-secondary mb-2">
-                                        Fever <span class="close ms-1" onclick="removeButton(this)">&times;</span>
-                                    </button>
-
-                                    <button class="btn btn-outline-secondary mb-2">Cough<span class="close ms-1"
-                                            onclick="removeButton(this)">&times;</span></button>
-                                    <button class="btn btn-outline-secondary mb-2">Weakness<span class="close ms-1"
-                                            onclick="removeButton(this)">&times;</span></button>
+                                    <% complaints.forEach(complaint => { %>
+                                        <button class="btn btn-outline-secondary mb-2" onclick="removeButton('<%= complaint.complaint_id %>')">
+                                            <%= complaint.complaint %> <span class="close ms-1">&times;</span>
+                                        </button>
+                                    <% }); %>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
+            
+                
                 <!--Diagnosis-->
                 <div class="row clearfix">
                     <div class="col-md-12">
@@ -477,32 +472,72 @@
     <!-- page js file -->
     <script src="../dist/assets/bundles/mainscripts.bundle.js"></script>
     <script src="../../js/hospital/index.js"></script>
-
     <script>
-        function removeButton(closeSpan) {
-            const button = closeSpan.parentElement;
-            const container = button.parentElement;
-            container.removeChild(button);
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOMContentLoaded event fired');
+            fetchMostCommonComplaints();
+        });
 
-            const buttonText = button.innerText.trim().replace('&times;', '').trim();
-            const originalButton = Array.from(document.querySelectorAll('.most-common button')).find(btn => btn.innerText.includes(buttonText));
-            if (originalButton) {
-                originalButton.classList.remove('btn-secondary');
-                originalButton.classList.add('btn-outline-secondary');
-            }
+        function removeButton(complaintId) {
+            fetch(`/api/remove-complaint/${complaintId}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to remove complaint');
+                }
+                console.log('Complaint removed successfully');
+                fetchMostCommonComplaints(); // Update the most common complaints list
+            })
+            .catch(error => {
+                console.error('Error removing complaint:', error.message);
+                alert('Failed to remove complaint. Please try again.');
+            });
         }
 
         function addCustom(inputId, containerId) {
-            const input = document.getElementById(inputId);
-            const value = input.value.trim();
-            if (value) {
-                const selectedButtonsDiv = document.getElementById(containerId);
-                const newButton = document.createElement('button');
-                newButton.className = 'btn btn-secondary selected-button m-1';
-                newButton.innerHTML = value + '<span class="close ms-1" onclick="removeButton(this)">&times;</span>';
-                selectedButtonsDiv.appendChild(newButton);
-                input.value = '';
+            const inputElement = document.getElementById(inputId);
+            const complaint = inputElement.value.trim();
+
+            if (complaint === '') {
+                alert('Please enter a complaint.');
+                return;
             }
+
+            const requestBody = {
+                complaint: complaint
+            };
+
+            fetch('/api/add-complaint', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to add complaint');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Complaint added successfully:', data);
+
+                const container = document.getElementById(containerId);
+                const buttonElement = document.createElement('button');
+                buttonElement.classList.add('btn', 'btn-outline-secondary', 'mb-2');
+                buttonElement.innerText = complaint;
+                buttonElement.innerHTML += `<span class="close ms-1" onclick="removeButton('${data.complaint_id}')">&times;</span>`;
+                container.appendChild(buttonElement);
+
+                inputElement.value = '';
+                fetchMostCommonComplaints(); // Update the most common complaints list
+            })
+            .catch(error => {
+                console.error('Error adding complaint:', error);
+                alert('Failed to add complaint. Please try again.');
+            });
         }
 
         function searchItems(inputId, containerId) {
@@ -519,8 +554,36 @@
                 }
             }
         }
-    </script>
 
+        function fetchMostCommonComplaints() {
+            console.log('Fetching most common complaints');
+            fetch('/api/most-common-complaints')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch most common complaints');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Most common complaints:', data);
+                const container = document.getElementById('mostCommonButtons');
+                container.innerHTML = ''; // Clear existing buttons
+
+                data.forEach(complaint => {
+                    const buttonElement = document.createElement('button');
+                    buttonElement.classList.add('btn', 'btn-outline-secondary', 'mb-2');
+                    buttonElement.innerText = complaint.complaint;
+                    buttonElement.innerHTML += `<span class="close ms-1" onclick="removeButton('${complaint.complaint_id}')">&times;</span>`;
+                    container.appendChild(buttonElement);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching most common complaints:', error);
+                
+            });
+        }
+    </script>
+     
 </body>
 
 </html>
