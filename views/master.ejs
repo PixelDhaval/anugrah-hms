@@ -302,167 +302,149 @@
                         <div class="col-lg-6 col-md-6 col-sm-12"></div>
                     </div>
                 </div>
-
-                <!--Complaints-->
-                <div class="row clearfix">
-                    <div class="col-md-12">
-                        <div class="card patients-list">
-                            <div class="header">
-                                <h2>Add Complaints</h2>
-                            </div>
-                            <div class="body">
-                                <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Enter New Complaint" id="customComplaint">
-                                    <div class="input-group-append">
-                                        <button class="btn btn-outline-secondary" type="button" onclick="addCustom('customComplaint', 'selected-buttons-complaint')">Add</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="container mt-3 col-sm-12">
-                                <h5 class="most-common">Most Common</h5>
-                                <div class="input-group mt-3 mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="icon-magnifier"></i></span>
-                                    </div>
-                                    <input type="text" class="form-control" placeholder="Search Complaint" id="searchInput" onkeyup="searchItems('searchInput', 'mostCommonButtons')">
-                                </div>
-                                <div class="selected-buttons mb-3" id="selected-buttons-complaint"></div>
-                                <div class="most-common mb-3" id="mostCommonButtons">
-                                    <% complaints.forEach(complaint => { %>
-                                        <button class="btn btn-outline-secondary mb-2" onclick="removeButton('<%= complaint.complaint_id %>')">
-                                            <%= complaint.complaint %> <span class="close ms-1">&times;</span>
-                                        </button>
-                                        
-                                    <% }); %>
-                                </div>
-                            </div>
-                        </div>
+<!-- Complaints -->
+<div class="row clearfix">
+    <div class="col-md-12">
+        <div class="card patients-list">
+            <div class="header">
+                <h2>Add Complaints</h2>
+            </div>
+            <div class="body">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Enter New Complaint" id="customComplaint">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" id="btn_add_complaint" type="button" onclick="addCustom('customComplaint', 'complaint')">Add</button>
                     </div>
                 </div>
-            
-                
-                <!--Diagnosis-->
-                <div class="row clearfix">
-                    <div class="col-md-12">
-                        <div class="card patients-list">
-                            <div class="header">
-                                <h2>Diagnosis</h2>
-                            </div>
-                            <div class="body">
-                                <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Enter New Diagnosis"
-                                        id="customDiagnosis">
-                                    <div class="input-group-append">
-                                        <button class="btn btn-outline-secondary" type="button"
-                                            onclick="addCustom('customDiagnosis', 'selected-buttons-diagnosis')">Add</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="container mt-3 col-sm-12">
-                                <h5 class="diagnosis">Diagnosis</h5>
-                                <div class="input-group mt-3 mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="icon-magnifier"></i></span>
-                                    </div>
-                                    <input type="text" class="form-control" placeholder="Search Diagnosis"
-                                        id="searchInput1" onkeyup="searchItems('searchInput1', 'diagnosisButtons')">
-                                </div>
-                                <div class="selected-buttons mb-3" id="selected-buttons-diagnosis"></div>
-                                <div class="most-common mb-3" id="diagnosisButtons">
-                                    <button class="btn btn-outline-secondary mb-2">Fever<span class="close ms-1"
-                                            onclick="removeButton(this)">&times;</span></button>
-                                    <button class="btn btn-outline-secondary mb-2">Cough<span class="close ms-1"
-                                            onclick="removeButton(this)">&times;</span></button>
-                                    <button class="btn btn-outline-secondary mb-2">Weakness<span class="close ms-1"
-                                            onclick="removeButton(this)">&times;</span></button>
-                                </div>
-                            </div>
-                        </div>
+            </div>
+            <div class="container mt-3 col-sm-12">
+                <h5 class="most-common">Most Common</h5>
+                <div class="input-group mt-3 mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="icon-magnifier"></i></span>
                     </div>
+                    <input type="text" class="form-control" placeholder="Search Complaint" id="searchInput" onkeyup="searchItems('searchInput', 'mostCommonButtons')">
                 </div>
-
-                <!--Test-->
-                <div class="row clearfix">
-                    <div class="col-md-12">
-                        <div class="card patients-list">
-                            <div class="header">
-                                <h2>Test</h2>
-                            </div>
-                            <div class="body">
-                                <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Enter New Test"
-                                        id="customTest">
-                                    <div class="input-group-append">
-                                        <button class="btn btn-outline-secondary" type="button"
-                                            onclick="addCustom('customTest', 'selected-buttons-test')">Add</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="container mt-3 col-sm-12">
-                                <h5 class="tests">Tests</h5>
-                                <div class="input-group mt-3 mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="icon-magnifier"></i></span>
-                                    </div>
-                                    <input type="text" class="form-control" placeholder="Search Test" id="searchInput2"
-                                        onkeyup="searchItems('searchInput2', 'testButtons')">
-                                </div>
-                                <div class="selected-buttons mb-3" id="selected-buttons-test"></div>
-                                <div class="most-common mb-3" id="testButtons">
-                                    <button class="btn btn-outline-secondary mb-2">Fever<span class="close ms-1"
-                                            onclick="removeButton(this)">&times;</span></button>
-                                    <button class="btn btn-outline-secondary mb-2">Cough<span class="close ms-1"
-                                            onclick="removeButton(this)">&times;</span></button>
-                                    <button class="btn btn-outline-secondary mb-2">Weakness<span class="close ms-1"
-                                            onclick="removeButton(this)">&times;</span></button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!--Advice-->
-                <div class="row clearfix">
-                    <div class="col-md-12">
-                        <div class="card patients-list">
-                            <div class="header">
-                                <h2>Advice</h2>
-                            </div>
-                            <div class="body">
-                                <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Enter New Advice"
-                                        id="customAdvice">
-                                    <div class="input-group-append">
-                                        <button class="btn btn-outline-secondary" type="button"
-                                            onclick="addCustom('customAdvice', 'selected-buttons-advice')">Add</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="container mt-3 col-sm-12">
-                                <h5 class="advice">Advice</h5>
-                                <div class="input-group mt-3 mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="icon-magnifier"></i></span>
-                                    </div>
-                                    <input type="text" class="form-control" placeholder="Search Advice"
-                                        id="searchInput3" onkeyup="searchItems('searchInput3', 'adviceButtons')">
-                                </div>
-                                <div class="selected-buttons mb-3" id="selected-buttons-advice"></div>
-                                <div class="most-common mb-3" id="adviceButtons">
-                                    <button class="btn btn-outline-secondary mb-2">Fever<span class="close ms-1"
-                                            onclick="removeButton(this)">&times;</span></button>
-                                    <button class="btn btn-outline-secondary mb-2">Cough<span class="close ms-1"
-                                            onclick="removeButton(this)">&times;</span></button>
-                                    <button class="btn btn-outline-secondary mb-2">Weakness<span class="close ms-1"
-                                            onclick="removeButton(this)">&times;</span></button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="selected-buttons mb-3" id="selected-buttons-complaint"></div>
+                <div class="most-common mb-3" id="mostCommonButtons  mostCommonButtons-complaint">
+                    <% complaints.forEach(complaint => { %>
+                        <button class="btn btn-outline-secondary mb-2" id="btn_common_complaints <%= complaint.complaint_id %>"
+                            onclick="removeButton('<%= complaint.complaint_id %>', 'complaint')">
+                        <%= complaint.complaint %> <span class="close ms-1">&times;</span>
+                    </button>
+                    <% }); %>
                 </div>
             </div>
         </div>
     </div>
+</div>
+
+<!-- Diagnosis -->
+<div class="row clearfix">
+    <div class="col-md-12">
+        <div class="card patients-list">
+            <div class="header">
+                <h2>Diagnosis</h2>
+            </div>
+            <div class="body">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Enter New Diagnosis" id="customDiagnosis">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" onclick="addCustom('customDiagnosis', 'diagnosis')" id="btn_add_diagnosis">Add</button>
+                    </div>
+                </div>
+            </div>
+            <div class="container mt-3 col-sm-12">
+                <h5 class="diagnosis">Diagnosis</h5>
+                <div class="input-group mt-3 mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="icon-magnifier"></i></span>
+                    </div>
+                    <input type="text" class="form-control" placeholder="Search Diagnosis" id="searchInput1" onkeyup="searchItems('searchInput1', 'diagnosisButtons')">
+                </div>
+                <div class="selected-buttons mb-3" id="selected-buttons-diagnosis"></div>
+                <div class="most-common mb-3" id="mostCommonButtons">
+                    <% diagnosis.forEach(diagnosis => { %>
+                        <button class="btn btn-outline-secondary mb-2" id="btn_common_diagnosis <%= diagnosis.diagnosis_id %>" onclick="removeButton('<%= diagnosis.diagnosis_id %>','diagnosis')">
+                            <%= diagnosis.diagnosis %> <span class="close ms-1">&times;</span>
+                        </button>
+                    <% }); %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Test -->
+<div class="row clearfix">
+    <div class="col-md-12">
+        <div class="card patients-list">
+            <div class="header">
+                <h2>Test</h2>
+            </div>
+            <div class="body">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Enter New Test" id="customTests">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" id="btn_add_tests" onclick="addCustom('customTests', 'tests')">Add</button>
+                    </div>
+                </div>
+            </div>
+            <div class="container mt-3 col-sm-12">
+                <h5 class="tests">Tests</h5>
+                <div class="input-group mt-3 mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="icon-magnifier"></i></span>
+                    </div>
+                    <input type="text" class="form-control" placeholder="Search Test" id="searchInput2" onkeyup="searchItems('searchInput2', 'testButtons')">
+                </div>
+                <div class="selected-buttons mb-3" id="selected-buttons-test"></div>
+                <div class="most-common mb-3" id="mostCommonButtons">
+                    <% tests.forEach(test => { %>
+                        <button class="btn btn-outline-secondary mb-2" id="btn_common_tests_<%= test.tests_id %>" onclick="removeButton('<%= test.tests_id %>','tests')">
+                            <%= test.tests %> <span class="close ms-1">&times;</span>
+                        </button>
+                    <% }); %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Advice -->
+<div class="row clearfix">
+    <div class="col-md-12">
+        <div class="card patients-list">
+            <div class="header">
+                <h2>Advice</h2>
+            </div>
+            <div class="body">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Enter New Advice" id="customAdvice">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" onclick="addCustom('customAdvice', 'advice')" id="btn_add_advice">Add</button>
+                    </div>
+                </div>
+            </div>
+            <div class="container mt-3 col-sm-12">
+                <h5 class="advice">Advice</h5>
+                <div class="input-group mt-3 mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="icon-magnifier"></i></span>
+                    </div>
+                    <input type="text" class="form-control" placeholder="Search Advice" id="searchInput3" onkeyup="searchItems('searchInput3', 'adviceButtons')">
+                </div>
+                <div class="selected-buttons mb-3" id="selected-buttons-advice"></div>
+                <div class="most-common mb-3" id="mostCommonButtons">
+                    <% advice.forEach(advice => { %>
+                        <button class="btn btn-outline-secondary mb-2" id="btn_common_advice_<%= advice.advice_id %>" onclick="removeButton('<%= advice.advice_id %>','advice')">
+                            <%= advice.advice %> <span class="close ms-1">&times;</span>
+                        </button>
+                    <% }); %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
     <!--Javascript-->
     <script src="../dist/assets/bundles/libscripts.bundle.js"></script>
     <script src="../dist/assets/bundles/vendorscripts.bundle.js"></script>
@@ -474,119 +456,97 @@
     <script src="../dist/assets/bundles/mainscripts.bundle.js"></script>
     <script src="../../js/hospital/index.js"></script>
     <script>
+        // Function to fetch initial data when the page loads
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOMContentLoaded event fired');
-            fetchMostCommonComplaints();
+            fetchInitialData('complaint');
+            fetchInitialData('diagnosis');
+            fetchInitialData('tests');
+            fetchInitialData('advice');
+            const mostCommonButtons = document.getElementById('mostCommonButtons');
+            console.log('Element:', mostCommonButtons);
         });
-        function removeButton(complaintId) {
-            fetch(`/api/remove-complaint/${complaintId}`, {
-                method: 'DELETE'
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to remove complaint');
-                }
-                console.log('Complaint removed successfully');
-                return response.json(); 
-            })
+    
+        function fetchInitialData(table) {
+            fetch(`/api/most-common-${table}`)
+            .then(response => response.json())
             .then(data => {
-                updateUIAfterDeletion(data.complaints); // Update UI based on updated complaints
+                updateMostCommonItems(table, data);
             })
-            .catch(error => {
-                console.error('Error removing complaint:', error.message);
+            .catch(error => console.error(`Error fetching ${table}:`, error));
+        }
+    
+        function addCustom(inputId, table) {
+            const inputValue = document.getElementById(inputId).value.trim();
+    
+            if (inputValue) {
+                fetch(`/api/add-${table}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ value: inputValue })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    
+                    document.getElementById(inputId).value = '';
+    
+                    updateMostCommonItems(table, data.items);
+                })
+                .catch(error => console.error('Error adding item:', error));
+            }
+        }
+    
+        // Function to remove an item
+        function removeButton(itemId, table) {
+           fetch(`/api/remove-${table}/${itemId}`, {
+           method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Item removed successfully:', data);
+                updateMostCommonItems(table,data.items);
+            })
+            .catch(error => console.error('Error removing item:', error));
+            
+        }
+    
+        // Function to update most common items after add or remove operations
+        function updateMostCommonItems(table, items) {
+            const mostCommonButtons = document.getElementById(`mostCommonButtons-${table}`);
+    
+            
+            if(mostCommonButtons){
+                mostCommonButtons.innerHTML = '';
+                // Add new buttons
+                items.forEach(item => {
+                    mostCommonButtons.innerHTML += `
+                        <button class="btn btn-outline-secondary mb-2" id="btn_common_${table}_${item.id}" onclick="removeButton('${item.id}', '${table}')">
+                            ${item.value} <span class="close ms-1">&times;</span>
+                        </button>
+                    `;
+                });
+            }else{
+                    console.error('Element with ID mostCommonButtons not found');
                 
-            });
-        }
-        
-        function updateUIAfterDeletion(complaints) {
-            const container = document.getElementById('mostCommonButtons');
-            container.innerHTML = '';
-        
-            complaints.forEach(complaint => {
-                const buttonElement = document.createElement('button');
-                buttonElement.classList.add('btn', 'btn-outline-secondary', 'mb-2');
-                buttonElement.innerText = complaint.complaint;
-                buttonElement.innerHTML += `<span class="close ms-1" onclick="removeButton('${complaint.complaint_id}')">&times;</span>`;
-                container.appendChild(buttonElement);
-            });
-        }
-        
-        
-        function addCustom(inputId, containerId) {
-            const inputElement = document.getElementById(inputId);
-            const complaint = inputElement.value.trim();
-
-            if (complaint === '') {
-                alert('Please enter a complaint.');
-                return;
             }
-
-            const requestBody = {
-                complaint: complaint
-            };
-
-            fetch('/api/add-complaint', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(requestBody)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to add complaint');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Complaint added successfully:', data);
-
-                const container = document.getElementById(containerId);
-                const buttonElement = document.createElement('button');
-                buttonElement.classList.add('btn', 'btn-outline-secondary', 'mb-2');
-                buttonElement.innerText = complaint;
-                buttonElement.innerHTML += `<span class="close ms-1" onclick="removeButton('${data.complaint_id}')">&times;</span>`;
-                container.appendChild(buttonElement);
-
-                inputElement.value = '';
-                fetchMostCommonComplaints(); // Update the most common complaints list
-            })
-            .catch(error => {
-                console.error('Error adding complaint:', error);
-            });
+            
         }
-
+    
+        // Function to search items dynamically
         function searchItems(inputId, containerId) {
-            const input = document.getElementById(inputId);
-            const filter = input.value.toLowerCase();
-            const buttons = document.getElementById(containerId).getElementsByTagName('button');
-
-            for (let i = 0; i < buttons.length; i++) {
-                const txtValue = buttons[i].textContent || buttons[i].innerText;
-                if (txtValue.toLowerCase().indexOf(filter) > -1) {
-                    buttons[i].style.display = '';
+            const searchInput = document.getElementById(inputId).value.toLowerCase();
+            const items = document.getElementById(containerId).getElementsByClassName('btn');
+    
+            Array.from(items).forEach(item => {
+                const itemName = item.textContent.trim().toLowerCase();
+                if (itemName.includes(searchInput)) {
+                    item.style.display = 'block';
                 } else {
-                    buttons[i].style.display = 'none';
+                    item.style.display = 'none';
                 }
-            }
-        }
-
-        function fetchMostCommonComplaints() {
-            fetch('/api/most-common-complaints')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to fetch most common complaints');
-                }
-                return response.json();
-            })
-            .then(data => {
-                updateUIAfterDeletion(data); 
-            })
-            .catch(error => {
-                console.error('Error fetching most common complaints:', error);
             });
         }
-          
     </script>
      
 </body>

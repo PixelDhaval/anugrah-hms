@@ -1,66 +1,60 @@
-const pool = require('../config/db'); 
+const pool = require('../config/db');
 
-const getMostCommonComplaints = async () => {
+const getMostCommonItems = async (table) => {
     try {
-        const queryText = 'SELECT * FROM complaints';
+        const queryText = `SELECT * FROM ${table}`;
         const { rows } = await pool.query(queryText);
-
-        if (!rows || rows.length === 0) {
-            throw new Error('No complaints found');
-        }
-
-        return rows;
+        return rows || []; 
     } catch (error) {
-        console.error('Error fetching most common complaints:', error);
+        console.error(`Error fetching most common items from ${table}:`, error);
         throw error;
     }
 };
 
-const addComplaint = async (req, res) => {
-    const { complaint } = req.body;
+const addItem = async (req, res, table) => {
+    const { value } = req.body;
 
     try {
-        const queryText = 'INSERT INTO complaints (complaint) VALUES ($1) RETURNING *';
-        const { rows } = await pool.query(queryText, [complaint]);
+        const queryText = `INSERT INTO ${table} (${table}) VALUES ($1) RETURNING ${table}_id`;
+        const { rows } = await pool.query(queryText, [value]);
 
         if (!rows || rows.length === 0) {
-            throw new Error('Failed to add complaint');
+            throw new Error('Failed to add item');
         }
 
-        const updatedComplaints = await getMostCommonComplaints(); 
-        res.status(201).json({ complaint: rows[0], complaints: updatedComplaints });
+        const updatedItems = await getMostCommonItems(table);
+        res.status(201).json({ item: rows[0], items: updatedItems });
     } catch (error) {
-        console.error('Error adding complaint:', error);
-        res.status(500).json({ error: 'Failed to add complaint' });
+        console.error(`Error adding item to ${table}:`, error);
+        res.status(500).json({ error: 'Failed to add item' });
     }
 };
-
-const removeComplaint = async (req, res) => {
-    const { complaintId } = req.params;
+const removeItem = async (req, res, table) => {
+    const { itemId } = req.params;
+    console.log('Received delete request for item ID:', itemId, 'from table:', table);
 
     try {
-        if (!complaintId) {
-            return res.status(400).json({ error: 'Invalid complaint ID' });
+        if (!itemId) {
+            return res.status(400).json({ error: 'Invalid item ID' });
         }
 
-        const queryText = 'DELETE FROM complaints WHERE complaint_id = $1';
-        const result = await pool.query(queryText, [complaintId]);
+        const queryText = `DELETE FROM ${table} WHERE ${table}_id = $1`;
+        const result = await pool.query(queryText, [itemId]);
 
         if (result.rowCount === 0) {
-            return res.status(404).json({ error: 'Complaint not found' });
+            return res.status(404).json({ error: 'Item not found' });
         }
 
-        const updatedComplaints = await getMostCommonComplaints(); 
-        res.status(200).json({ message: 'Complaint removed successfully', complaints: updatedComplaints });
+        const updatedItems = await getMostCommonItems(table);
+        res.status(200).json({ message: 'Item removed successfully', items: updatedItems });
     } catch (error) {
-        console.error('Error removing complaint:', error);
-        res.status(500).json({ error: 'Failed to remove complaint' });
+        console.error(`Error removing item from ${table}:`, error);
+        res.status(500).json({ error: 'Failed to remove item' });
     }
 };
 
-
 module.exports = {
-    addComplaint,
-    getMostCommonComplaints,
-    removeComplaint
+    getMostCommonItems,
+    addItem,
+    removeItem
 };
