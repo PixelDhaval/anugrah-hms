@@ -1,12 +1,10 @@
-// masterRoute.js
 const express = require('express');
 const router = express.Router();
 const masterController = require('../controllers/masterController');
 
-// Define tables and corresponding routes
+
 const tables = ['complaint', 'diagnosis', 'tests', 'advice'];
 
-// Route to render the master view with initial data
 router.get('/master', async (req, res) => {
     try {
         const promises = tables.map(table => masterController.getMostCommonItems(table));
@@ -18,17 +16,13 @@ router.get('/master', async (req, res) => {
     }
 });
 
-// Dynamically create routes for each table
+
 tables.forEach(table => {
-    // POST route to add an item
     router.post(`/api/add-${table}`, (req, res) => masterController.addItem(req, res, table));
-    
-    // DELETE route to remove an item
     router.delete(`/api/remove-${table}/:itemId`, (req, res) => {
         masterController.removeItem(req, res, table);
     }); 
-    // GET route to fetch most common items
-    router.get(`/api/most-common-${table}`, async (req, res) => {
+        router.get(`/api/most-common-${table}`, async (req, res) => {
         try {
             const items = await masterController.getMostCommonItems(table);
             res.json(items);

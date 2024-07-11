@@ -326,7 +326,7 @@
                     <input type="text" class="form-control" placeholder="Search Complaint" id="searchInput" onkeyup="searchItems('searchInput', 'mostCommonButtons')">
                 </div>
                 <div class="selected-buttons mb-3" id="selected-buttons-complaint"></div>
-                <div class="most-common mb-3" id="mostCommonButtons  mostCommonButtons-complaint">
+                <div class="most-common mb-3" id="mostCommonButtons" name="mostCommonButtons-complaint">
                     <% complaints.forEach(complaint => { %>
                         <button class="btn btn-outline-secondary mb-2" id="btn_common_complaints <%= complaint.complaint_id %>"
                             onclick="removeButton('<%= complaint.complaint_id %>', 'complaint')">
@@ -363,7 +363,7 @@
                     <input type="text" class="form-control" placeholder="Search Diagnosis" id="searchInput1" onkeyup="searchItems('searchInput1', 'diagnosisButtons')">
                 </div>
                 <div class="selected-buttons mb-3" id="selected-buttons-diagnosis"></div>
-                <div class="most-common mb-3" id="mostCommonButtons">
+                <div class="most-common mb-3" id="mostCommonButtons" name="mostCommonButtons-diagnosis">
                     <% diagnosis.forEach(diagnosis => { %>
                         <button class="btn btn-outline-secondary mb-2" id="btn_common_diagnosis <%= diagnosis.diagnosis_id %>" onclick="removeButton('<%= diagnosis.diagnosis_id %>','diagnosis')">
                             <%= diagnosis.diagnosis %> <span class="close ms-1">&times;</span>
@@ -399,7 +399,7 @@
                     <input type="text" class="form-control" placeholder="Search Test" id="searchInput2" onkeyup="searchItems('searchInput2', 'testButtons')">
                 </div>
                 <div class="selected-buttons mb-3" id="selected-buttons-test"></div>
-                <div class="most-common mb-3" id="mostCommonButtons">
+                <div class="most-common mb-3" id="mostCommonButtons" name="mostCommonButtons-tests">
                     <% tests.forEach(test => { %>
                         <button class="btn btn-outline-secondary mb-2" id="btn_common_tests_<%= test.tests_id %>" onclick="removeButton('<%= test.tests_id %>','tests')">
                             <%= test.tests %> <span class="close ms-1">&times;</span>
@@ -434,7 +434,7 @@
                     <input type="text" class="form-control" placeholder="Search Advice" id="searchInput3" onkeyup="searchItems('searchInput3', 'adviceButtons')">
                 </div>
                 <div class="selected-buttons mb-3" id="selected-buttons-advice"></div>
-                <div class="most-common mb-3" id="mostCommonButtons">
+                <div class="most-common mb-3" id="mostCommonButtons" name="mostCommonButtons-advice">
                     <% advice.forEach(advice => { %>
                         <button class="btn btn-outline-secondary mb-2" id="btn_common_advice_<%= advice.advice_id %>" onclick="removeButton('<%= advice.advice_id %>','advice')">
                             <%= advice.advice %> <span class="close ms-1">&times;</span>
@@ -462,8 +462,6 @@
             fetchInitialData('diagnosis');
             fetchInitialData('tests');
             fetchInitialData('advice');
-            const mostCommonButtons = document.getElementById('mostCommonButtons');
-            console.log('Element:', mostCommonButtons);
         });
     
         function fetchInitialData(table) {
@@ -490,8 +488,8 @@
                 .then(data => {
                     
                     document.getElementById(inputId).value = '';
-    
-                    updateMostCommonItems(table, data.items);
+                    location.reload();
+                    //updateMostCommonItems(table, data.items);
                 })
                 .catch(error => console.error('Error adding item:', error));
             }
@@ -505,7 +503,7 @@
             .then(response => response.json())
             .then(data => {
                 console.log('Item removed successfully:', data);
-                updateMostCommonItems(table,data.items);
+                location.reload();
             })
             .catch(error => console.error('Error removing item:', error));
             
@@ -513,12 +511,12 @@
     
         // Function to update most common items after add or remove operations
         function updateMostCommonItems(table, items) {
-            const mostCommonButtons = document.getElementById(`mostCommonButtons-${table}`);
+            const mostCommonButtons = document.getElementsByName(`mostCommonButtons-${table}`);
     
             
             if(mostCommonButtons){
                 mostCommonButtons.innerHTML = '';
-                // Add new buttons
+                
                 items.forEach(item => {
                     mostCommonButtons.innerHTML += `
                         <button class="btn btn-outline-secondary mb-2" id="btn_common_${table}_${item.id}" onclick="removeButton('${item.id}', '${table}')">
