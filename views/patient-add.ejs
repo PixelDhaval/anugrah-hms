@@ -539,7 +539,7 @@
                                     <div class="row mb-3">
                                         <div class="col-md-4">
                                             <label for="patient_id" class="form-label">Patient ID</label>
-                                            <input type="number" class="form-control" id="patient_id" name="patient_id"
+                                            <input type="text" class="form-control" id="patient_id" name="patient_id"
                                                 required readonly>
                                         </div>
                                         <div class="col-md-4">
@@ -615,8 +615,9 @@
                                             required>
                                         <div class="invalid-feedback">Please enter the referrer.</div>
                                     </div>
-                                    <a href="patient-complaints.html" class="btn btn-primary" role="button"
-                                        id="submitBtn">Submit</a>
+                                    <!-- <a href="/patient-complaints" class="btn btn-primary" role="button"
+                                        id="submitBtn">Submit</a> -->
+                                        <button type="submit" class="btn btn-primary" id="submitBtn" onclick="handleFormSubmit()">Submit</button>
                                 </form>
                             </div>
                         </div>
@@ -638,63 +639,99 @@
     <script src="../dist/assets/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', (event) => {
-            //Calculate age based on birthdate
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/get-next-patient-id')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('patient_id').value = data.nextPatientId;
+                })
+                .catch(error => {
+                    console.error('Error fetching next patient ID:', error);
+                });
+    
             document.getElementById('birthdate').addEventListener('change', function () {
                 calculateAge();
-            });
+            })
+        });
+    
+            
+            function handleFormSubmit(event) {
+                event.preventDefault();
 
-            function calculateAge() {
-                const birthdate = new Date(document.getElementById('birthdate').value);
-                const today = new Date();
+                const form = document.getElementById('patientForm');
 
-                let years = today.getFullYear() - birthdate.getFullYear();
-                let months = today.getMonth() - birthdate.getMonth();
-                let days = today.getDate() - birthdate.getDate();
+                if (form.checkValidity()) {
+                    const patientData = {
+                        patient_id: document.getElementById('patient_id').value,
+                        Fname: document.getElementById('Fname').value,
+                        Lname: document.getElementById('Lname').value,
+                        birthdate: document.getElementById('birthdate').value,
+                        age: document.getElementById('age').value,
+                        gender: document.getElementById('gender').value,
+                        phone: document.getElementById('phone').value,
+                        doctor_assigned: document.getElementById('doctorAssigned').value,
+                        address: document.getElementById('address').value,
+                        medical_history: document.getElementById('medical_history').value,
+                        refered_by: document.getElementById('refered_by').value
+                    };
 
-                // Adjust for negative days
-                if (days < 0) {
-                    months--;
-                    const previousMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-                    days += previousMonth.getDate();
+                    fetch('/add-patients', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(patientData),
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Patient added successfully:', data);
+                        // Redirect to patient complaints page after successful addition
+                        window.location.href = '/patient-complaints';
+                    })
+                    .catch(error => {
+                        console.error('Error adding patient:', error);
+                    });
                 }
 
-                if (months < 0) {
-                    years--;
-                    months += 12;
-                }
-                if (years < 0) {
-                    years = 0;
-                    months = 0;
-                }
-
-                //Age in years and months
-                document.getElementById('age').value = `${years} years, ${months} months and ${days} days`;
+                form.classList.add('was-validated');
             }
 
             const form = document.getElementById('patientForm');
-            const submitBtn = document.getElementById('submitBtn');
-
-            form.addEventListener('submit', function (event) {
-                if (!form.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                form.classList.add('was-validated');
-            });
-
-            submitBtn.addEventListener('click', function (event) {
-                if (!form.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                } else {
-                    form.submit();
-                }
-                form.classList.add('was-validated');
-            });
-        });
-
+            form.addEventListener('submit', handleFormSubmit);
             
+
+        function calculateAge() {
+            const birthdate = new Date(document.getElementById('birthdate').value);
+            const today = new Date();
+
+            let years = today.getFullYear() - birthdate.getFullYear();
+            let months = today.getMonth() - birthdate.getMonth();
+            let days = today.getDate() - birthdate.getDate();
+
+            if (days < 0) {
+                months--;
+                const previousMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+                days += previousMonth.getDate();
+            }
+
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+            if (years < 0) {
+                years = 0;
+                months = 0;
+            }
+
+            document.getElementById('age').value = `${years} years, ${months} months and ${days} days`;
+        }
+
     </script>
 
 </body>
