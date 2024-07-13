@@ -573,7 +573,7 @@
                             </div>
                             <div class="mb-3">
                                 <label for="editAge" class="form-label">Age</label>
-                                <input type="number" class="form-control" id="editAge" required>
+                                <input type="text" class="form-control" id="editAge" required>
                                 <div class="invalid-feedback">Please provide an age.</div>
                             </div>
                             <div class="mb-3">
@@ -588,16 +588,16 @@
                             </div>
                             <div class="mb-3">
                                 <label for="editLastVisit" class="form-label">Last Visit</label>
-                                <input type="date" class="form-control" id="editLastVisit" required>
+                                <input type="date" class="form-control" id="editLastVisit">
                                 <div class="invalid-feedback">Please last visit date.</div>
                             </div>
                             <div class="mb-3">
                                 <label for="editDoctorAssigned" class="form-label">Assign Doctor</label>
                                 <select class="form-control" id="editDoctorAssigned" name="edit_doctor_assigned" required>
                                     <option value="" disabled selected>Assign Doctor</option>
-                                    <option value="Dr. John">Dr. John</option>
-                                    <option value="Dr. Joe">Dr. Joe</option>
-                                    <option value="Dr. Richard">Dr. Richard</option>
+                                    <% doctors.forEach(doctor => { %>
+                                        <option value="<%= doctor %>"><%= doctor %></option>
+                                    <% }); %>
                                 </select>
                                 <div class="invalid-feedback">Please assign the doctor.</div>
                             </div>
@@ -605,7 +605,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" id="saveChangesBtn">Save changes</button>
+                        <button type="button" class="btn btn-primary" id="saveChangesBtn" >Save changes</button>
                     </div>
                 </div>
             </div>
@@ -622,79 +622,106 @@
     <script src="../dist/assets/js/bootstrap.bundle.min.js"></script>
     <script src="../dist/assets/js/tabulator.min.js"></script>
     <script>
-        const patientData = [
-            { id: "KU 00598", name: "Daniel", age: 32, address: "71 Pilgrim Avenue Chevy Chase, MD 20815", phone_no: "9876543217", last_visit: "2018-01-11", doctor_assigned: "Dr. John" },
-            { id: "KU 00258", name: "Alexander", age: 22, address: "123 6th St. Melbourne, FL 32904", phone_no: "9876543216", last_visit: "2018-01-15", doctor_assigned: "Dr. John" },
-            { id: "KU 00369", name: "Richard", age: 26, address: "123 6th St. Melbourne, FL 32904", phone_no: "9876543215", last_visit: "2018-01-16", doctor_assigned: "Dr. John" },
-            { id: "KU 00147", name: "Samuel", age: 45, address: "71 Pilgrim Avenue Chevy Chase, MD 20815", phone_no: "9876543214", last_visit: "2018-01-17", doctor_assigned: "Dr. John" },
-            { id: "KU 00123", name: "Stephen", age: 55, address: "71 Pilgrim Avenue Chevy Chase, MD 20815", phone_no: "9876543213", last_visit: "2018-01-18", doctor_assigned: "Dr. John" },
-            { id: "KU 00456", name: "Joseph", age: 27, address: "70 Bowman St. South Windsor, CT 06074", phone_no: "9876543212", last_visit: "2018-01-19", doctor_assigned: "Dr. John" },
-            { id: "KU 00789", name: "Cameron", age: 38, address: "123 6th St. Melbourne, FL 32904", phone_no: "9876543211", last_visit: "2018-01-20", doctor_assigned: "Dr. John" },
-            { id: "KU 00987", name: "Alex", age: 39, address: "123 6th St. Melbourne, FL 32904", phone_no: "9876543218", last_visit: "2018-01-21", doctor_assigned: "Dr. John" }
-        ];
+        var table;
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('/fetch-patients')
+                .then(response => response.json())
+                .then(patientData => {
+                    table = new Tabulator("#patient-table", {
+                        data: patientData,
+                        layout: "fitData",
+                        columns: [
+                            { title: "ID", field: "patient_id", headerFilter: "input", headerHozAlign: "center" },
+                            { title: "Name", field: "name", headerFilter: "input", headerHozAlign: "center" },
+                            { title: "Age", field: "age", headerHozAlign: "center" },
+                            { title: "Address", field: "address", headerFilter: "input", headerHozAlign: "center" },
+                            { title: "Number", field: "phone", headerFilter: "input", headerHozAlign: "center" },
+                            { title: "Last Visit", field: "last_visited", headerFilter: "input", headerHozAlign: "center" },
+                            { title: "Doctor Assigned", field: "doctor_assigned", headerFilter: "input", headerHozAlign: "center" },
+                            {
+                                title: "Actions",
+                                field: "actions",
+                                headerHozAlign: "center",
+                                formatter: function (cell, formatterParams, onRendered) {
+                                    return `<button class="btn btn-sm btn-primary edit-btn"><i class="fa fa-pencil"></i> Edit</button>`;
+                                },
+                                cellClick: function (e, cell) {
+                                    const data = cell.getRow().getData();
 
-        //Initialize Tabulator
-        const table = new Tabulator("#patient-table", {
-            data: patientData,
-            layout: "fitColumns",
-            columns: [
-                { title: "ID", field: "id", headerFilter: "input", headerHozAlign: "center" },
-                { title: "Name", field: "name", headerFilter: "input", headerHozAlign: "center" },
-                { title: "Age", field: "age", headerHozAlign: "center" },
-                { title: "Address", field: "address", headerFilter: "input", headerHozAlign: "center" },
-                { title: "Number", field: "phone_no", headerFilter: "input", headerHozAlign: "center" },
-                { title: "Last Visit", field: "last_visit", headerFilter: "input", headerHozAlign: "center" },
-                { title: "Doctor Assigned", field: "doctor_assigned", headerFilter: "input", headerHozAlign: "center" },
-                {
-                    title: "Actions",
-                    field: "actions",
-                    headerHozAlign: "center",
-                    formatter: function (cell, formatterParams, onRendered) {
-                        return `<button class="btn btn-sm btn-primary edit-btn"><i class="fa fa-pencil"></i> Edit</button>`;
-                    },
-                    cellClick: function (e, cell) {
-                        const data = cell.getRow().getData();
+                                    // Populate the edit modal fields
+                                    document.getElementById('editName').value = data.name;
+                                    document.getElementById('editAge').value = data.age;
+                                    document.getElementById('editAddress').value = data.address;
+                                    document.getElementById('editPhoneNo').value = data.phone;
 
-                        //Populate the modal fields
-                        document.getElementById('editName').value = data.name;
-                        document.getElementById('editAge').value = data.age;
-                        document.getElementById('editAddress').value = data.address;
-                        document.getElementById('editPhoneNo').value = data.phone_no;
-                        document.getElementById('editLastVisit').value = data.last_visit;
-                        document.getElementById('editDoctorAssigned').value = data.doctor_assigned;
+                                  
+                                    if (data.last_visited) {
+                                        const dateParts = data.last_visited.split('T')[0].split('-');
+                                        const formattedDate = `${dateParts[0]}-${dateParts[1]}-${dateParts[2]}`;
+                                        document.getElementById('editLastVisit').value = formattedDate;
+                                    } else {
+                                        document.getElementById('editLastVisit').value = '';
+                                    }
+                                  
+                                    document.getElementById('editDoctorAssigned').value = data.doctor_assigned;
 
-                        //Store the row ID for update
-                        document.getElementById('editPatientForm').dataset.rowId = data.id;
 
-                        //Show the edit modal
-                        const editModal = new bootstrap.Modal(document.getElementById('editPatientModal'));
-                        editModal.show();
-                    }
-                }
-            ]
+                                    document.getElementById('editPatientForm').dataset.rowId = data.patient_id;
+
+                                    const editModal = new bootstrap.Modal(document.getElementById('editPatientModal'));
+                                    editModal.show();
+                                }
+                            }
+                        ]
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching patient data:', error);
+                });
         });
 
-        //Save changes button
-        document.getElementById('saveChangesBtn').addEventListener('click', function () {
+        document.getElementById('saveChangesBtn').addEventListener('click', editPatient);
+        function editPatient() {
             const editPatientForm = document.getElementById('editPatientForm');
             if (editPatientForm.checkValidity() === false) {
                 editPatientForm.classList.add('was-validated');
             } else {
+                
                 const rowId = editPatientForm.dataset.rowId;
+                
                 const updatedData = {
-                    id: rowId,
+                    patient_id: rowId,
                     name: document.getElementById('editName').value,
                     age: document.getElementById('editAge').value,
                     address: document.getElementById('editAddress').value,
-                    phone_no: document.getElementById('editPhoneNo').value,
+                    phone: document.getElementById('editPhoneNo').value,
                     last_visit: document.getElementById('editLastVisit').value,
+                    doctor_assigned: document.getElementById('editDoctorAssigned').value,
                 };
-                table.updateRow(rowId, updatedData);
 
-                const editModal = bootstrap.Modal.getInstance(document.getElementById('editPatientModal'));
-                editModal.hide();
+                fetch(`/edit-patient/${rowId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        table.updateRow(rowId, updatedData);
+                        const editModal = bootstrap.Modal.getInstance(document.getElementById('editPatientModal'));
+                        editModal.hide();
+                    } else {
+                        console.error('Failed to update patient:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating patient:', error);
+                });
             }
-        });
+        }
+        
     </script>
 </body>
 

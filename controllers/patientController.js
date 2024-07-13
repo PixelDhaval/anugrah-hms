@@ -1,10 +1,20 @@
 const pool = require('../config/db');
 
-exports.getAllPatients = (req, res) => {
-    res.render('patient-all');
-};
-let nextPatientId = 1;
+exports.getAllPatients = async (req, res) => {
+    try {
+        const client = await pool.connect();
+        const result = await client.query('SELECT name FROM doctors'); 
+        client.release();
 
+        const doctors = result.rows.map(row => row.name); 
+        res.render('patient-all', { doctors: doctors });
+    } catch (error) {
+        console.error('Error fetching doctors:', error);
+        res.status(500).send('Internal server error');
+    }
+};
+
+let nextPatientId = 1;
 const getNextPatientId = async () => {
     try {
         const client = await pool.connect();
@@ -49,6 +59,7 @@ exports.addPatientPage = async (req, res) => {
         res.status(500).send('Internal server error');
     }
 };
+
 exports.addPatient = async (req, res) => {
     const { patient_id, Fname, Lname, birthdate, age, gender, phone, doctor_assigned, address, medical_history, refered_by } = req.body;
     const name = `${Fname} ${Lname}`;
@@ -66,6 +77,40 @@ exports.addPatient = async (req, res) => {
     } catch (error) {
         console.error('Error adding patient:', error); 
         res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+exports.fetchPatients= async (req,res)=>{
+    try {
+        const client = await pool.connect();
+        const patientData = await client.query('SELECT * FROM patients');
+
+        res.json(patientData.rows); 
+    } catch (error) {
+        console.error('Error fetching patients:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+exports.updatePatient = async (req, res) => {
+    const { id } = req.params;
+    const { name, age, address, phone, last_visit, doctor_assigned } = req.body;
+
+    try {
+        const client = await pool.connect();
+        const query = `
+            UPDATE patients
+            SET name = $1, age = $2, address = $3, phone = $4, last_visited = $5, doctor_assigned = $6
+            WHERE patient_id = $7
+        `;
+
+
+        await client.query(query, [name, age, address, phone, last_visit, doctor_assigned, id]);
+        client.release();
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error updating patient:', error);
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
 
