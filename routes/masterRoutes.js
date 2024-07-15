@@ -33,4 +33,14 @@ tables.forEach(table => {
     });
 });
 
+router.get('/opd-service-master',(req,res)=>{
+    res.render('opd-service-master');
+})
+
+router.post('/add-service', masterController.addService);
+router.get('/services', masterController.getAllServices);
+router.put('/update-services/:code', masterController.updateService);
+router.delete('/delete-service/:code',masterController.deleteService);
+router.get('/get-next-service-code', masterController.getNextServiceCode);
+
 module.exports = router;

@@ -53,8 +53,103 @@ const removeItem = async (req, res, table) => {
     }
 };
 
+let nextServiceId=1;
+const getNextServiceId = async () => {
+    let client;
+    try {
+        client = await pool.connect();
+        const result = await client.query('SELECT MAX(CAST(SUBSTRING(code, 3) AS INT)) AS max_id FROM opd_services');
+        let currentMaxId = result.rows[0].max_id || 0;
+        nextServiceId = currentMaxId + 1;
+
+        const nextId = 'SM' + String(nextServiceId).padStart(3, '0');
+        return nextId;
+    } catch (error) {
+        console.error('Error fetching next Service code:', error);
+        throw error;
+    } finally {
+        if (client) {
+            client.release();
+        }
+    }
+};
+
+const getNextServiceCode = async (req, res) => {
+    try {
+        const nextId = await getNextServiceId();
+        res.json({ nextServiceId: nextId });
+    } catch (error) {
+        console.error('Error fetching next Service code:', error);
+        res.status(500).send('Internal server error');
+    }
+};
+
+const addService = async (req, res) => {
+    const { code, service, rateForNewPatient, rateForOldPatient } = req.body;
+
+    try {
+        const queryText = 'INSERT INTO opd_services (code, opd_service, new_patient, old_patient) VALUES ($1, $2, $3, $4) RETURNING *';
+        const values = [code, service, rateForNewPatient, rateForOldPatient];
+        
+        const result = await pool.query(queryText, values);
+        
+        res.status(201).json({ message: 'Service added successfully', service: result.rows[0] });
+    } catch (error) {
+        console.error('Error adding service:', error);
+        res.status(500).json({ error: 'Failed to add service' });
+    }
+};
+
+const getAllServices = async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM opd_services');
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error fetching services:', error);
+        res.status(500).json({ error: 'Failed to fetch services' });
+    }
+};
+const updateService = async (req, res) => {
+    const { code, service, rateForNewPatient, rateForOldPatient } = req.body;
+    try {
+        const queryText = 'UPDATE opd_services SET opd_service = $1, new_patient = $2, old_patient = $3 WHERE code = $4 RETURNING *';
+        const values = [service, rateForNewPatient, rateForOldPatient, code];
+
+        const result = await pool.query(queryText, values);
+
+        res.json({ updatedService: result.rows[0] });
+    } catch (error) {
+        console.error('Error updating service:', error);
+        res.status(500).json({ error: 'Failed to update service' });
+    }
+};
+
+
+const deleteService = async (req, res) => {
+    const { code } = req.params; // Assuming rowId is passed as a URL parameter
+
+    try {
+        const queryText = 'DELETE FROM opd_services WHERE code = $1';
+        const result = await pool.query(queryText, [code]);
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'Service not found' });
+        }
+
+        res.status(200).json({ message: 'Service deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting service:', error);
+        res.status(500).json({ error: 'Failed to delete service' });
+    }
+};
+
 module.exports = {
     getMostCommonItems,
     addItem,
-    removeItem
+    removeItem,
+    getNextServiceCode,
+    addService,
+    getAllServices,
+    updateService,
+    deleteService
 };
