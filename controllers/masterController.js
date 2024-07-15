@@ -126,7 +126,7 @@ const updateService = async (req, res) => {
 
 
 const deleteService = async (req, res) => {
-    const { code } = req.params; // Assuming rowId is passed as a URL parameter
+    const { code } = req.params; 
 
     try {
         const queryText = 'DELETE FROM opd_services WHERE code = $1';
