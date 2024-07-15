@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const { format } = require('date-fns');
 
 exports.getAllPatients = async (req, res) => {
     try {
@@ -79,16 +80,25 @@ exports.addPatient = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
-
-exports.fetchPatients= async (req,res)=>{
+exports.fetchPatients = async (req, res) => {
+    let client;
     try {
-        const client = await pool.connect();
-        const patientData = await client.query('SELECT * FROM patients');
+        client = await pool.connect();
+        const patientData = await client.query(`
+            SELECT patient_id, name, age, address, phone,
+                   TO_CHAR(last_visited, 'YYYY-MM-DD') AS last_visited,appointment_status,
+                   doctor_assigned
+            FROM patients
+        `);
 
-        res.json(patientData.rows); 
+        res.json(patientData.rows);
     } catch (error) {
         console.error('Error fetching patients:', error);
         res.status(500).json({ error: 'Internal server error' });
+    } finally {
+        if (client) {
+            client.release();
+        }
     }
 };
 exports.updatePatient = async (req, res) => {
@@ -96,6 +106,10 @@ exports.updatePatient = async (req, res) => {
     const { name, age, address, phone, last_visit, doctor_assigned } = req.body;
 
     try {
+        // Format last_visit to yyyy/mm/dd format
+        const formattedLastVisit = format(new Date(last_visit), 'yyyy-MM-dd');
+        console.log(formattedLastVisit);
+
         const client = await pool.connect();
         const query = `
             UPDATE patients
@@ -103,8 +117,7 @@ exports.updatePatient = async (req, res) => {
             WHERE patient_id = $7
         `;
 
-
-        await client.query(query, [name, age, address, phone, last_visit, doctor_assigned, id]);
+        await client.query(query, [name, age, address, phone, formattedLastVisit, doctor_assigned, id]);
         client.release();
 
         res.json({ success: true });
@@ -113,7 +126,6 @@ exports.updatePatient = async (req, res) => {
         res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
-
 exports.getComplaints = (req, res) => {
     res.render('patient-complaints');
 };
