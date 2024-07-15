@@ -9,5 +9,7 @@ router.get('/get-next-patient-id', patientController.getNextPatientId);
 router.get('/patient-complaints', patientController.getComplaints);
 router.get('/fetch-patients',patientController.fetchPatients);
 router.put('/edit-patient/:id', patientController.updatePatient);
+router.get('/fetch-complaints', patientController.fetchComplaints);
+router.post('/add-complaint', patientController.addComplaint);
 
 module.exports = router;

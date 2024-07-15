@@ -49,11 +49,11 @@ exports.getNextPatientId = async (req, res) => {
 exports.addPatientPage = async (req, res) => {
     try {
         const client = await pool.connect();
-        const result = await client.query('SELECT name FROM doctors');
+        const result = await client.query('SELECT doctor_id, name FROM doctors');
         client.release();
 
-        const doctors = result.rows.map(row => row.name);
-
+        const doctors = result.rows;
+        
         res.render('patient-add', { doctors: doctors });
     } catch (error) {
         console.error('Error fetching doctors:', error);
@@ -81,26 +81,23 @@ exports.addPatient = async (req, res) => {
     }
 };
 exports.fetchPatients = async (req, res) => {
-    let client;
     try {
-        client = await pool.connect();
+        const client = await pool.connect();
         const patientData = await client.query(`
-            SELECT patient_id, name, age, address, phone,
-                   TO_CHAR(last_visited, 'YYYY-MM-DD') AS last_visited,appointment_status,
-                   doctor_assigned
-            FROM patients
+            SELECT p.patient_id, p.name, p.age, p.address, p.phone, 
+                   TO_CHAR(p.last_visited, 'YYYY-MM-DD') AS last_visited,
+                   p.appointment_status, p.doctor_assigned, d.doctor_id
+            FROM patients p
+            LEFT JOIN doctors d ON p.doctor_assigned = d.name
         `);
 
         res.json(patientData.rows);
     } catch (error) {
         console.error('Error fetching patients:', error);
         res.status(500).json({ error: 'Internal server error' });
-    } finally {
-        if (client) {
-            client.release();
-        }
     }
 };
+
 exports.updatePatient = async (req, res) => {
     const { id } = req.params;
     const { name, age, address, phone, last_visit, doctor_assigned } = req.body;
@@ -108,8 +105,7 @@ exports.updatePatient = async (req, res) => {
     try {
         // Format last_visit to yyyy/mm/dd format
         const formattedLastVisit = format(new Date(last_visit), 'yyyy-MM-dd');
-        console.log(formattedLastVisit);
-
+       
         const client = await pool.connect();
         const query = `
             UPDATE patients
@@ -128,4 +124,32 @@ exports.updatePatient = async (req, res) => {
 };
 exports.getComplaints = (req, res) => {
     res.render('patient-complaints');
+};
+
+exports.fetchComplaints = async (req, res) => {
+    try {
+        const client = await pool.connect();
+        const complaintData = await client.query('SELECT complaint FROM complaint');
+        client.release();
+
+        res.json(complaintData.rows);
+    } catch (error) {
+        console.error('Error fetching complaints:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+exports.addComplaint = async (req, res) => {
+    const { complaint } = req.body;
+
+    try {
+        const client = await pool.connect();
+        await client.query('INSERT INTO complaint (complaint) VALUES ($1)', [complaint]);
+        client.release();
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error adding complaint:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 };

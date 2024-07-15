@@ -527,7 +527,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="row clearfix">
                     <div class="col-md-12">
                         <div class="card patients-list">
@@ -586,14 +585,22 @@
                                         </div>
                                         <div class="col-md-4">
                                             <label for="doctorAssigned" class="form-label">Assign Doctor</label>
-                                            <select class="form-control" id="doctorAssigned" name="doctor_assigned" required>
+                                            <select class="form-control" id="doctorAssigned" name="doctor_assigned" required onchange="setDoctorId()">
                                                 <option value="" disabled selected>Assign Doctor</option>
-                                                <% doctors.forEach(doctor => { %>
-                                                    <option value="<%= doctor %>"><%= doctor %></option>
-                                                <% }); %>
+                                                <% if (doctors && doctors.length > 0) { %>
+                                                    <% doctors.forEach(doctor => { %>
+                                                        <option value="<%= doctor.name %>" data-doctor-id="<%= doctor.doctor_id %>"><%= doctor.name %></option>
+                                                    <% }); %>
+                                                <% } else { %>
+                                                    <option value="" disabled>No doctors available</option>
+                                                <% } %>
                                             </select>
+                                            <input type="hidden" id="doctor_id" name="doctor_id">
                                             <div class="invalid-feedback">Please assign the doctor.</div>
                                         </div>
+                                        
+                                       
+                                        
                                     </div>
                                     <div class="mb-3">
                                         <label for="address" class="form-label">Address</label>
@@ -626,6 +633,8 @@
             </div>
         </div>
     </div>
+
+ 
     <!--Javascript-->
     <script src="../dist/assets/bundles/libscripts.bundle.js"></script>
     <script src="../dist/assets/bundles/vendorscripts.bundle.js"></script>
@@ -639,7 +648,12 @@
     <script src="../dist/assets/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        
+        function setDoctorId() {
+            const doctorAssignedSelect = document.getElementById('doctorAssigned');
+            const selectedOption = doctorAssignedSelect.options[doctorAssignedSelect.selectedIndex];
+            const doctorId = selectedOption.getAttribute('data-doctor-id');
+            document.getElementById('doctor_id').value = doctorId;
+        }
         document.addEventListener('DOMContentLoaded', () => {
             fetch('/get-next-patient-id')
                 .then(response => response.json())
@@ -655,53 +669,57 @@
             })
         });
     
-            
-            function handleFormSubmit(event) {
-                event.preventDefault();
-
-                const form = document.getElementById('patientForm');
-
-                if (form.checkValidity()) {
-                    const patientData = {
-                        patient_id: document.getElementById('patient_id').value,
-                        Fname: document.getElementById('Fname').value,
-                        Lname: document.getElementById('Lname').value,
-                        birthdate: document.getElementById('birthdate').value,
-                        age: document.getElementById('age').value,
-                        gender: document.getElementById('gender').value,
-                        phone: document.getElementById('phone').value,
-                        doctor_assigned: document.getElementById('doctorAssigned').value,
-                        address: document.getElementById('address').value,
-                        medical_history: document.getElementById('medical_history').value,
-                        refered_by: document.getElementById('refered_by').value
-                    };
-
-                    fetch('/add-patients', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(patientData),
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Patient added successfully:', data);
-                        // Redirect to patient complaints page after successful addition
-                        window.location.href = '/patient-complaints';
-                    })
-                    .catch(error => {
-                        console.error('Error adding patient:', error);
-                    });
-                }
-
-                form.classList.add('was-validated');
+        function handleFormSubmit(event) {
+            event.preventDefault();
+        
+            const form = document.getElementById('patientForm');
+        
+            if (form.checkValidity()) {
+                // Retrieve patient_id and doctor_id values
+                const patientId = document.getElementById('patient_id').value;
+                const doctorId = document.getElementById('doctor_id').value;
+        
+                const patientData = {
+                    patient_id: patientId,
+                    Fname: document.getElementById('Fname').value,
+                    Lname: document.getElementById('Lname').value,
+                    birthdate: document.getElementById('birthdate').value,
+                    age: document.getElementById('age').value,
+                    gender: document.getElementById('gender').value,
+                    phone: document.getElementById('phone').value,
+                    doctor_assigned: document.getElementById('doctorAssigned').value,
+                    address: document.getElementById('address').value,
+                    medical_history: document.getElementById('medical_history').value,
+                    refered_by: document.getElementById('refered_by').value,
+                    doctor_id: doctorId, // Include doctor_id in patientData
+                };
+        
+                fetch('/add-patients', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(patientData),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Patient added successfully:', data);
+                    // Redirect to patient complaints page after successful addition
+                    window.location.href = `/patient-complaints?patientId=${patientId}&doctorId=${doctorId}`;
+                })
+                .catch(error => {
+                    console.error('Error adding patient:', error);
+                });
             }
-
+        
+            form.classList.add('was-validated');
+        }
+        
             const form = document.getElementById('patientForm');
             form.addEventListener('submit', handleFormSubmit);
             

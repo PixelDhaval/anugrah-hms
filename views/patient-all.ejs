@@ -626,7 +626,6 @@
         document.addEventListener('DOMContentLoaded', function () {
             fetchPatients();
         });
-
         function fetchPatients() {
             fetch('/fetch-patients')
                 .then(response => response.json())
@@ -642,27 +641,29 @@
                             { title: "Number", field: "phone", headerFilter: "input", headerHozAlign: "center" },
                             { title: "Last Visit", field: "last_visited", headerFilter: "input", headerHozAlign: "center" },
                             { title: "Doctor Assigned", field: "doctor_assigned", headerFilter: "input", headerHozAlign: "center" },
+                            { title: "Doctor ID", field: "doctor_id", visible: false },  // Hidden field for doctor_id
                             {
                                 title: "Actions",
                                 field: "actions",
                                 headerHozAlign: "center",
                                 formatter: function (cell, formatterParams, onRendered) {
+                                    const data = cell.getRow().getData();
                                     return `
                                         <button class="btn btn-sm btn-primary edit-btn"><i class="fa fa-pencil"></i> Edit</button>
-                                        <button class="btn btn-sm btn-primary new-appointment-btn" data-patientid="${cell.getRow().getData().patient_id}"><i class="fa fa-calendar-plus"></i> New Appointment</button>
+                                        <button class="btn btn-sm btn-primary new-appointment-btn" data-patientid="${data.patient_id}" data-doctorid="${data.doctor_id}"><i class="fa fa-calendar-plus"></i> New Appointment</button>
                                     `;
                                 },
                                 cellClick: function (e, cell) {
-                                    const data = cell.getRow().getData();
                                     const actionButton = e.target.closest('button');
-        
                                     if (actionButton) {
+                                        const data = cell.getRow().getData();
                                         if (actionButton.classList.contains('new-appointment-btn')) {
                                             const patientId = actionButton.getAttribute('data-patientid');
-                                            if (patientId) {
-                                                window.location.href = `/patient-complaints?patientId=${patientId}`;
+                                            const doctorId = actionButton.getAttribute('data-doctorid');
+                                            if (patientId && doctorId) {
+                                                window.location.href = `/patient-complaints?patientId=${patientId}&doctorId=${doctorId}`;
                                             } else {
-                                                console.error('Patient ID not found.');
+                                                console.error('Patient ID or Doctor ID not found.');
                                             }
                                         } else if (actionButton.classList.contains('edit-btn')) {
                                             // Populate the edit modal fields
@@ -696,6 +697,7 @@
                     console.error('Error fetching patient data:', error);
                 });
         }
+        
         
         
         document.getElementById('saveChangesBtn').addEventListener('click', editPatient);

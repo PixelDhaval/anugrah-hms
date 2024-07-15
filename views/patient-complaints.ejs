@@ -325,7 +325,7 @@
                                 <div class="selected-buttons mb-3"></div>
 
                                 <div class="most-common" id="mostCommonButtons">
-                                    <button class="btn btn-outline-secondary mb-2"
+                                    <!-- <button class="btn btn-outline-secondary mb-2"
                                         onclick="addButton(this)">Fever</button>
                                     <button class="btn btn-outline-secondary mb-2"
                                         onclick="addButton(this)">Cough</button>
@@ -394,7 +394,7 @@
                                     <button class="btn btn-outline-secondary mb-2" onclick="addButton(this)">Neck
                                         Pain</button>
                                     <button class="btn btn-outline-secondary mb-2" onclick="addButton(this)">Burning
-                                        Micturition</button>
+                                        Micturition</button> -->
 
                                 </div>
 
@@ -434,7 +434,7 @@
                 button.classList.add('btn-outline-secondary');
             } else {
                 const newButton = document.createElement('button');
-                newButton.className = 'btn btn-secondary selected-button m-1';
+                newButton.className = 'btn btn-secondary selected-button mb-2';
                 newButton.innerText = buttonText;
                 newButton.onclick = function () {
                     selectedButtonsDiv.removeChild(newButton);
@@ -453,23 +453,48 @@
         function addCustomComplaint() {
             const customComplaintInput = document.getElementById('customComplaint');
             const complaintText = customComplaintInput.value.trim();
-
+        
             if (complaintText === '') return;
-
-            const selectedButtonsDiv = document.querySelector('.selected-buttons');
-
-            const existingButton = Array.from(selectedButtonsDiv.children).find(child => child.innerText === complaintText);
-            if (existingButton) return;
-
-            const newButton = document.createElement('button');
-            newButton.className = 'btn btn-secondary selected-button m-1';
-            newButton.innerText = complaintText;
-            newButton.onclick = function () {
-                selectedButtonsDiv.removeChild(newButton);
-            };
-
-            selectedButtonsDiv.appendChild(newButton);
-            customComplaintInput.value = '';
+        
+            fetch('/add-complaint', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ complaint: complaintText }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const selectedButtonsDiv = document.querySelector('.selected-buttons');
+                    const mostCommonButtonsDiv = document.getElementById('mostCommonButtons');
+        
+                    const newButton = document.createElement('button');
+                    newButton.className = 'btn btn-secondary selected-button mb-2';
+                    newButton.innerText = complaintText;
+                    newButton.onclick = function () {
+                        selectedButtonsDiv.removeChild(newButton);
+                    };
+        
+                    selectedButtonsDiv.appendChild(newButton);
+        
+                    const mostCommonButton = document.createElement('button');
+                    mostCommonButton.className = 'btn btn-outline-secondary mb-2';
+                    mostCommonButton.innerText = complaintText;
+                    mostCommonButton.onclick = function () {
+                        addButton(mostCommonButton);
+                    };
+        
+                    mostCommonButtonsDiv.appendChild(mostCommonButton);
+        
+                    customComplaintInput.value = '';
+                } else {
+                    console.error('Error adding complaint:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error adding complaint:', error);
+            });
         }
 
         function searchComplaints() {
@@ -485,6 +510,29 @@
                 }
             });
         }
+
+       
+        function fetchComplaints() {
+            fetch('/fetch-complaints')
+                .then(response => response.json())
+                .then(complaintData => {
+                    const container = document.getElementById('mostCommonButtons');
+                    container.innerHTML = ''; 
+        
+                    complaintData.forEach(complaint => {
+                        const button = document.createElement('button');
+                        button.className = 'btn btn-outline-secondary mb-2';
+                        button.textContent = complaint.complaint;
+                        button.onclick = function () { addButton(button); };
+                        container.appendChild(button);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching complaints:', error);
+                });
+        }
+        
+       document.addEventListener('DOMContentLoaded', fetchComplaints);
     </script>
 
 </body>
