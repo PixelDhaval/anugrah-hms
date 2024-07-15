@@ -471,7 +471,7 @@
                 return;
             }
             else{
-            // Add new service to local array
+        
             const newService = { code, service, rateForNewPatient, rateForOldPatient };
             serviceData.push(newService); 
                     
@@ -566,7 +566,7 @@
             })
             .then(data => {
                 
-               
+               fetchNextServiceCode();
                 loadServices(); 
             })
             .catch(error => {
