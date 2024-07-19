@@ -675,7 +675,7 @@
             const form = document.getElementById('patientForm');
         
             if (form.checkValidity()) {
-                // Retrieve patient_id and doctor_id values
+                
                 const patientId = document.getElementById('patient_id').value;
                 const doctorId = document.getElementById('doctor_id').value;
         
@@ -691,7 +691,7 @@
                     address: document.getElementById('address').value,
                     medical_history: document.getElementById('medical_history').value,
                     refered_by: document.getElementById('refered_by').value,
-                    doctor_id: doctorId, // Include doctor_id in patientData
+                    doctor_id: doctorId, 
                 };
         
                 fetch('/add-patients', {
@@ -709,7 +709,7 @@
                 })
                 .then(data => {
                     console.log('Patient added successfully:', data);
-                    // Redirect to patient complaints page after successful addition
+                  
                     window.location.href = `/patient-complaints?patientId=${patientId}&doctorId=${doctorId}`;
                 })
                 .catch(error => {

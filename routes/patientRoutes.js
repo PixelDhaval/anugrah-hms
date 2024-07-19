@@ -12,4 +12,6 @@ router.put('/edit-patient/:id', patientController.updatePatient);
 router.get('/fetch-complaints', patientController.fetchComplaints);
 router.post('/add-complaint', patientController.addComplaint);
 
+router.post('/add-appointment', patientController.addAppointment);
+
 module.exports = router;

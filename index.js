@@ -9,6 +9,7 @@ const doctorRoutes = require('./routes/doctorRoutes');
 const roomRoutes = require('./routes/roomRoutes');
 const patientRoutes = require('./routes/patientRoutes');
 const masterRoutes = require('./routes/masterRoutes');
+const appointmentRoutes = require('./routes/appointmentRoutes');
 
 const app = express();
 
@@ -25,6 +26,8 @@ app.use('/', doctorRoutes);
 app.use('/', roomRoutes);
 app.use('/', patientRoutes);
 app.use('/', masterRoutes);
+app.use('/', appointmentRoutes);
+
 
 
 app.use((err, req, res, next) => {

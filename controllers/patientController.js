@@ -153,3 +153,49 @@ exports.addComplaint = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+exports.getPatientData = async (req, res) => {
+    const patientId = req.params.id;
+
+    try {
+        const client = await pool.connect();
+        const patientResult = await client.query('SELECT * FROM patients WHERE patient_id = $1', [patientId]);
+        const appointmentResult = await client.query('SELECT complaints FROM appointments WHERE patient_id = $1', [patientId]);
+
+        client.release();
+
+        res.json({
+            patient: patientResult.rows[0],
+            appointments: appointmentResult.rows,
+        });
+    } catch (error) {
+        console.error('Error fetching patient data:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+exports.addAppointment = async (req, res) => {
+    const { patient_id, doctor_id, complaints } = req.body;
+
+    try {
+        // Fetch patient info to check last_visited
+        const patient = await pool.query('SELECT last_visited FROM patients WHERE patient_id = $1', [patient_id]);
+
+        if (!patient.rows.length) {
+            return res.status(400).json({ success: false, error: 'Patient not found' });
+        }
+
+        const lastVisited = patient.rows[0].last_visited;
+        const status = lastVisited ? 'Re-schedule' : 'Scheduled';
+
+        // Insert the appointment
+        await pool.query(
+            'INSERT INTO appointments (patient_id, doctor_id, complaints, status) VALUES ($1, $2, $3, $4)',
+            [patient_id, doctor_id, complaints, status]
+        );
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error adding appointment:', error);
+        res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+};
