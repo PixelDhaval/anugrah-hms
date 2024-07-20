@@ -536,136 +536,165 @@
 
     </script> -->
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const patientId = 'PT001'; 
-            try {
-                const response = await fetch(`/api/patient/${patientId}`);
-                const data = await response.json();
-
-                document.getElementById('patientName').value = data.patient.name;
-
-                const mostCommonButtons = document.getElementById('mostCommonButtons');
-                data.appointments.forEach(appointment => {
-                    const button = document.createElement('button');
-                    button.className = 'btn btn-outline-secondary mb-2';
-                    button.textContent = appointments.complaints; 
-                    button.onclick = () => addButton(button);
-                    mostCommonButtons.appendChild(button);
-                });
-            } catch (err) {
-                console.error('Error fetching patient data:', err);
-            }
-        });
-
-        function addButton(button) {
-            const selectedButtonsDiv = document.querySelector('.selected-buttons');
-            const buttonText = button.innerText;
-
-            const existingButton = Array.from(selectedButtonsDiv.children).find(child => child.innerText === buttonText);
-            if (existingButton) {
-                selectedButtonsDiv.removeChild(existingButton);
-                button.classList.remove('btn-secondary');
-                button.classList.add('btn-outline-secondary');
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+    document.addEventListener('DOMContentLoaded', async () => {
+        const patientId = getQueryParam('patientId');
+        const appointmentId = getQueryParam('appointmentId');
+    
+        try {
+            const response = await fetch(`/api/patient/${patientId}/appointment/${appointmentId}`);
+            const data = await response.json();
+            document.getElementById('patientName').value = data.patient.name;
+            if (data.appointments.length > 0) {
+                const complaints = data.appointments[0];
+                const patientComplaints = complaints ? complaints.split(',').map(c => c.trim()) : [];
+    
+                console.log('Patient Complaints:', patientComplaints);
+    
+                fetchComplaints(patientComplaints);
             } else {
+                console.log('No appointments found for this patient.');
+            }
+    
+        } catch (err) {
+            console.error('Error fetching patient data:', err);
+        }
+    });
+    
+    function toggleButtonSelection(button) {
+        if (button.classList.contains('btn-outline-secondary')) {
+            button.classList.remove('btn-outline-secondary');
+            button.classList.add('btn-secondary', 'selected-button');
+            button.style.color = 'white';
+        } else {
+            button.classList.remove('btn-secondary', 'selected-button');
+            button.classList.add('btn-outline-secondary');
+            button.style.color = ''; 
+        }
+    }
+    
+    function addButton(button) {
+        const selectedButtonsDiv = document.querySelector('.selected-buttons');
+        const buttonText = button.innerText;
+    
+        const existingButton = Array.from(selectedButtonsDiv.children).find(child => child.innerText === buttonText);
+        if (existingButton) {
+            selectedButtonsDiv.removeChild(existingButton);
+            button.classList.remove('btn-secondary', 'selected-button');
+            button.classList.add('btn-outline-secondary');
+            button.style.color = '';
+        } else {
+            const newButton = document.createElement('button');
+            newButton.className = 'btn btn-secondary selected-button mb-2';
+            newButton.innerText = buttonText;
+            newButton.onclick = function () {
+                selectedButtonsDiv.removeChild(newButton);
+                const originalButton = Array.from(document.querySelectorAll('.most-common button')).find(btn => btn.innerText === buttonText);
+                if (originalButton) {
+                    originalButton.classList.remove('btn-secondary', 'selected-button');
+                    originalButton.classList.add('btn-outline-secondary');
+                    originalButton.style.color = ''; 
+                }
+            };
+            selectedButtonsDiv.appendChild(newButton);
+            button.classList.remove('btn-outline-secondary');
+            button.classList.add('btn-secondary', 'selected-button');
+            button.style.color = 'white'; 
+        }
+    }
+    
+    function addCustomComplaint() {
+        const customComplaintInput = document.getElementById('customComplaint');
+        const complaintText = customComplaintInput.value.trim();
+    
+        if (complaintText === '') return;
+    
+        fetch('/add-complaint', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ complaint: complaintText }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const selectedButtonsDiv = document.querySelector('.selected-buttons');
+                const mostCommonButtonsDiv = document.getElementById('mostCommonButtons');
+    
                 const newButton = document.createElement('button');
                 newButton.className = 'btn btn-secondary selected-button mb-2';
-                newButton.innerText = buttonText;
+                newButton.innerText = complaintText;
                 newButton.onclick = function () {
                     selectedButtonsDiv.removeChild(newButton);
-                    const originalButton = Array.from(document.querySelectorAll('.most-common button')).find(btn => btn.innerText === buttonText);
-                    if (originalButton) {
-                        originalButton.classList.remove('btn-secondary');
-                        originalButton.classList.add('btn-outline-secondary');
-                    }
                 };
+    
                 selectedButtonsDiv.appendChild(newButton);
-                button.classList.remove('btn-outline-secondary');
-                button.classList.add('btn-secondary');
+    
+                const mostCommonButton = document.createElement('button');
+                mostCommonButton.className = 'btn btn-outline-secondary mb-2';
+                mostCommonButton.innerText = complaintText;
+                mostCommonButton.onclick = function () {
+                    addButton(mostCommonButton);
+                };
+    
+                mostCommonButtonsDiv.appendChild(mostCommonButton);
+    
+                customComplaintInput.value = '';
+            } else {
+                console.error('Error adding complaint:', data.error);
             }
-        }
-
-        function addCustomComplaint() {
-            const customComplaintInput = document.getElementById('customComplaint');
-            const complaintText = customComplaintInput.value.trim();
-        
-            if (complaintText === '') return;
-        
-            fetch('/add-complaint', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ complaint: complaintText }),
-            })
+        })
+        .catch(error => {
+            console.error('Error adding complaint:', error);
+        });
+    }
+    
+    function searchComplaints() {
+        const searchInput = document.getElementById('searchInput').value.toLowerCase();
+        const buttons = document.querySelectorAll('.most-common button');
+    
+        buttons.forEach(button => {
+            const complaint = button.innerText.toLowerCase();
+            if (complaint.includes(searchInput)) {
+                button.style.display = 'inline-block';
+            } else {
+                button.style.display = 'none';
+            }
+        });
+    }
+    
+    function fetchComplaints(patientComplaintList = []) {
+        fetch('/fetch-complaints')
             .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const selectedButtonsDiv = document.querySelector('.selected-buttons');
-                    const mostCommonButtonsDiv = document.getElementById('mostCommonButtons');
-        
-                    const newButton = document.createElement('button');
-                    newButton.className = 'btn btn-secondary selected-button mb-2';
-                    newButton.innerText = complaintText;
-                    newButton.onclick = function () {
-                        selectedButtonsDiv.removeChild(newButton);
-                    };
-        
-                    selectedButtonsDiv.appendChild(newButton);
-        
-                    const mostCommonButton = document.createElement('button');
-                    mostCommonButton.className = 'btn btn-outline-secondary mb-2';
-                    mostCommonButton.innerText = complaintText;
-                    mostCommonButton.onclick = function () {
-                        addButton(mostCommonButton);
-                    };
-        
-                    mostCommonButtonsDiv.appendChild(mostCommonButton);
-        
-                    customComplaintInput.value = '';
-                } else {
-                    console.error('Error adding complaint:', data.error);
-                }
+            .then(complaintData => {
+                const container = document.getElementById('mostCommonButtons');
+                container.innerHTML = '';
+    
+                complaintData.forEach(complaintObj => {
+                    const complaint = complaintObj.complaint;
+                    const button = document.createElement('button');
+                    button.className = 'btn btn-outline-secondary mb-2';
+                    button.textContent = complaint;
+                    button.onclick = function () { addButton(button); };
+    
+                    if (patientComplaintList.includes(complaint)) {
+                        button.classList.add('btn-secondary', 'selected-button');
+                        button.style.color = 'white';
+                    }
+    
+                    container.appendChild(button);
+                });
             })
             .catch(error => {
-                console.error('Error adding complaint:', error);
+                console.error('Error fetching complaints:', error);
             });
-        }
-
-        function searchComplaints() {
-            const searchInput = document.getElementById('searchInput').value.toLowerCase();
-            const buttons = document.querySelectorAll('.most-common button');
-
-            buttons.forEach(button => {
-                const complaint = button.innerText.toLowerCase();
-                if (complaint.includes(searchInput)) {
-                    button.style.display = 'inline-block';
-                } else {
-                    button.style.display = 'none';
-                }
-            });
-        }
-        function fetchComplaints() {
-            fetch('/fetch-complaints')
-                .then(response => response.json())
-                .then(complaintData => {
-                    const container = document.getElementById('mostCommonButtons');
-                    container.innerHTML = ''; 
-        
-                    complaintData.forEach(complaint => {
-                        const button = document.createElement('button');
-                        button.className = 'btn btn-outline-secondary mb-2';
-                        button.textContent = complaint.complaint;
-                        button.onclick = function () { addButton(button); };
-                        container.appendChild(button);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching complaints:', error);
-                });
-        }
-        
-       document.addEventListener('DOMContentLoaded', fetchComplaints);
-    </script>
+    }
+</script>
+       
 </body>
 
 </html>

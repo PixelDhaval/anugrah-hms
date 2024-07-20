@@ -362,6 +362,9 @@
                                 <input type="text" class="form-control" id="editAppointmentId" readonly>
                             </div>
                             <div class="mb-3">
+                                <input type="hidden" class="form-control" id="editPatientId">
+                            </div>
+                            <div class="mb-3">
                                 <label for="editPatientName" class="form-label">Patient Name</label>
                                 <input type="text" class="form-control" id="editPatientName" required>
                                 <div class="invalid-feedback">Please provide a patient name.</div>
@@ -389,8 +392,8 @@
                             <div class="mb-3">
                                 <label for="editStatus" class="form-label">Status</label>
                                 <select class="form-control" id="editStatus" required>
-                                    <option value="Scheduled">Schedule</option>
-                                    <option value="Re-scheduled">Reschedule</option>
+                                    <option value="Scheduled">Scheduled</option>
+                                    <option value="Re-schedule">Re-schedule</option>
                                     <option value="Completed">Completed</option>
                                     <option value="Cancelled">Cancel</option>
                                 </select>
@@ -440,21 +443,20 @@
     <script src="../../js/hospital/index.js"></script>
     <script src="../dist/assets/js/bootstrap.bundle.min.js"></script>
     <script src="../dist/assets/js/tabulator.min.js"></script>
-
     <script>
-       
-        document.addEventListener('DOMContentLoaded',()=>{
+        document.addEventListener('DOMContentLoaded', () => {
             getPatientRecords();
         });
+    
         document.getElementById('saveAppointmentChangesBtn').addEventListener('click', function () {
             var editAppointmentForm = document.getElementById('editAppointmentForm');
-            
+    
             if (editAppointmentForm.checkValidity() === false) {
                 editAppointmentForm.classList.add('was-validated');
             } else {
                 var updatedData = {
                     appointmentId: document.getElementById('editAppointmentId').value,
-                    patientId: document.getElementById('editAppointmentId').value,
+                    patientId: document.getElementById('editPatientId').value,
                     name: document.getElementById('editPatientName').value,
                     age: document.getElementById('editPatientAge').value,
                     address: document.getElementById('editPatientAddress').value,
@@ -462,9 +464,9 @@
                     lastVisit: document.getElementById('editLastVisit').value,
                     status: document.getElementById('editStatus').value
                 };
-              
+    
                 fetch('/update-appointment', {
-                    method: 'put',
+                    method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -476,9 +478,6 @@
                         var editAppointmentModal = bootstrap.Modal.getInstance(document.getElementById('editAppointmentModal'));
                         editAppointmentModal.hide();
                         getPatientRecords();
-                        
-                        document.querySelector('.selected-buttons').innerHTML = '';
-                       
                     } else {
                         console.error('Error updating appointment and patient details:', data.error);
                     }
@@ -488,9 +487,9 @@
                 });
             }
         });
+    
         document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
-            const appointmentId = this.dataset.rowId;  // This should be appointmentId
-            console.log(appointmentId);
+            const appointmentId = this.dataset.rowId;
             
             fetch(`/delete-appointment/${appointmentId}`, {
                 method: 'DELETE',
@@ -499,7 +498,7 @@
             .then(data => {
                 if (data.success) {
                     alert('Appointment deleted successfully.');
-                    getPatientRecords(); // Refresh the table
+                    getPatientRecords();
                 } else {
                     console.error('Error deleting appointment:', data.error);
                 }
@@ -507,103 +506,105 @@
             .catch(error => {
                 console.error('Error deleting appointment:', error);
             });
-        
-            // Hide the delete modal
+    
             var deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteRecordModal'));
             deleteModal.hide();
         });
-        
-        function getPatientRecords(){
+    
+        function getPatientRecords() {
             fetch('/get-patient-records')
-            .then(response => response.json())
-            .then(data => {
-                const table = new Tabulator("#appointments-table", {
-                    data: data,
-                    layout: "fitDataFill",
-                    columns: [
-                        { title: "ID", field: "id", headerFilter: "input", headerHozAlign: "center" },
-                        { title: "Name", field: "name", headerFilter: "input", headerHozAlign: "center" },
-                        { title: "Age", field: "age", headerFilter: "input", headerHozAlign: "center" },
-                        { title: "Address", field: "address", headerFilter: "input", headerHozAlign: "center" },
-                        { title: "Number", field: "number", headerFilter: "input", headerHozAlign: "center" },
-                        { title: "Last Visit", field: "last_visited", headerFilter: "input", headerHozAlign: "center" },
-                        {
-                            title: "Status", field: "status", headerFilter: "input", headerHozAlign: "center", formatter: function (cell, formatterParams, onRendered) {
-                                const value = cell.getValue();
-                                let badgeClass = "";
-                                switch (value) {
-                                    case "Schedule":
-                                        badgeClass = "badge-primary";
-                                        break;
-                                    case "Reschedule":
-                                        badgeClass = "badge-warning";
-                                        break;
-                                    case "Completed":
-                                        badgeClass = "badge-success";
-                                        break;
-                                    case "Cancel":
-                                        badgeClass = "badge-danger";
-                                        break;
-                                    default:
-                                        badgeClass = "badge-secondary";
+                .then(response => response.json())
+                .then(data => {
+                    const table = new Tabulator("#appointments-table", {
+                        data: data,
+                        layout: "fitDataFill",
+                        columns: [
+                            { title: "Appointment ID", field: "appointment_id", visible: false },
+                            { title: "Patient ID", field: "patient_id", headerFilter: "input", headerHozAlign: "center" },
+                            { title: "Name", field: "name", headerFilter: "input", headerHozAlign: "center" },
+                            { title: "Age", field: "age", headerFilter: "input", headerHozAlign: "center" },
+                            { title: "Address", field: "address", headerFilter: "input", headerHozAlign: "center" },
+                            { title: "Number", field: "number", headerFilter: "input", headerHozAlign: "center" },
+                            { title: "Last Visit", field: "last_visited", headerFilter: "input", headerHozAlign: "center" },
+                            {
+                                title: "Status", field: "status", headerFilter: "input", headerHozAlign: "center", formatter: function (cell, formatterParams, onRendered) {
+                                    const value = cell.getValue();
+                                    let badgeClass = "";
+                                    switch (value) {
+                                        case "Scheduled":
+                                            badgeClass = "badge-primary";
+                                            break;
+                                        case "Re-schedule":
+                                            badgeClass = "badge-warning";
+                                            break;
+                                        case "Completed":
+                                            badgeClass = "badge-success";
+                                            break;
+                                        case "Cancelled":
+                                            badgeClass = "badge-danger";
+                                            break;
+                                        default:
+                                            badgeClass = "badge-secondary";
+                                    }
+                                    return `<span class="badge ${badgeClass}">${value}</span>`;
                                 }
-                                return `<span class="badge ${badgeClass}">${value}</span>`;
-                            }
-                        },
-                        {
-                            title: "Actions", field: "actions", headerHozAlign: "center", formatter: function (cell, formatterParams, onRendered) {
-                                return `
-                            <button class="btn btn-sm btn-primary edit-btn"><i class="fa fa-pencil"></i> Edit</button>
-                            <button class="btn btn-sm btn-danger delete-btn"><i class="fa fa-trash"></i> Delete</button>`;
                             },
-                            cellClick: function (e, cell) {
-                                var data = cell.getRow().getData();
-                                if (e.target.classList.contains('edit-btn')) {
-                                    // Populate the modal fields
-                                    document.getElementById('editAppointmentId').value = data.id;
-                                    document.getElementById('editPatientName').value = data.name;
-                                    document.getElementById('editPatientAge').value = data.age;
-                                    document.getElementById('editPatientAddress').value = data.address;
-                                    document.getElementById('editPatientNumber').value = data.number;
-                                   
-                                   if (data.last_visited) {
-                                    const dateParts = data.last_visited.split('T')[0].split('-');
-                                    const formattedDate = `${dateParts[0]}-${dateParts[1]}-${dateParts[2]}`;
-                                    document.getElementById('editLastVisit').value = formattedDate;
-                                    } else {
-                                        document.getElementById('editLastVisit').value = '';
+                            {
+                                title: "Actions", field: "actions", headerHozAlign: "center", formatter: function (cell, formatterParams, onRendered) {
+                                    const data = cell.getRow().getData();
+                                    let buttons = `
+                                        <button class="btn btn-sm btn-primary edit-btn"><i class="fa fa-pencil"></i> Edit</button>
+                                        <button class="btn btn-sm btn-danger delete-btn"><i class="fa fa-trash"></i> Delete</button>`;
+                                    if (data.status !== "Cancelled" && data.status !== "Completed") {
+                                        buttons += `
+                                        <button class="btn btn-sm btn-success prescribe-btn"><i class="fa fa-file-medical"></i> Prescribe</button>`;
                                     }
-                                    
-                                    const statusSelect = document.getElementById('editStatus');
-                                    const options = Array.from(statusSelect.options).map(option => option.value);
-                                    
-                                    if (options.includes(data.status)) {
-                                        statusSelect.value = data.status;
-                                    } else {
-                                        console.error('Status value not found in options:', data.status);
+                                    return buttons;
+                                },
+                                cellClick: function (e, cell) {
+                                    var data = cell.getRow().getData();
+                                    if (e.target.classList.contains('edit-btn')) {
+                                        document.getElementById('editAppointmentId').value = data.appointment_id;
+                                        document.getElementById('editPatientId').value = data.patient_id;
+                                        document.getElementById('editPatientName').value = data.name;
+                                        document.getElementById('editPatientAge').value = data.age;
+                                        document.getElementById('editPatientAddress').value = data.address;
+                                        document.getElementById('editPatientNumber').value = data.number;
+                                        if (data.last_visited) {
+                                            const dateParts = data.last_visited.split('T')[0].split('-');
+                                            const formattedDate = `${dateParts[0]}-${dateParts[1]}-${dateParts[2]}`;
+                                            document.getElementById('editLastVisit').value = formattedDate;
+                                        } else {
+                                            document.getElementById('editLastVisit').value = '';
+                                        }
+                                        const statusSelect = document.getElementById('editStatus');
+                                        const options = Array.from(statusSelect.options).map(option => option.value);
+                                        if (options.includes(data.status)) {
+                                            statusSelect.value = data.status;
+                                        } else {
+                                            console.error('Status value not found in options:', data.status);
+                                        }
+                                        var editAppointmentModal = new bootstrap.Modal(document.getElementById('editAppointmentModal'));
+                                        editAppointmentModal.show();
+                                    } else if (e.target.classList.contains('delete-btn')) {
+                                        document.getElementById('confirmDeleteBtn').dataset.rowId = data.appointment_id;
+                                        var deleteModal = new bootstrap.Modal(document.getElementById('deleteRecordModal'));
+                                        deleteModal.show();
+                                    } else if (e.target.classList.contains('prescribe-btn')) {
+                                       const appointmentId=document.getElementById('editAppointmentId').value = data.appointment_id;
+                                       const patientId=document.getElementById('editPatientId').value = data.patient_id;
+                                       window.location.href=`/create-prescription?appointmentId=${appointmentId}&patientId=${patientId}`
                                     }
-                                    
-                                    // Show the modal
-                                    var editAppointmentModal = new bootstrap.Modal(document.getElementById('editAppointmentModal'));
-                                    editAppointmentModal.show();
-                                } else if (e.target.classList.contains('delete-btn')) {
-                                    // Store the row ID in the delete button's dataset
-                                    document.getElementById('confirmDeleteBtn').dataset.rowId = data.id;
-
-                                    // Show the delete modal
-                                    var deleteModal = new bootstrap.Modal(document.getElementById('deleteRecordModal'));
-                                    deleteModal.show();
                                 }
                             }
-                        }
-                    ]
+                        ]
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching appointment data:', error);
                 });
-            })
-            .catch(error => {
-                console.error('Error fetching appointment data:', error);
-            });
         }
     </script>
-</body>
+    </body>
 
 </html>

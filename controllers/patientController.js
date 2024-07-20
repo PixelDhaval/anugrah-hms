@@ -152,32 +152,34 @@ exports.addComplaint = async (req, res) => {
         console.error('Error adding complaint:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
-};
-
-exports.getPatientData = async (req, res) => {
-    const patientId = req.params.id;
+};exports.getPatientData = async (req, res) => {
+    const { patientId, appointmentId } = req.params;
 
     try {
         const client = await pool.connect();
-        const patientResult = await client.query('SELECT * FROM patients WHERE patient_id = $1', [patientId]);
-        const appointmentResult = await client.query('SELECT complaints FROM appointments WHERE patient_id = $1', [patientId]);
 
+        const patientResult = await client.query('SELECT * FROM patients WHERE patient_id = $1', [patientId]);
+        const appointmentResult = await client.query('SELECT complaints FROM appointments WHERE appointment_id = $1 AND patient_id = $2', [appointmentId, patientId]);
+        
         client.release();
+
+        const complaints = appointmentResult.rows.length > 0 ? appointmentResult.rows[0].complaints : '';
 
         res.json({
             patient: patientResult.rows[0],
-            appointments: appointmentResult.rows,
+            appointments: [complaints], 
         });
+    
     } catch (error) {
         console.error('Error fetching patient data:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
 exports.addAppointment = async (req, res) => {
     const { patient_id, doctor_id, complaints } = req.body;
 
     try {
-        // Fetch patient info to check last_visited
         const patient = await pool.query('SELECT last_visited FROM patients WHERE patient_id = $1', [patient_id]);
 
         if (!patient.rows.length) {
@@ -187,7 +189,6 @@ exports.addAppointment = async (req, res) => {
         const lastVisited = patient.rows[0].last_visited;
         const status = lastVisited ? 'Re-schedule' : 'Scheduled';
 
-        // Insert the appointment
         await pool.query(
             'INSERT INTO appointments (patient_id, doctor_id, complaints, status) VALUES ($1, $2, $3, $4)',
             [patient_id, doctor_id, complaints, status]

@@ -13,8 +13,8 @@ exports.getPatientRecords = async (req, res) => {
         const client = await pool.connect();
         const result = await client.query(`
             SELECT
-                a.appointment_id AS id,
-                p.patient_id AS id,
+                a.appointment_id,
+                p.patient_id,
                 p.name,
                 p.age,
                 p.address AS address,
@@ -34,8 +34,7 @@ exports.getPatientRecords = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
-
-exports.updatePatientRecord=async(req,res)=>{
+exports.updatePatientRecord = async (req, res) => {
     const {
         appointmentId,
         patientId,
@@ -59,7 +58,7 @@ exports.updatePatientRecord=async(req,res)=>{
     const updateAppointmentQuery = `
         UPDATE appointments
         SET status = $1
-        WHERE patient_id = $2
+        WHERE appointment_id = $2
     `;
     const appointmentValues = [status, appointmentId];
 
@@ -81,12 +80,11 @@ exports.updatePatientRecord=async(req,res)=>{
     }
 }
 
-exports.deleteAppointment=async (req,res)=>{
-    const patientId = req.params.id;
-
+exports.deleteAppointment = async (req, res) => {
+    const appointmentId = req.params.id;
+    console.log(appointmentId);
     try {
-       
-        await pool.query('DELETE FROM appointments WHERE patient_id = $1', [patientId]);
+        await pool.query('DELETE FROM appointments WHERE appointment_id = $1', [appointmentId]);
 
         res.json({ success: true });
     } catch (error) {
