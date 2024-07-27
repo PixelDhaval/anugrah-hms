@@ -550,7 +550,10 @@
                                 }
                             },
                             {
-                                title: "Actions", field: "actions", headerHozAlign: "center", formatter: function (cell, formatterParams, onRendered) {
+                                title: "Actions",
+                                field: "actions",
+                                headerHozAlign: "center",
+                                formatter: function (cell, formatterParams, onRendered) {
                                     const data = cell.getRow().getData();
                                     let buttons = `
                                         <button class="btn btn-sm btn-primary edit-btn"><i class="fa fa-pencil"></i> Edit</button>
@@ -558,18 +561,22 @@
                                     if (data.status !== "Cancelled" && data.status !== "Completed") {
                                         buttons += `
                                         <button class="btn btn-sm btn-success prescribe-btn"><i class="fa fa-file-medical"></i> Prescribe</button>`;
+                                    } else {
+                                        buttons += `
+                                        <button class="btn btn-sm btn-success prescribe-btn" disabled><i class="fa fa-file-medical"></i> Prescribe</button>`;
                                     }
                                     return buttons;
-                                },
-                                cellClick: function (e, cell) {
-                                    var data = cell.getRow().getData();
-                                    if (e.target.classList.contains('edit-btn')) {
-                                        document.getElementById('editAppointmentId').value = data.appointment_id;
-                                        document.getElementById('editPatientId').value = data.patient_id;
-                                        document.getElementById('editPatientName').value = data.name;
-                                        document.getElementById('editPatientAge').value = data.age;
-                                        document.getElementById('editPatientAddress').value = data.address;
-                                        document.getElementById('editPatientNumber').value = data.number;
+                            }
+                            ,
+                            cellClick: function (e, cell) {
+                                var data = cell.getRow().getData();
+                                if (e.target.classList.contains('edit-btn')) {
+                                    document.getElementById('editAppointmentId').value = data.appointment_id;
+                                    document.getElementById('editPatientId').value = data.patient_id;
+                                    document.getElementById('editPatientName').value = data.name;
+                                    document.getElementById('editPatientAge').value = data.age;
+                                    document.getElementById('editPatientAddress').value = data.address;
+                                    document.getElementById('editPatientNumber').value = data.number;
                                         if (data.last_visited) {
                                             const dateParts = data.last_visited.split('T')[0].split('-');
                                             const formattedDate = `${dateParts[0]}-${dateParts[1]}-${dateParts[2]}`;

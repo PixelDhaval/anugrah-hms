@@ -92,3 +92,65 @@ exports.deleteAppointment = async (req, res) => {
         res.json({ success: false, error: 'Error deleting appointment' });
     }
 }
+
+//fetch tests
+exports.fetchTests = async (req, res) => {
+    try {
+        const client = await pool.connect();
+        const result = await client.query('SELECT tests FROM Tests');
+        client.release();
+        
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error fetching tests:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+
+// Add Test
+exports.addTest = async (req, res) => {
+    const { test } = req.body;
+
+    try {
+        const client = await pool.connect();
+        await client.query('INSERT INTO Tests (tests) VALUES ($1)', [test]);
+        client.release();
+        
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error adding test:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+// Fetch Diagnosis
+exports.fetchDiagnosis = async (req, res) => {
+    try {
+        const client = await pool.connect();
+        const result = await client.query('SELECT diagnosis FROM Diagnosis');
+        client.release();
+        
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error fetching diagnosis:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+
+// Add Diagnosis
+exports.addDiagnosis = async (req, res) => {
+    const { diagnosis } = req.body;
+
+    try {
+        const client = await pool.connect();
+        await client.query('INSERT INTO Diagnosis (diagnosis) VALUES ($1)', [diagnosis]);
+        client.release();
+        
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error adding diagnosis:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};

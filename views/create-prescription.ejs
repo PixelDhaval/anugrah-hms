@@ -355,9 +355,8 @@
                                                 onclick="addCustomComplaint()">Add</button>
                                         </div>
                                     </div>
-
                                     <div class="form-group mt-3">
-                                        <h5>Most Common</h5>
+                                        <h5>Most Common Complaints</h5>
                                         <div class="input-group mt-3 mb-3">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text"><i class="icon-magnifier"></i></span>
@@ -370,6 +369,48 @@
 
                                         </div>
                                         <div class="invalid-feedback">Please provide patient's complaints.</div>
+
+
+                                       <!--Tests-->
+                                    <div class="input-group mt-3">
+                                        <input type="text" class="form-control" placeholder="Enter Test" id="customTest">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="addCustomTest()">Add</button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group mt-3">
+                                        <h5>Most Common Tests</h5>
+                                        <div class="input-group mt-3 mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="icon-magnifier"></i></span>
+                                            </div>
+                                            <input type="text" class="form-control" placeholder="Search tests" id="searchInputTests" onkeyup="searchTests()">
+                                        </div>
+                                        <div class="selected-buttons mb-3" id="selected-buttons-tests"></div>
+                                        <div class="most-common" id="mostCommonButtons-tests"></div>
+                                    </div>
+
+                                    <!-- Diagnosis -->
+                                    <div class="input-group mt-3">
+                                        <input type="text" class="form-control" placeholder="Enter Diagnosis" id="customDiagnosis">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="addCustomDiagnosis()">Add</button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group mt-3">
+                                        <h5>Most Common Diagnosis</h5>
+                                        <div class="input-group mt-3 mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="icon-magnifier"></i></span>
+                                            </div>
+                                            <input type="text" class="form-control" placeholder="Search Diagnosis" id="searchInputDiagnosis" onkeyup="searchDiagnosis()">
+                                        </div>
+                                        <div class="selected-buttons mb-3" id="selected-buttons-diagnosis"></div>
+                                        <div class="most-common" id="mostCommonButtons-diagnosis"></div>
+                                        <div class="invalid-feedback">Please provide Diagnosis.</div>
+                                    </div>
+
+
                                         <div class="d-flex justify-content-start mt-3 mb-3">
                                             <button type="submit" class="btn btn-primary" id="submitBtn">Generate
                                                 Prescription PDF</button>
@@ -395,146 +436,6 @@
     <script src="../dist/assets/bundles/mainscripts.bundle.js"></script>
     <script src="../../js/hospital/index.js"></script>
     <script src="../dist/assets/js/bootstrap.bundle.min.js"></script>
-<!-- 
-
-    <script>
-        document.addEventListener('DOMContentLoaded', (event) => {
-            function addButton(button) {
-                const selectedButtonsDiv = document.querySelector('.selected-buttons');
-                const buttonText = button.innerText;
-
-                const existingButton = Array.from(selectedButtonsDiv.children).find(child => child.innerText === buttonText);
-                if (existingButton) {
-                    selectedButtonsDiv.removeChild(existingButton);
-                    button.classList.remove('btn-secondary');
-                    button.classList.add('btn-outline-secondary');
-                } else {
-                    const newButton = document.createElement('button');
-                    newButton.className = 'btn btn-secondary selected-button m-1';
-                    newButton.innerText = buttonText;
-                    newButton.onclick = function () {
-                        selectedButtonsDiv.removeChild(newButton);
-                        const originalButton = Array.from(document.querySelectorAll('.most-common button')).find(btn => btn.innerText === buttonText);
-                        if (originalButton) {
-                            originalButton.classList.remove('btn-secondary');
-                            originalButton.classList.add('btn-outline-secondary');
-                        }
-                    };
-                    selectedButtonsDiv.appendChild(newButton);
-                    button.classList.remove('btn-outline-secondary');
-                    button.classList.add('btn-secondary');
-                }
-            }
-
-            function addButton(button) {
-                const selectedButtonsDiv = document.querySelector('.selected-buttons');
-                const buttonText = button.innerText;
-    
-                const existingButton = Array.from(selectedButtonsDiv.children).find(child => child.innerText === buttonText);
-                if (existingButton) {
-                    selectedButtonsDiv.removeChild(existingButton);
-                    button.classList.remove('btn-secondary');
-                    button.classList.add('btn-outline-secondary');
-                } else {
-                    const newButton = document.createElement('button');
-                    newButton.className = 'btn btn-secondary selected-button m-1';
-                    newButton.innerText = buttonText;
-                    newButton.onclick = function () {
-                        selectedButtonsDiv.removeChild(newButton);
-                        const originalButton = Array.from(document.querySelectorAll('.most-common button')).find(btn => btn.innerText === buttonText);
-                        if (originalButton) {
-                            originalButton.classList.remove('btn-secondary');
-                            originalButton.classList.add('btn-outline-secondary');
-                        }
-                    };
-                    selectedButtonsDiv.appendChild(newButton);
-                    button.classList.remove('btn-outline-secondary');
-                    button.classList.add('btn-secondary');
-                }
-            }
-    
-            function addCustomComplaint() {
-                const customComplaintInput = document.getElementById('customComplaint');
-                const complaintText = customComplaintInput.value.trim();
-    
-                if (complaintText === '') return;
-    
-                const selectedButtonsDiv = document.querySelector('.selected-buttons');
-    
-                const existingButton = Array.from(selectedButtonsDiv.children).find(child => child.innerText === complaintText);
-                if (existingButton) return;
-    
-                const newButton = document.createElement('button');
-                newButton.className = 'btn btn-secondary selected-button m-1';
-                newButton.innerText = complaintText;
-                newButton.onclick = function () {
-                    selectedButtonsDiv.removeChild(newButton);
-                };
-    
-                selectedButtonsDiv.appendChild(newButton);
-                customComplaintInput.value = '';
-            }
-    
-            function searchComplaints() {
-                const searchInput = document.getElementById('searchInput').value.toLowerCase();
-                const buttons = document.querySelectorAll('.most-common button');
-    
-                buttons.forEach(button => {
-                    const complaint = button.innerText.toLowerCase();
-                    if (complaint.includes(searchInput)) {
-                        button.style.display = 'inline-block';
-                    } else {
-                        button.style.display = 'none';
-                    }
-                });
-            }   
-            
-            document.getElementById('prescriptionForm').addEventListener('submit', function (event) {
-                event.preventDefault(); // Prevent form submission
-
-                // Gather form data
-                const patientName = document.getElementById('patientName').value;
-                const medication = document.getElementById('medication').value;
-                const dosage = document.getElementById('dosage').value;
-                const complaints=document.getElementById('mostCommonButtons').value;
-                // Example: Send data to backend API (you would implement this)
-               // sendDataToBackend(patientName, medication, dosage);
-            });
-
-            /*function sendDataToBackend(patientName, medication, dosage) {
-                // Example: Replace with actual API call to backend for PDF generation
-                console.log("Sending data to backend for PDF generation...");
-                // Replace this with actual code to generate PDF and handle the response
-                alert(`Data submitted: Patient Name - ${patientName}, Medication - ${medication}, Dosage - ${dosage}`);
-            }*/
-
-            const form = document.getElementById('prescriptionForm');
-            const submitBtn = document.getElementById('submitBtn');
-
-            form.addEventListener('submit', function (event) {
-                if (!form.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                form.classList.add('was-validated');
-            });
-
-            submitBtn.addEventListener('click', function (event) {
-                if (!form.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                } else {
-                    form.submit();
-                }
-                form.classList.add('was-validated');
-            });
-
-            window.addButton = addButton;
-            window.addCustomComplaint = addCustomComplaint;
-            window.searchComplaints = searchComplaints;
-        });
-
-    </script> -->
     <script>
         function getQueryParam(name) {
             const urlParams = new URLSearchParams(window.location.search);
@@ -543,6 +444,8 @@
     document.addEventListener('DOMContentLoaded', async () => {
         const patientId = getQueryParam('patientId');
         const appointmentId = getQueryParam('appointmentId');
+        fetchTests();
+        fetchDiagnosis();
     
         try {
             const response = await fetch(`/api/patient/${patientId}/appointment/${appointmentId}`);
@@ -692,6 +595,170 @@
             .catch(error => {
                 console.error('Error fetching complaints:', error);
             });
+    }
+
+
+    //Tests
+    function addCustomTest() {
+        const customTestInput = document.getElementById('customTest');
+        const testText = customTestInput.value.trim();
+    
+        if (testText === '') return;
+    
+        fetch('prescription/add-test', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ test: testText }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const selectedButtonsDiv = document.getElementById('selected-buttons-tests');
+                const mostCommonButtonsDiv = document.getElementById('mostCommonButtons-tests');
+    
+                const newButton = document.createElement('button');
+                newButton.className = 'btn btn-secondary selected-button mb-2';
+                newButton.innerText = testText;
+                newButton.onclick = function () {
+                    selectedButtonsDiv.removeChild(newButton);
+                };
+    
+                selectedButtonsDiv.appendChild(newButton);
+    
+                const mostCommonButton = document.createElement('button');
+                mostCommonButton.className = 'btn btn-outline-secondary mb-2';
+                mostCommonButton.innerText = testText;
+                mostCommonButton.onclick = function () {
+                    addButton(mostCommonButton);
+                };
+    
+                mostCommonButtonsDiv.appendChild(mostCommonButton);
+    
+                customTestInput.value = '';  
+            } else {
+                console.error('Error adding Test:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error adding Test:', error);
+        });
+    }
+    async function fetchTests() {
+        fetch('/prescription/fetch-tests')
+            .then(response => response.json())
+            .then(data => {
+                const mostCommonButtonsDiv = document.getElementById('mostCommonButtons-tests');
+                mostCommonButtonsDiv.innerHTML = ''; 
+    
+                data.forEach(testObj => {
+                    const test = testObj.tests;
+                    const button = document.createElement('button');
+                    button.className = 'btn btn-outline-secondary mb-2';
+                    button.innerText = test;
+                    button.onclick = function () {
+                        addButton(button, 'selected-buttons-tests', 'mostCommonButtons-tests');
+                    };
+    
+                    mostCommonButtonsDiv.appendChild(button);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching tests:', error);
+            });
+    } 
+    function searchTests() {
+        const searchInput = document.getElementById('searchInputTests').value.toLowerCase();
+        const buttons = document.querySelectorAll('#mostCommonButtons-tests button');
+        
+        buttons.forEach(button => {
+            const test = button.innerText.toLowerCase();
+            button.style.display = test.includes(searchInput) ? 'inline-block' : 'none';
+        });
+    }
+    
+     
+    function addCustomDiagnosis() {
+        const customDiagnosisInput = document.getElementById('customDiagnosis');
+        const diagnosisText = customDiagnosisInput.value.trim();
+    
+        if (diagnosisText === '') return;
+    
+        fetch('/prescription/add-diagnosis', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ diagnosis: diagnosisText }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const selectedButtonsDiv = document.querySelector('#selected-buttons-diagnosis');
+                const mostCommonButtonsDiv = document.getElementById('mostCommonButtons-diagnosis');
+    
+                // Add to selected buttons
+                const newButton = document.createElement('button');
+                newButton.className = 'btn btn-secondary selected-button mb-2';
+                newButton.innerText = diagnosisText;
+                newButton.onclick = function () {
+                    selectedButtonsDiv.removeChild(newButton);
+                };
+                selectedButtonsDiv.appendChild(newButton);
+    
+                // Add to most common buttons
+                const mostCommonButton = document.createElement('button');
+                mostCommonButton.className = 'btn btn-outline-secondary mb-2';
+                mostCommonButton.innerText = diagnosisText;
+                mostCommonButton.onclick = function () {
+                    addButton(mostCommonButton, 'selected-buttons-diagnosis', 'mostCommonButtons-diagnosis');
+                };
+                mostCommonButtonsDiv.appendChild(mostCommonButton);
+    
+                customDiagnosisInput.value = '';
+            } else {
+                console.error('Error adding diagnosis:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error adding diagnosis:', error);
+        });
+    }
+   
+    async function fetchDiagnosis() {
+        try {
+            const response = await fetch('/prescription/fetch-diagnosis');
+            if (!response.ok) throw new Error('Network response was not ok');
+            
+            const data = await response.json();
+            const mostCommonButtonsDiv = document.getElementById('mostCommonButtons-diagnosis');
+            mostCommonButtonsDiv.innerHTML = ''; // Clear previous buttons if any
+    
+            data.forEach(diagnosisObj => {
+                const diagnosis = diagnosisObj.diagnosis;
+                const button = document.createElement('button');
+                button.className = 'btn btn-outline-secondary mb-2';
+                button.innerText = diagnosis;
+                button.onclick = function () {
+                    addButton(button, 'selected-buttons-diagnosis', 'mostCommonButtons-diagnosis');
+                };
+    
+                mostCommonButtonsDiv.appendChild(button);
+            });
+        } catch (error) {
+            console.error('Error fetching diagnoses:', error);
+        }
+    }
+    
+    function searchDiagnosis() {
+        const searchInput = document.getElementById('searchInputDiagnosis').value.toLowerCase();
+        const buttons = document.querySelectorAll('#mostCommonButtons-diagnosis button');
+        
+        buttons.forEach(button => {
+            const diagnosis = button.innerText.toLowerCase();
+            button.style.display = diagnosis.includes(searchInput) ? 'inline-block' : 'none';
+        });
     }
 </script>
        
