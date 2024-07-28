@@ -10,12 +10,18 @@ router.post('/add-complaint', patientController.addComplaint);
 router.get('/get-patient-records',appointmentController.getPatientRecords);
 router.put('/update-appointment',appointmentController.updatePatientRecord);
 router.delete('/delete-appointment/:id',appointmentController.deleteAppointment);
+
 router.get('/prescription/fetch-tests', appointmentController.fetchTests);
 router.post('/prescription/add-test', appointmentController.addTest);
-
 router.get('/prescription/fetch-diagnosis', appointmentController.fetchDiagnosis);
-
 router.post('/prescription/add-diagnosis', appointmentController.addDiagnosis);
+router.post('/prescription/add-advice', appointmentController.addAdvice);
+router.get('/prescription/fetch-advice', appointmentController.fetchAdvice);
+
+// //router.post('/prescription/generate-pdf', appointmentController.addPrescription);
+// router.post('/prescription/generate-pdf', appointmentController.addPrescription);
+
+router.post('/prescription/generate-pdf', appointmentController.addPrescription);
 
 
 module.exports = router;

@@ -154,3 +154,72 @@ exports.addDiagnosis = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+
+
+// Fetch Advice
+exports.fetchAdvice = async (req, res) => {
+    try {
+        const client = await pool.connect();
+        console.log('Connected to the database.');
+        
+        const result = await client.query('SELECT advice FROM advice');
+        client.release();
+        console.log('Fetched advice from database:', result.rows);
+        
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error fetching advice:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+
+// Add Advice
+exports.addAdvice = async (req, res) => {
+    const { advice } = req.body;
+
+    try {
+        const client = await pool.connect();
+        await client.query('INSERT INTO advice (advice) VALUES ($1)', [advice]);
+        client.release();
+        
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error adding advice:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+
+exports.addPrescription = async (req, res) => {
+    const { patientId, appointmentId, patientName, medication, dosage, complaints, tests, diagnosis, advice } = req.body;
+
+    try {
+        // Fetch doctor_id from Appointments table based on patient_id and appointment_id
+        const doctorQuery = 'SELECT doctor_id FROM Appointments WHERE patient_id = $1 AND appointment_id = $2';
+        const doctorResult = await pool.query(doctorQuery, [patientId, appointmentId]);
+        if (doctorResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Doctor not found for the given appointment' });
+        }
+        const doctorId = doctorResult.rows[0].doctor_id;
+
+        // Insert data into Prescriptions table
+        const insertPrescriptionQuery = `
+            INSERT INTO Prescriptions (patient_id, doctor_id, prescription_date, diagnosis, advice, medical_test, medicines, instructions)
+            VALUES ($1, $2, NOW(), $3, $4, $5, $6, $7) RETURNING prescription_id;
+        `;
+        const prescriptionValues = [patientId, doctorId, diagnosis.join(', '), advice.join(', '), tests.join(', '), medication, dosage];
+        const prescriptionResult = await pool.query(insertPrescriptionQuery, prescriptionValues);
+        const prescriptionId = prescriptionResult.rows[0].prescription_id;
+
+        // Update complaints in Appointments table
+        const updateAppointmentQuery = 'UPDATE Appointments SET complaints = $1 WHERE patient_id = $2 AND appointment_id = $3';
+        await pool.query(updateAppointmentQuery, [complaints.join(', '), patientId, appointmentId]);
+
+        res.json({ prescriptionId, message: 'Prescription generated successfully' });
+    } catch (error) {
+        console.error('Error generating prescription:', error);
+        res.status(500).json({ error: 'Error generating prescription' });
+    }
+};
