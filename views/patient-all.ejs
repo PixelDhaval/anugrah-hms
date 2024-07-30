@@ -630,6 +630,7 @@
             fetch('/fetch-patients')
                 .then(response => response.json())
                 .then(patientData => {
+                   
                     table = new Tabulator("#patient-table", {
                         data: patientData,
                         layout: "fitData",
@@ -641,20 +642,28 @@
                             { title: "Number", field: "phone", headerFilter: "input", headerHozAlign: "center" },
                             { title: "Last Visit", field: "last_visited", headerFilter: "input", headerHozAlign: "center" },
                             { title: "Doctor Assigned", field: "doctor_assigned", headerFilter: "input", headerHozAlign: "center" },
-                            { title: "Doctor ID", field: "doctor_id", visible: false },  // Hidden field for doctor_id
+                            { title: "Doctor ID", field: "doctor_id", visible: false },  
                             {
                                 title: "Actions",
                                 field: "actions",
                                 headerHozAlign: "center",
                                 formatter: function (cell, formatterParams, onRendered) {
                                     const data = cell.getRow().getData();
-                                    return `
+                                    let buttons = `
                                         <button class="btn btn-sm btn-primary edit-btn"><i class="fa fa-pencil"></i> Edit</button>
                                         <button class="btn btn-sm btn-primary new-appointment-btn" data-patientid="${data.patient_id}" data-doctorid="${data.doctor_id}"><i class="fa fa-calendar-plus"></i> New Appointment</button>
                                     `;
+
+                                    if (data.appointment_status === "completed") {
+                                        buttons += `
+                                        <button class="btn btn-sm btn-info billing-btn"><i class="fa fa-dollar-sign"></i> Billing</button>`;
+                                    }
+
+                                    return buttons;
                                 },
                                 cellClick: function (e, cell) {
                                     const actionButton = e.target.closest('button');
+                                    
                                     if (actionButton) {
                                         const data = cell.getRow().getData();
                                         if (actionButton.classList.contains('new-appointment-btn')) {
@@ -686,6 +695,8 @@
         
                                             const editModal = new bootstrap.Modal(document.getElementById('editPatientModal'));
                                             editModal.show();
+                                        }else if (actionButton.classList.contains('billing-btn')) {
+                                            window.location.href=`/` //link of billing page
                                         }
                                     }
                                 }

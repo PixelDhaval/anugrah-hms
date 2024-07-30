@@ -214,9 +214,14 @@ exports.addPrescription = async (req, res) => {
         const prescriptionId = prescriptionResult.rows[0].prescription_id;
 
         // Update complaints in Appointments table
-        const updateAppointmentQuery = 'UPDATE Appointments SET complaints = $1 WHERE patient_id = $2 AND appointment_id = $3';
-        await pool.query(updateAppointmentQuery, [complaints.join(', '), patientId, appointmentId]);
+        const updateAppointmentQuery = 'UPDATE Appointments SET complaints = $1, status = $2 WHERE patient_id = $3 AND appointment_id = $4';
+        await pool.query(updateAppointmentQuery, [complaints.join(', '), 'Completed', patientId, appointmentId]);
 
+        //update appointment_status and last visit in patient table and 
+        
+         const updatePatientQuery = 'UPDATE Patients SET last_visited = NOW(),appointment_status=$1 WHERE patient_id = $2';
+         await pool.query(updatePatientQuery, ['completed',patientId]);
+ 
         res.json({ prescriptionId, message: 'Prescription generated successfully' });
     } catch (error) {
         console.error('Error generating prescription:', error);

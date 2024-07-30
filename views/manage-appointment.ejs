@@ -558,6 +558,12 @@
                                     let buttons = `
                                         <button class="btn btn-sm btn-primary edit-btn"><i class="fa fa-pencil"></i> Edit</button>
                                         <button class="btn btn-sm btn-danger delete-btn"><i class="fa fa-trash"></i> Delete</button>`;
+                            
+                                    if (data.status === "Completed") {
+                                        buttons += `
+                                        <button class="btn btn-sm btn-info billing-btn"><i class="fa fa-dollar-sign"></i> Billing</button>`;
+                                    }
+                            
                                     if (data.status !== "Cancelled" && data.status !== "Completed") {
                                         buttons += `
                                         <button class="btn btn-sm btn-success prescribe-btn"><i class="fa fa-file-medical"></i> Prescribe</button>`;
@@ -565,7 +571,7 @@
                                         buttons += `
                                         <button class="btn btn-sm btn-success prescribe-btn" disabled><i class="fa fa-file-medical"></i> Prescribe</button>`;
                                     }
-                                    return buttons;
+                                    return buttons;   
                             }
                             ,
                             cellClick: function (e, cell) {
@@ -601,7 +607,9 @@
                                        const appointmentId=document.getElementById('editAppointmentId').value = data.appointment_id;
                                        const patientId=document.getElementById('editPatientId').value = data.patient_id;
                                        window.location.href=`/create-prescription?appointmentId=${appointmentId}&patientId=${patientId}`
-                                    }
+                                    }else if (e.target.classList.contains('billing-btn')) {
+                                         window.location.href=`/` //link of billing page
+                                     }
                                 }
                             }
                         ]

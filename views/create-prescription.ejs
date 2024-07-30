@@ -426,7 +426,7 @@
 
 
                                         <div class="d-flex justify-content-start mt-3 mb-3">
-                                            <button type="submit" class="btn btn-primary" id="submitBtn" onclick="generatePrescription()">Generate
+                                            <button type="submit" class="btn btn-primary" id="submitBtn" >Generate
                                                 Prescription PDF</button>
                                         </div>
                                     </div>
@@ -868,48 +868,65 @@
         }
 
         
-        async function generatePrescription(){
-            
+        document.getElementById('prescriptionForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent default form submission
+        
+            // Gather data from the form
             const patientName = document.getElementById('patientName').value;
             const medication = document.getElementById('medication').value;
             const dosage = document.getElementById('dosage').value;
         
-            const selectedComplaints = Array.from(document.getElementById('selected-buttons-complaint').children).map(btn => btn.textContent);
-            const selectedTests = Array.from(document.getElementById('selected-buttons-tests').children).map(btn => btn.textContent);
-            const selectedDiagnosis = Array.from(document.getElementById('selected-buttons-diagnosis').children).map(btn => btn.textContent);
-            const selectedAdvice = Array.from(document.getElementById('selected-buttons-advice').children).map(btn => btn.textContent);
+            // Fetch existing complaints (if not already stored during the initial data fetch)
+            const existingComplaints = Array.from(document.querySelectorAll('#mostCommonButtons-complaint .btn-secondary'))
+                .map(button => button.textContent);
         
+            // Gather newly selected complaints, tests, diagnosis, and advice
+            const newSelectedComplaints = Array.from(document.querySelectorAll('#selected-buttons-complaint .selected-button'))
+                .map(button => button.innerText);
+            const selectedTests = Array.from(document.querySelectorAll('#selected-buttons-tests .selected-button'))
+                .map(button => button.innerText);
+            const selectedDiagnosis = Array.from(document.querySelectorAll('#selected-buttons-diagnosis .selected-button'))
+                .map(button => button.innerText);
+            const selectedAdvice = Array.from(document.querySelectorAll('#selected-buttons-advice .selected-button'))
+                .map(button => button.innerText);
+        
+            // Combine existing and new complaints, ensuring no duplicates
+            const combinedComplaints = [...new Set([...existingComplaints, ...newSelectedComplaints])];
+        
+            // Prepare data to send to backend
             const prescriptionData = {
                 patientId,
                 appointmentId,
                 patientName,
                 medication,
                 dosage,
-                complaints: selectedComplaints,
+                complaints: combinedComplaints,
                 tests: selectedTests,
                 diagnosis: selectedDiagnosis,
                 advice: selectedAdvice
             };
         
             try {
-                const response = await fetch('/prescription/generate-pdf', {
+                // Send data to backend endpoint for processing and generating PDF
+                const response = await fetch(`/prescription/generate-pdf?patient_id=${patientId}&appointment_id=${appointmentId}`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(prescriptionData)
                 });
         
                 if (response.ok) {
                     const result = await response.json();
-                    console.log('Prescription generated successfully:', result);
+                    console.log('Prescription generated:', result);
+                    window.location.href='/manage-appointment';
                 } else {
                     console.error('Error generating prescription:', response.statusText);
                 }
             } catch (error) {
-                console.error('Error generating prescription:', error);
+                console.error('Error:', error);
             }
-        }
+        });
          
         </script>
 </body>
