@@ -32,7 +32,6 @@ const addItem = async (req, res, table) => {
 
 const removeItem = async (req, res, table) => {
     const { itemId } = req.params;
-    console.log('Received delete request for item ID:', itemId, 'from table:', table);
 
     try {
         if (!itemId) {
@@ -149,9 +148,7 @@ const deleteService = async (req, res) => {
 // Indoor Services Management
 const getIndoorServices = async (req, res) => {
     try {
-        const client = await pool.connect();
-        const result = await client.query('SELECT * FROM indoor_services ORDER BY indoor_service_name');
-        client.release();
+        const result = await pool.query('SELECT * FROM indoor_services ORDER BY indoor_service_name');
         res.render('indoor-services', { services: result.rows });
     } catch (error) {
         console.error('Error fetching indoor services:', error);
@@ -162,20 +159,18 @@ const getIndoorServices = async (req, res) => {
 const createIndoorService = async (req, res) => {
     try {
         const { indoor_service_name, rate } = req.body;
-        const client = await pool.connect();
 
 
         // Get the next ID to generate the code
-        const nextIdResult = await client.query('SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM indoor_services');
+        const nextIdResult = await pool.query('SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM indoor_services');
         const nextId = nextIdResult.rows[0].next_id;
         const code = `IMS${nextId.toString().padStart(3, '0')}`;
 
-        const result = await client.query(
+        const result = await pool.query(
             'INSERT INTO indoor_services (code, indoor_service_name, rate) VALUES ($1, $2, $3) RETURNING *',
             [code, indoor_service_name, rate]
         );
 
-        client.release();
         res.json(result.rows[0]);
     } catch (error) {
         console.error('Error creating indoor service:', error);
@@ -187,15 +182,13 @@ const updateIndoorService = async (req, res) => {
     try {
         const { id } = req.params;
         const { indoor_service_name, rate } = req.body;
-        const client = await pool.connect();
 
 
-        const result = await client.query(
+        const result = await pool.query(
             'UPDATE indoor_services SET indoor_service_name = $1, rate = $2 WHERE id = $3 RETURNING *',
             [indoor_service_name, rate, id]
         );
 
-        client.release();
         res.json(result.rows[0]);
     } catch (error) {
         console.error('Error updating indoor service:', error);
@@ -206,9 +199,7 @@ const updateIndoorService = async (req, res) => {
 const deleteIndoorService = async (req, res) => {
     try {
         const { id } = req.params;
-        const client = await pool.connect();
-        await client.query('DELETE FROM indoor_services WHERE id = $1', [id]);
-        client.release();
+        await pool.query('DELETE FROM indoor_services WHERE id = $1', [id]);
         res.json({ success: true });
 
     } catch (error) {

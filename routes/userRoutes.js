@@ -24,11 +24,11 @@ router.get('/user-authentication', userController.checkAuth, (req, res) => {
     res.render('user-authentication');  
 });
 
-router.post('/create-user', userController.createUser);
-router.get('/showUsers', userController.showUsers);
-router.delete('/delete-user/:id', userController.deleteUser);
-router.put('/updateUser', userController.updateUser);
-router.put('/changePassword', userController.changePassword);
+router.post('/create-user', userController.checkAuth, userController.createUser);
+router.get('/showUsers', userController.checkAuth, userController.showUsers);
+router.delete('/delete-user/:id', userController.checkAuth, userController.deleteUser);
+router.put('/updateUser', userController.checkAuth, userController.updateUser);
+router.put('/changePassword', userController.checkAuth, userController.changePassword);
 
 router.get("/get-user-name", userController.getUserName)
 router.get("/logout", userController.logout)

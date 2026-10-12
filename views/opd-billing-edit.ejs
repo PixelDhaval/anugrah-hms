@@ -122,7 +122,7 @@
                                 <h2>OPD Billing</h2>
                                 <ul class="breadcrumb">
                                     <li class="breadcrumb-item">
-                                        <a href="index.html"
+                                        <a href="/index"
                                             ><i class="fa fa-dashboard"></i
                                         ></a>
                                     </li>
@@ -179,13 +179,13 @@
                                                 <label
                                                     for="opdNo"
                                                     class="form-label"
-                                                    >OPD No.</label
+                                                    >Bill No.</label
                                                 >
                                                 <input
                                                     type="text"
                                                     class="form-control"
                                                     id="opdNo"
-                                                    value="<%= bill_id %>"
+                                                    value="<%= bill_no %>"
                                                     readonly
                                                 />
                                             </div>
@@ -505,7 +505,6 @@
                 qty: 1,
                 rate: e.new_patient,
             }));
-            console.log(serviceData);
             table.setData(serviceData);
         });
 
@@ -619,12 +618,10 @@ var serviceData = []
             //Calculate total, discount, and net amount
             function calculateAmounts() {
                 const selectedRows = table.getSelectedData();
-                console.log(selectedRows);
                 const total = selectedRows.reduce(
                     (sum, row) => sum + parseInt(row.rate),
                     0
                 );
-                console.log(total);
                 const discountPercent =
                     parseFloat(
                         document.getElementById("discountPercent").value

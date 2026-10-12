@@ -34,7 +34,7 @@
                                 <h2>Create Prescription</h2>
                                 <ul class="breadcrumb">
                                     <li class="breadcrumb-item">
-                                        <a href="index.html"><i class="fa fa-dashboard"></i></a>
+                                        <a href="/index"><i class="fa fa-dashboard"></i></a>
                                     </li>
                                     <li class="breadcrumb-item">
                                         Create Prescription
@@ -615,7 +615,6 @@
 
         function importMedicines(instructions) {
             const medicines = cleanAndParseJSON(instructions);
-            console.log(medicines);
 
             // Clear existing medicine fields if any
             $("#medicine-container").empty();
@@ -832,7 +831,6 @@
         $("#prescriptionForm").submit(function (event) {
             event.preventDefault();
             const groupedData = groupFormData();
-            console.log(groupedData);
         });
 
         // Function to group form data by medicine
@@ -956,7 +954,6 @@
                     `/api/patient/${patientId}/appointment/${appointmentId}`
                 );
                 const data = await response.json();
-                console.log(data);
                 document.getElementById("patientName").value =
                     data.patient.name;
 
@@ -995,7 +992,6 @@
                         ? complaints.split(",").map((c) => c.trim())
                         : [];
                     const prescription = data.prescription;
-                    console.log(prescription);
                     const testList = prescription.medical_test;
                     const adviceList = prescription.advice;
                     const diagnosisList = prescription.diagnosis
@@ -1005,11 +1001,9 @@
                         : [];
                     
                     processOldPrescription(data.oldPrescription);
-                    console.log("Patient Complaints:", patientComplaints);
                     document.getElementById("medical-history").value =
                         data.patient.medical_history;
                     prescriptionId = prescription.prescription_id;
-                    console.log(data.prescription);
                     medList = data.medList;
 
                     document.getElementById("electro_cg_1").value = prescription.electro_cg_1
@@ -1020,8 +1014,6 @@
                     fetchTests(testList);
                     fetchDiagnosis(diagnosisList);
                     fetchAdvice(adviceList);
-                } else {
-                    console.log("No appointments found for this patient.");
                 }
             } catch (err) {
                 console.error("Error fetching patient data:", err);
@@ -1572,7 +1564,6 @@
         }
 
         function printDiv(divId, arr) {
-            console.log(arr)
             var vitals = "";
             if (arr.bp != "" || arr.pulse != "" || arr.spo2 !== "" || arr.temp != "" || arr.sugar != "" || arr.habits != "") {
                 vitals += `<div class="info-row" > <b>Vitals:</b> &nbsp &nbsp<span>`

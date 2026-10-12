@@ -4,8 +4,8 @@ const appointmentController = require('../controllers/appointmentController');
 const patientController = require('../controllers/patientController');
 const userController = require('../controllers/userController');
 
-router.get('/billing', appointmentController.getBillingPage)
-router.get('/billing/:id', appointmentController.getBillingPage)
+router.get('/billing', userController.checkAuth, appointmentController.getBillingPage)
+router.get('/billing/:id', userController.checkAuth, appointmentController.getBillingPage)
 router.get('/create-prescription',userController.checkAuth,  appointmentController.createPrescription);
 router.get('/manage-appointment',userController.checkAuth,  appointmentController.manageAppointment);
 router.get('/api/patient/:patientId/appointment/:appointmentId',userController.checkAuth,  patientController.getPatientData); 
@@ -14,7 +14,7 @@ router.get('/get-patient-records',userController.checkAuth, appointmentControlle
 router.get('/get-all-patient-records',userController.checkAuth, appointmentController.getAllPatientRecords);
 router.put('/update-appointment',userController.checkAuth, appointmentController.updatePatientRecord);
 router.delete('/delete-appointment/:id',userController.checkAuth, appointmentController.deleteAppointment);
-router.get("/all-appointment", (req, res) => {
+router.get("/all-appointment", userController.checkAuth, (req, res) => {
     res.render("all-appointments")
 })
 router.post('/get-prev-prescription', appointmentController.getPrevPrescription)
@@ -24,7 +24,7 @@ router.get('/prescription/fetch-diagnosis',userController.checkAuth,  appointmen
 router.post('/prescription/add-diagnosis',userController.checkAuth,  appointmentController.addDiagnosis);
 router.post('/prescription/add-advice',userController.checkAuth,  appointmentController.addAdvice);
 router.get('/prescription/fetch-advice',userController.checkAuth,  appointmentController.fetchAdvice);
-router.get('/get-opd-master', appointmentController.getOPDMaster)
+router.get('/get-opd-master', userController.checkAuth, appointmentController.getOPDMaster)
 router.get("/edit-prescription", (req, res)=>{
     res.render("view-prescription")
 })
@@ -33,28 +33,28 @@ router.get("/edit-prescription", (req, res)=>{
 
 router.post('/prescription/generate-pdf',userController.checkAuth,  appointmentController.addPrescription);
 router.post('/prescription/update-pdf',userController.checkAuth,  appointmentController.updatePrescription);
-router.post('/generate-bill', appointmentController.generateBill)
-router.post('/edit-bill', appointmentController.editBill)
-router.get('/report-opd', (req, res) => {
+router.post('/generate-bill', userController.checkAuth, appointmentController.generateBill)
+router.post('/edit-bill', userController.checkAuth, appointmentController.editBill)
+router.get('/report-opd', userController.checkAuth, (req, res) => {
     res.render('report-opd');
 })
 
-router.post("/get-opd-entries", appointmentController.getOpdEntries)
-router.get("/opd-billing-list", (req, res) => {
+router.post("/get-opd-entries", userController.checkAuth, appointmentController.getOpdEntries)
+router.get("/opd-billing-list", userController.checkAuth, (req, res) => {
     res.render("opd-billing-list")
 })
-router.get("/get-opd-bill-list", appointmentController.getOpdBillList)
-router.get("/opd-billing" , appointmentController.fetchOpdBilling)
-router.get("/get-opd-particular/:id", appointmentController.getOpdParticular)
-router.post("/change-payment-status", appointmentController.changePaymentStatus)
+router.get("/get-opd-bill-list", userController.checkAuth, appointmentController.getOpdBillList)
+router.get("/opd-billing", userController.checkAuth, appointmentController.fetchOpdBilling)
+router.get("/get-opd-particular/:id", userController.checkAuth, appointmentController.getOpdParticular)
+router.post("/change-payment-status", userController.checkAuth, appointmentController.changePaymentStatus)
 router.post("/add-medicine", appointmentController.addMedicine)
-router.get("/report-cash-coll", (req, res) => {
+router.get("/report-cash-coll", userController.checkAuth, (req, res) => {
     res.render("report-cash-coll")
 })
 
-router.post("/get-cash-collection", appointmentController.getCashReport)
+router.post("/get-cash-collection", userController.checkAuth, appointmentController.getCashReport)
 router.post("/cancel-appointment", appointmentController.cancelAppointment)
-router.get("/fetch-bill-by-id", appointmentController.getBillData)
+router.get("/fetch-bill-by-id", userController.checkAuth, appointmentController.getBillData)
 
 // Add new route for updating appointment status
 router.post('/update-appointment-status', userController.checkAuth, appointmentController.updateAppointmentStatus);

@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const { paginate } = require('../utils/tableQuery');
 
 exports.createPrescription = (req, res) => {
     res.render('create-prescription');
@@ -8,52 +9,69 @@ exports.manageAppointment = (req, res) => {
     res.render('manage-appointment');
 };
 
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+const APPOINTMENT_STATUSES = ['Scheduled', 'Re-schedule', 'Completed', 'Cancelled', 'transferred_to_ipd'];
+// Age is free text ("47", "31 years, 1 months..."), so sort and filter on its leading number
+const PATIENT_AGE = String.raw`substring(p.age from '^\s*(\d+)')::int`;
+
+// Paging, sorting and filtering for both appointment tables (Tabulator remote mode).
+// todayOnly limits rows to today's appointments (Manage Appointments page).
+const appointmentTable = ({ todayOnly }) => ({
+    select: `a.appointment_id, p.patient_id, p.name, p.age,
+             p.address AS address, p.phone AS number,
+             TO_CHAR(p.last_visited, 'YYYY-MM-DD') AS last_visited,
+             TO_CHAR(a.appointment_date, 'YYYY-MM-DD') AS appointment_date,
+             a.status, d.name AS doctor_name`,
+    from: `appointments a
+           JOIN patients p ON a.patient_id = p.patient_id
+           JOIN doctors d ON a.doctor_id = d.doctor_id
+           JOIN users u ON d.user_id = u.user_id`,
+    columns: {
+        doctor_name: { sql: 'd.name' },
+        patient_id: { sql: 'p.patient_id' },
+        name: { sql: 'p.name' },
+        age: {
+            sql: PATIENT_AGE,
+            // "40" for an exact age, "30-40" for a range
+            filter: (value, add) => {
+                const range = value.match(/^(\d+)\s*-\s*(\d+)$/);
+                if (range) return `${PATIENT_AGE} BETWEEN ${add(Number(range[1]))} AND ${add(Number(range[2]))}`;
+                if (/^\d+$/.test(value)) return `${PATIENT_AGE} = ${add(Number(value))}`;
+                return null;
+            },
+        },
+        address: { sql: 'p.address' },
+        number: { sql: 'p.phone' },
+        last_visited: { sql: 'p.last_visited', filter: false },
+        appointment_date: { sql: 'a.appointment_date', filter: false },
+        status: { sql: 'a.status', filter: 'exact' },
+    },
+    search: ['p.patient_id', 'p.name', 'p.phone', 'p.address', 'd.name'],
+    extraFilters: (query, add) => {
+        const conditions = [];
+        if (todayOnly) {
+            conditions.push(`a.appointment_date = ${add(getTodayDate())}`);
+        } else {
+            if (DATE_PATTERN.test(query.dateFrom)) conditions.push(`a.appointment_date >= ${add(query.dateFrom)}`);
+            if (DATE_PATTERN.test(query.dateTo)) conditions.push(`a.appointment_date <= ${add(query.dateTo)}`);
+        }
+        if (APPOINTMENT_STATUSES.includes(query.status)) conditions.push(`a.status = ${add(query.status)}`);
+        return conditions;
+    },
+    defaultSort: todayOnly
+        // Patients still waiting first, then the most recent visit
+        ? `CASE a.status WHEN 'Scheduled' THEN 1 WHEN 'Re-schedule' THEN 2 WHEN 'Completed' THEN 3 ELSE 4 END,
+           p.last_visited DESC NULLS LAST, p.last_visited_time DESC NULLS LAST`
+        : 'a.appointment_id DESC',
+    tieBreaker: 'a.appointment_id DESC',
+});
+
+const todaysAppointments = appointmentTable({ todayOnly: true });
+const allAppointments = appointmentTable({ todayOnly: false });
+
 exports.getPatientRecords = async (req, res) => {
     try {
-        function getTodayDate() {
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = String(today.getMonth() + 1).padStart(2, '0');
-            const day = String(today.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }
-
-        const date = getTodayDate();
-        const client = await pool.connect();
-
-        const result = await client.query(`
-            SELECT
-                a.appointment_id,
-                p.patient_id,
-                p.name,
-                p.age,
-                p.address AS address,
-                p.phone AS number,
-                TO_CHAR(p.last_visited, 'YYYY-MM-DD') AS last_visited,
-                a.status,
-                d.name AS doctor_name
-            FROM
-                appointments a
-            JOIN
-                patients p ON a.patient_id = p.patient_id
-            JOIN 
-                doctors d ON a.doctor_id = d.doctor_id
-            JOIN
-                users u ON d.user_id = u.user_id
-            WHERE
-                a.appointment_date = $1
-            ORDER BY
-                CASE 
-                    WHEN a.status = 'Scheduled' THEN 1
-                    WHEN a.status = 'Re-schedule' THEN 2
-                    WHEN a.status = 'Completed' THEN 3
-                    ELSE 4
-                END,
-                p.last_visited DESC, p.last_visited_time DESC;
-        `, [date]);
-        
-        client.release();
-        res.json(result.rows);
+        res.json(await paginate(pool, req.query, todaysAppointments));
     } catch (error) {
         console.error('Error fetching appointment data:', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -62,56 +80,12 @@ exports.getPatientRecords = async (req, res) => {
 
 exports.getAllPatientRecords = async (req, res) => {
     try {
-        function getTodayDate() {
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = String(today.getMonth() + 1).padStart(2, '0');
-            const day = String(today.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }
-
-        const date = getTodayDate();
-        const client = await pool.connect();
-        try {
-            if (!req.session.username) {
-                throw new Error("Username not found in session.");
-            }
-
-            const result = await client.query(`
-                SELECT
-                    a.appointment_id,
-                    p.patient_id,
-                    p.name,
-                    p.age,
-                    p.address AS address,
-                    p.phone AS number,
-                    TO_CHAR(p.last_visited, 'YYYY-MM-DD') AS last_visited,
-                    a.status,
-                    d.name AS doctor_name
-                FROM
-                    appointments a 
-                JOIN
-                    patients p ON a.patient_id = p.patient_id
-                JOIN 
-                    doctors d ON a.doctor_id = d.doctor_id
-                JOIN
-                    users u ON d.user_id = u.user_id
-                ORDER BY
-                    a.appointment_id DESC;
-            `, []);
-
-            console.log(result.rows)
-
-            res.json(result.rows);
-        } finally {
-            client.release();
-        }
+        res.json(await paginate(pool, req.query, allAppointments));
     } catch (error) {
-        console.error('Error fetching appointment data:', error.message);
+        console.error('Error fetching appointment data:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
-
 
 exports.updatePatientRecord = async (req, res) => {
     const { appointmentId, patientId, name, age, address, number, lastVisit, status } = req.body;
@@ -150,12 +124,10 @@ exports.updatePatientRecord = async (req, res) => {
 
 exports.deleteAppointment = async (req, res) => {
     const appointmentId = req.params.id;
-    console.log(appointmentId);
 
     const client = await pool.connect();
     try {
         const patient_id = await client.query('DELETE FROM appointments WHERE appointment_id = $1 RETURNING patient_id', [appointmentId]);
-        console.log(patient_id.rows[0].patient_id);
 
         await client.query('UPDATE patients SET appointment_status = $1 WHERE patient_id = $2', ["completed", patient_id.rows[0].patient_id]);
         res.json({ success: true });
@@ -226,9 +198,7 @@ exports.addDiagnosis = async (req, res) => {
 exports.fetchAdvice = async (req, res) => {
     const client = await pool.connect();
     try {
-        console.log('Connected to the database.');
         const result = await client.query('SELECT advice FROM advice');
-        console.log('Fetched advice from database:', result.rows);
         res.json(result.rows);
     } catch (error) {
         console.error('Error fetching advice:', error);
@@ -324,20 +294,17 @@ exports.updatePrescription = async (req, res) => {
 
 exports.getBillingPage = async (req, res) => {
     const patient_id = req.params.id;
-    console.log(patient_id);
     const client = await pool.connect();
     try {
         const result = await client.query("SELECT * FROM patients WHERE patient_id = $1", [patient_id]);
         const opd = await client.query("SELECT * FROM opd_services");
-        console.log(result.rows[0]);
-        console.log(opd.rows);
         if (result.rows.length > 0) {
             res.render('opd-billing', { data: result.rows[0], opd: opd.rows });
         } else {
             res.status(404).send('Patient not found');
         }
     } catch (error) {
-        console.log(error);
+        console.error('Error loading billing page:', error);
         res.status(500).send('Server error');
     } finally {
         client.release();
@@ -348,10 +315,9 @@ exports.getOPDMaster = async (req, res) => {
     const client = await pool.connect();
     try {
         const result = await client.query("SELECT * FROM opd_services");
-        console.log(result.rows);
         res.json({ data: result.rows });
     } catch (error) {
-        console.log(error);
+        console.error('Error fetching OPD services:', error);
         res.status(500).json({ error: 'Internal server error' });
     } finally {
         client.release();
@@ -360,7 +326,6 @@ exports.getOPDMaster = async (req, res) => {
 
 exports.generateBill = async (req, res) => {
     const { patientId, particulars, discountAmount, discountPercent, paymentMethod, type, total } = req.body;
-    console.log(particulars);
     let paymentDate = null;
     let paymentStatus = "pending";
 
@@ -371,13 +336,14 @@ exports.generateBill = async (req, res) => {
 
     const client = await pool.connect();
     try {
-        const billId = await client.query("INSERT INTO bills (patient_id, date, type, particulars, discountAmt, discountPer, payment_status, payment_method, payment_date, total) VALUES ($1, NOW(), $2, $3, $4, $5, $6, $7, $8, $9) RETURNING bill_id", [patientId, type, JSON.stringify(particulars), discountAmount, discountPercent, paymentStatus, paymentMethod, paymentDate, total]);
+        const billId = await client.query("INSERT INTO bills (patient_id, date, type, particulars, discountAmt, discountPer, payment_status, payment_method, payment_date, total) VALUES ($1, NOW(), $2, $3, $4, $5, $6, $7, $8, $9) RETURNING bill_id, bill_no", [patientId, type, JSON.stringify(particulars), discountAmount, discountPercent, paymentStatus, paymentMethod, paymentDate, total]);
         await client.query("UPDATE patients SET appointment_status = $1 WHERE patient_id = $2", ["completed", patientId]);
         await client.query("UPDATE prescriptions SET bill_id = $1 WHERE patient_id = $2 AND prescription_date = $3", [billId.rows[0].bill_id, patientId, getTodayDate()]);
-        res.json({ success: true });
+        // bill_no is assigned by the bills_assign_bill_no trigger (e.g. 25-26/OPD/00042)
+        res.json({ success: true, billId: billId.rows[0].bill_id, billNo: billId.rows[0].bill_no });
     } catch (error) {
         res.json({ success: false, err: error });
-        console.log(error);
+        console.error('Error generating bill:', error);
     } finally {
         client.release();
     }
@@ -385,7 +351,6 @@ exports.generateBill = async (req, res) => {
 
 exports.editBill = async (req, res) => {
     const { patientId, particulars, discountAmount, discountPercent, paymentMethod, type, billId, total } = req.body;
-    console.log(particulars);
     let paymentDate = null;
     let paymentStatus = "pending";
 
@@ -416,109 +381,127 @@ exports.editBill = async (req, res) => {
         res.json({ success: true });
     } catch (error) {
         res.json({ success: false, err: error });
-        console.log(error);
+        console.error('Error editing bill:', error);
     } finally {
         client.release();
     }
 };
 
+const MONTH_PATTERN = /^\d{4}-\d{2}$/;
+
+// Monthly OPD report: every OPD bill dated in the given month (YYYY-MM)
 exports.getOpdEntries = async (req, res) => {
-    const month = req.body.month;
-    console.log(month);
-    const client = await pool.connect();
+    const { month } = req.body;
+    if (!MONTH_PATTERN.test(month)) {
+        return res.status(400).json({ success: false, error: 'Month must be YYYY-MM' });
+    }
     try {
-        const result = await client.query(
-            `SELECT 
-                patients.patient_id AS patient_id, 
-                patients.name AS name, 
-                patients.doctor_assigned AS doctor, 
-                to_char(bills.date, 'YYYY-MM-DD') AS date, 
-                bills.total AS total,
-                bills.payment_status AS status
-            FROM 
-                bills 
-            JOIN 
-                patients 
-            ON 
-                bills.patient_id = patients.patient_id 
-            WHERE 
-                to_char(bills.date, 'YYYY-MM') = $1`,
-            [month] // Ensure month is in 'YYYY-MM' format
+        // Date range instead of to_char(date) so an index on bills.date can be used
+        const result = await pool.query(
+            `SELECT
+                b.bill_id,
+                b.bill_no,
+                p.patient_id,
+                p.name,
+                p.doctor_assigned AS doctor,
+                TO_CHAR(b.date, 'YYYY-MM-DD') AS date,
+                b.total,
+                b.recieved,
+                b.payment_status AS status
+            FROM bills b
+            JOIN patients p ON b.patient_id = p.patient_id
+            WHERE b.type = 'opd'
+              AND b.date >= ($1 || '-01')::date
+              AND b.date < ($1 || '-01')::date + interval '1 month'
+            ORDER BY b.date, b.bill_id`,
+            [month]
         );
-
         res.json({ success: true, data: result.rows });
     } catch (err) {
-        res.json({ success: false, err: err });
-        console.log(err);
-    } finally {
-        client.release();
+        console.error('Error fetching OPD report:', err);
+        res.status(500).json({ success: false, error: 'Error fetching OPD report' });
     }
 };
 
+// Daily cash collection: every OPD bill dated on the given day (YYYY-MM-DD).
+// "recieved" is what was actually collected; "total" is the billed amount.
 exports.getCashReport = async (req, res) => {
-    const date = req.body.date;
-    console.log(date);
-    const client = await pool.connect();
+    const { date } = req.body;
+    if (!DATE_PATTERN.test(date)) {
+        return res.status(400).json({ success: false, error: 'Date must be YYYY-MM-DD' });
+    }
     try {
-        const result = await client.query(
-            `SELECT 
-                patients.patient_id AS patient_id, 
-                patients.name AS name, 
-                patients.doctor_assigned AS doctor, 
-                to_char(bills.date, 'YYYY-MM-DD') AS date, 
-                bills.total AS total,
-                bills.payment_status AS status,
-                bills.payment_method AS mode
-            FROM 
-                bills 
-            JOIN 
-                patients 
-            ON 
-                bills.patient_id = patients.patient_id 
-            WHERE 
-                bills.date = $1`,
-            [date] // Ensure month is in 'YYYY-MM' format
+        const result = await pool.query(
+            `SELECT
+                b.bill_id,
+                b.bill_no,
+                p.patient_id,
+                p.name,
+                p.doctor_assigned AS doctor,
+                TO_CHAR(b.date, 'YYYY-MM-DD') AS date,
+                b.total,
+                b.recieved,
+                b.payment_status AS status,
+                UPPER(b.payment_method) AS mode
+            FROM bills b
+            JOIN patients p ON b.patient_id = p.patient_id
+            WHERE b.type = 'opd' AND b.date = $1
+            ORDER BY b.bill_id`,
+            [date]
         );
-
         res.json({ success: true, data: result.rows });
     } catch (err) {
-        res.json({ success: false, err: err });
-        console.log(err);
-    } finally {
-        client.release();
+        console.error('Error fetching cash collection report:', err);
+        res.status(500).json({ success: false, error: 'Error fetching cash collection report' });
     }
+};
+
+const PAYMENT_STATUSES = ['pending', 'partially paid', 'completed'];
+
+// Paging, sorting and filtering for the OPD billing list (Tabulator remote mode).
+// Leaves out b.particulars: the list only needs totals, not the line items.
+const opdBillTable = {
+    select: `b.bill_id, b.bill_no, TO_CHAR(b.date, 'YYYY-MM-DD') AS date, b.patient_id, p.name, p.phone,
+             b.total, b.recieved, b.payment_status, b.payment_method`,
+    from: 'bills b JOIN patients p ON b.patient_id = p.patient_id',
+    columns: {
+        bill_no: { sql: 'b.bill_no' },
+        date: { sql: 'b.date', filter: false },
+        patient_id: { sql: 'b.patient_id' },
+        name: { sql: 'p.name' },
+        total: { sql: 'b.total', filter: false },
+        payment_status: { sql: 'b.payment_status', filter: false },
+    },
+    search: ['b.bill_no', 'b.patient_id', 'p.name', 'p.phone'],
+    extraFilters: (query, add) => {
+        const conditions = [`b.type = ${add('opd')}`];
+        if (DATE_PATTERN.test(query.dateFrom)) conditions.push(`b.date >= ${add(query.dateFrom)}`);
+        if (DATE_PATTERN.test(query.dateTo)) conditions.push(`b.date <= ${add(query.dateTo)}`);
+        if (PAYMENT_STATUSES.includes(query.status)) conditions.push(`b.payment_status = ${add(query.status)}`);
+        return conditions;
+    },
+    defaultSort: 'b.bill_id DESC',
+    tieBreaker: 'b.bill_id DESC',
 };
 
 exports.getOpdBillList = async (req, res) => {
-    const client = await pool.connect();
     try {
-        const result = await client.query("SELECT b.*, to_char(b.date, 'YYYY-MM-DD') as date, p.name FROM bills b JOIN patients p ON b.patient_id = p.patient_id WHERE b.type = $1 ORDER BY b.bill_id DESC", ["opd"]);
-        console.log(result.rows)
-        res.json({
-            success: true,
-            data: result.rows
-        });
+        res.json(await paginate(pool, req.query, opdBillTable));
     } catch (error) {
-        console.log(error);
-        res.json({ success: false });
-    } finally {
-        client.release();
+        console.error('Error fetching OPD bills:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 };
 
 exports.fetchOpdBilling = async (req, res) => {
     const billid = req.query.id;
-    console.log("bill ID: ", billid)
     const client = await pool.connect();
     try {
-        console.log(1)
         const result = await client.query("SELECT * FROM bills b JOIN patients p ON b.patient_id = p.patient_id WHERE b.bill_id = $1", [billid]);
         const data = result.rows[0];
-        console.log("2")
         res.render("opd-billing-edit", data);
-        console.log("3")
     } catch (error) {
-        console.log(error);
+        console.error('Error loading OPD bill:', error);
         res.status(500).send('Server error');
     } finally {
         client.release();
@@ -532,7 +515,7 @@ exports.getOpdParticular = async (req, res) => {
         const result = await client.query("SELECT * FROM bills WHERE bill_id = $1", [billid]);
         res.json({ data: result.rows[0].particulars });
     } catch (error) {
-        console.log(error);
+        console.error('Error fetching OPD bill particulars:', error);
         res.status(500).send('Server error');
     } finally {
         client.release();
@@ -554,7 +537,7 @@ exports.changePaymentStatus = async (req, res) => {
         await client.query("UPDATE bills SET payment_status = $1, payment_method = $2, payment_date = $3, recieved = $5 WHERE bill_id = $4", [paymentStatus, paymentMethod, paymentDate, bill_id, total]);
         res.json({ success: true });
     } catch (error) {
-        console.log(error);
+        console.error('Error changing payment status:', error);
         res.json({ success: false });
     } finally {
         client.release();
@@ -562,14 +545,13 @@ exports.changePaymentStatus = async (req, res) => {
 };
 
 exports.addMedicine = async (req, res) => {
-    console.log(req.body)
     const { name, nos, dose_qty, doses, timing } = req.body;
     const client = await pool.connect();
     try {
         const result = await client.query("INSERT INTO medicine (name, qty, dose_qty, doses, timing) VALUES ($1, $2, $3, $4, $5) RETURNING id", [name, nos, dose_qty, doses, timing]);
         res.json({ success: true, id: result.rows[0].id });
     } catch (err) {
-        console.log(err);
+        console.error('Error adding medicine:', err);
         res.json({ success: false });
     } finally {
         client.release();
@@ -586,9 +568,7 @@ function getTodayDate() {
 exports.cancelAppointment = async (req, res) => {
     const patient_id = req.body.patient_id;
     const client = await pool.connect();
-    
-    console.log("Patient ID:", patient_id); // Debug: Log patient_id
-    
+
     try {
         // Start a transaction
         await client.query('BEGIN');
@@ -598,19 +578,16 @@ exports.cancelAppointment = async (req, res) => {
             "DELETE FROM appointments WHERE patient_id = $1 AND (status = 'Re-schedule' OR status = 'Scheduled')",
             [patient_id]
         );
-        console.log("Delete Result:", deleteResult.rowCount); // Debug: Log affected rows
         
         // Update patients
         const updateResult = await client.query(
             "UPDATE patients SET appointment_status = 'completed' WHERE patient_id = $1",
             [patient_id]
         );
-        console.log("Update Result:", updateResult.rowCount); // Debug: Log affected rows
         
         // Commit the transaction
         await client.query('COMMIT');
         
-        console.log("Transaction Completed");
         res.status(200).send("Appointment cancelled successfully.");
     } catch (err) {
         await client.query('ROLLBACK');
@@ -623,20 +600,21 @@ exports.cancelAppointment = async (req, res) => {
 
 exports.getPrevPrescription = async (req, res) => {
     const patient_id = req.body.patientId;
-    console.log(req.body)
     const client = await pool.connect();
     try{
         const result = await client.query("SELECT * FROM prescriptions WHERE patient_id = $1 ORDER BY prescription_date DESC LIMIT 1", [patient_id])
+        // A first-time patient has no previous prescription: that's not an error
+        const previous = result.rows[0] || null;
         res.json({
             success: true,
-            prescription: result.rows[0].instructions,
-            data: result.rows[0]
+            prescription: previous ? previous.instructions : null,
+            data: previous
         })
     } catch (err){
-        console.log(err)
-        res.json({
+        console.error('Error fetching previous prescription:', err);
+        res.status(500).json({
             success: false,
-            err: err
+            error: 'Error fetching previous prescription'
         })
     } finally{
         client.release();
@@ -742,49 +720,39 @@ exports.deleteBill = async (req, res) => {
     }
 };
 
+// OPD transactions between two dates, both inclusive
 exports.getTransactionReport = async (req, res) => {
     const { fromDate, toDate } = req.body;
-    const client = await pool.connect();
-    
+    if (!DATE_PATTERN.test(fromDate) || !DATE_PATTERN.test(toDate)) {
+        return res.status(400).json({ success: false, error: 'Dates must be YYYY-MM-DD' });
+    }
     try {
-        const result = await client.query(
-            `SELECT 
+        // bills.date is a DATE, so "<= toDate" already includes the whole last day
+        const result = await pool.query(
+            `SELECT
                 b.bill_id,
-                b.patient_id, 
-                p.name, 
-                to_char(b.date, 'YYYY-MM-DD') AS date,
-                b.total, 
+                b.bill_no,
+                b.patient_id,
+                p.name,
+                TO_CHAR(b.date, 'YYYY-MM-DD') AS date,
+                b.total,
                 b.payment_status,
-                b.payment_method,
-                b.discountAmt,
+                UPPER(b.payment_method) AS payment_method,
+                b.discountamt AS "discountAmt",
                 b.recieved,
                 b.type
-            FROM 
-                bills b 
-            JOIN 
-                patients p 
-            ON 
-                b.patient_id = p.patient_id 
-            WHERE 
-                b.date >= $1 AND b.date <= $2::date + interval '1 day'
-                AND (b.payment_status = 'completed' OR b.payment_status = 'partially paid')
-            ORDER BY
-                b.date DESC`,
+            FROM bills b
+            JOIN patients p ON b.patient_id = p.patient_id
+            WHERE b.type = 'opd'
+              AND b.date >= $1 AND b.date <= $2
+              AND b.payment_status IN ('completed', 'partially paid')
+            ORDER BY b.date DESC, b.bill_id DESC`,
             [fromDate, toDate]
         );
-
-        res.json({ 
-            success: true, 
-            data: result.rows
-        });
+        res.json({ success: true, data: result.rows });
     } catch (err) {
         console.error('Error fetching transaction report:', err);
-        res.json({ 
-            success: false, 
-            error: err.message 
-        });
-    } finally {
-        client.release();
+        res.status(500).json({ success: false, error: 'Error fetching transaction report' });
     }
 };
 
@@ -796,50 +764,40 @@ exports.getIpdTransactionReportPage = (req, res) => {
     res.render('report-ipd-transactions');
 };
 
+// IPD payments (credits) between two dates, both inclusive
 exports.getIpdTransactionReport = async (req, res) => {
     const { fromDate, toDate } = req.body;
-    const client = await pool.connect();
-    
+    if (!DATE_PATTERN.test(fromDate) || !DATE_PATTERN.test(toDate)) {
+        return res.status(400).json({ success: false, error: 'Dates must be YYYY-MM-DD' });
+    }
     try {
-        const result = await client.query(
-            `SELECT 
+        // transaction_date is a TIMESTAMP: "< toDate + 1 day" covers the whole last day and nothing after it
+        const result = await pool.query(
+            `SELECT
                 t.id,
                 t.ipd_appointment_id,
-                a.id as appointment_id,
-                a.patient_id, 
-                p.name as patient_name, 
-                to_char(t.transaction_date, 'YYYY-MM-DD') AS date,
-                t.amount, 
-                t.payment_method,
+                a.id AS appointment_id,
+                a.bill_no,
+                a.patient_id,
+                p.name AS patient_name,
+                TO_CHAR(t.transaction_date, 'YYYY-MM-DD') AS date,
+                t.amount,
+                UPPER(t.payment_method) AS payment_method,
                 t.transaction_type,
-                d.name as doctor_name
-            FROM 
-                ipd_appointment_transactions t
-            JOIN 
-                ipd_appointments a ON t.ipd_appointment_id = a.id
-            JOIN 
-                patients p ON a.patient_id = p.patient_id
-            LEFT JOIN
-                doctors d ON a.doctor_id = d.doctor_id
-            WHERE 
-                t.transaction_date >= $1 AND t.transaction_date <= $2::date + interval '1 day'
-                AND t.transaction_type = 'credit'
-            ORDER BY
-                t.transaction_date DESC`,
+                d.name AS doctor_name
+            FROM ipd_appointment_transactions t
+            JOIN ipd_appointments a ON t.ipd_appointment_id = a.id
+            JOIN patients p ON a.patient_id = p.patient_id
+            LEFT JOIN doctors d ON a.doctor_id = d.doctor_id
+            WHERE t.transaction_date >= $1
+              AND t.transaction_date < $2::date + interval '1 day'
+              AND t.transaction_type = 'credit'
+            ORDER BY t.transaction_date DESC, t.id DESC`,
             [fromDate, toDate]
         );
-
-        res.json({ 
-            success: true, 
-            data: result.rows
-        });
+        res.json({ success: true, data: result.rows });
     } catch (err) {
         console.error('Error fetching IPD transaction report:', err);
-        res.json({ 
-            success: false, 
-            error: err.message 
-        });
-    } finally {
-        client.release();
+        res.status(500).json({ success: false, error: 'Error fetching IPD transaction report' });
     }
 };

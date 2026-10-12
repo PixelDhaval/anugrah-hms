@@ -54,7 +54,7 @@
                                 <h2>OPD Billing</h2>
                                 <ul class="breadcrumb">
                                     <li class="breadcrumb-item">
-                                        <a href="index.html"
+                                        <a href="/index"
                                             ><i class="fa fa-dashboard"></i
                                         ></a>
                                     </li>
@@ -366,7 +366,6 @@ document.addEventListener("DOMContentLoaded", () => {
                             e.rate = e.new_patient
                             return e;
                         });
-                        console.log(serviceData);
                         table.setData(serviceData);
                     });
             });
@@ -464,12 +463,10 @@ document.addEventListener("DOMContentLoaded", () => {
             //Calculate total, discount, and net amount
             function calculateAmounts() {
                 const selectedRows = table.getSelectedData();
-                console.log(selectedRows);
                 const total = selectedRows.reduce(
                     (sum, row) => sum + parseInt(row.rate),
                     0
                 );
-                console.log(total);
                 const discountPercent =
                     parseFloat(
                         document.getElementById("discountPercent").value
@@ -560,8 +557,9 @@ document.addEventListener("DOMContentLoaded", () => {
                         .then((response) => response.json())
                         .then((data) => {
                             if (data.success == false) {
-                                alert("Error: ", data.err);
+                                alert("Error generating bill. Please try again.");
                             } else {
+                                alert(`Bill ${data.billNo} generated.`);
                                 window.location.href = "../manage-appointment"
                             }
                         });

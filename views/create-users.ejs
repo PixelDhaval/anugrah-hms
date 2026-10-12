@@ -31,7 +31,7 @@
                         <div class="col-lg-6 col-md-6 col-sm-12">
                             <h2>Create New User</h2>
                             <ul class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="index.html"><i class="fa fa-dashboard"></i></a>
+                                <li class="breadcrumb-item"><a href="/index"><i class="fa fa-dashboard"></i></a>
                                 </li>
                                 <li class="breadcrumb-item">Create User</li>
                                 <li class="breadcrumb-item active">Create New User</li>
@@ -343,7 +343,6 @@
                 return response.json();
             })
             .then(data => {
-                console.log('User created successfully:', data);
                 document.getElementById('createUserForm').reset();
                 alert('User created successfully!'); 
             })

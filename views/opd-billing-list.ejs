@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>AHMS :: All Patients</title>
+    <title>AHMS :: OPD Billing</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="Iconic Bootstrap 4.5.0 Admin Template" />
@@ -18,7 +18,6 @@
     <link rel="stylesheet" href="../dist/assets/css/main.css" />
     <link rel="stylesheet" href="../dist/assets/css/tabulator_bootstrap5.css" />
 
-    <link rel="stylesheet" href="../dist/assets/vendor/jquery-datatable/dataTables.bootstrap4.min.css" />
 
     <style>
         .tabulator {
@@ -39,29 +38,17 @@
                 <div class="block-header">
                     <div class="row">
                         <div class="col-lg-6 col-md-6 col-sm-12">
-                            <h2>Payments List</h2>
+                            <h2>OPD Billing</h2>
                             <ul class="breadcrumb">
                                 <li class="breadcrumb-item">
-                                    <a href="index.html"><i class="fa fa-dashboard"></i></a>
+                                    <a href="/index"><i class="fa fa-dashboard"></i></a>
                                 </li>
-                                <li class="breadcrumb-item">Payments</li>
-                                <li class="breadcrumb-item active">
-                                    Payments
-                                </li>
+                                <li class="breadcrumb-item">Billing</li>
+                                <li class="breadcrumb-item active">OPD Billing</li>
                             </ul>
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-12">
                             <div class="d-flex flex-row-reverse">
-                                <div class="page_action">
-                                    <button type="button" class="btn btn-primary">
-                                        <i class="fa fa-download"></i>
-                                        Download report
-                                    </button>
-                                    <button type="button" class="btn btn-secondary">
-                                        <i class="fa fa-send"></i> Send
-                                        report
-                                    </button>
-                                </div>
                                 <div class="p-2 d-flex"></div>
                             </div>
                         </div>
@@ -73,32 +60,6 @@
                         <div class="card">
                             <div class="header">
                                 <h2>Payments List</h2>
-                                <ul class="header-dropdown">
-                                    <li>
-                                        <a class="tab_btn" href="javascript:void(0);" title="Weekly">W</a>
-                                    </li>
-                                    <li>
-                                        <a class="tab_btn" href="javascript:void(0);" title="Monthly">M</a>
-                                    </li>
-                                    <li>
-                                        <a class="tab_btn active" href="javascript:void(0);" title="Yearly">Y</a>
-                                    </li>
-                                    <li class="dropdown">
-                                        <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown"
-                                            role="button" aria-haspopup="true" aria-expanded="false"></a>
-                                        <ul class="dropdown-menu dropdown-menu-right">
-                                            <li>
-                                                <a href="javascript:void(0);">Action</a>
-                                            </li>
-                                            <li>
-                                                <a href="javascript:void(0);">Another Action</a>
-                                            </li>
-                                            <li>
-                                                <a href="javascript:void(0);">Something else</a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                </ul>
                             </div>
                             <div class="modal fade" id="payment" tabindex="-1" aria-labelledby="exampleModalLabel"
                                 aria-hidden="true">
@@ -171,24 +132,36 @@
                             </div>
 
                             <div class="body">
-                                <div class="table-responsive">
-                                    <table
-                                        class="table table-hover js-basic-example dataTable table-custom table-striped"
-                                        id="bills">
-                                        <thead>
-                                            <tr>
-                                                <th>Bill No</th>
-                                                <th>Bill date</th>
-                                                <th>Patient ID</th>
-                                                <th>Patient Name</th>
-                                                <th>Total</th>
-                                                <th>Status</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody></tbody>
-                                    </table>
+                                <div class="row g-2 align-items-end mb-3" id="bill-filters">
+                                    <div class="col-md-4">
+                                        <label for="billSearch" class="form-label small mb-1">Search</label>
+                                        <input type="search" class="form-control form-control-sm" id="billSearch"
+                                            placeholder="Bill no (e.g. 25-26/OPD/00042), patient ID, name or phone" autocomplete="off">
+                                    </div>
+                                    <div class="col-6 col-md-2">
+                                        <label for="statusFilter" class="form-label small mb-1">Payment status</label>
+                                        <select class="form-control form-control-sm" id="statusFilter">
+                                            <option value="">All</option>
+                                            <option value="pending">Pending</option>
+                                            <option value="partially paid">Partially paid</option>
+                                            <option value="completed">Completed</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6 col-md-2">
+                                        <label for="dateFrom" class="form-label small mb-1">Bill date from</label>
+                                        <input type="date" class="form-control form-control-sm" id="dateFrom">
+                                    </div>
+                                    <div class="col-6 col-md-2">
+                                        <label for="dateTo" class="form-label small mb-1">Bill date to</label>
+                                        <input type="date" class="form-control form-control-sm" id="dateTo">
+                                    </div>
+                                    <div class="col-6 col-md-auto">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="clearBillFilters">
+                                            <i class="fa fa-times"></i> Clear filters
+                                        </button>
+                                    </div>
                                 </div>
+                                <div id="bills-table"></div>
                             </div>
                         </div>
                     </div>
@@ -205,9 +178,7 @@
     <script src="../dist/assets/bundles/mainscripts.bundle.js"></script>
     <script src="../../js/hospital/index.js"></script>
     <script src="../dist/assets/js/bootstrap.bundle.min.js"></script>
-    <script src="../dist/assets/bundles/datatablescripts.bundle.js"></script>
     <script src="../dist/assets/js/tabulator.min.js"></script>
-    <script src="../dist/assets/js/jquery-datatable.js"></script>
     <script>
         function getSelectedRadioValue(name) {
             const selectedRadio = document.querySelector(
@@ -216,9 +187,7 @@
             return selectedRadio ? selectedRadio.value : null;
         }
         function changePayment() {
-            console.log("clicked");
             var paymentMethod = getSelectedRadioValue("btnradio");
-            console.log(paymentMethod);
             fetch("change-payment-status", {
                 method: "POST",
                 headers: {
@@ -233,7 +202,8 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        window.location.href = "opd-billing-list"
+                        bootstrap.Modal.getInstance(document.getElementById("payment")).hide();
+                        table.replaceData();
                     }
                 })
                 .catch((error) => {
@@ -259,39 +229,84 @@
             window.location.href = "/opd-billing?id=" + billId;
         }
 
+        var table;
         $(document).ready(() => {
-            var table = $("#bills").DataTable();
-
-            fetch("get-opd-bill-list")
-                .then((response) => response.json())
-                .then((data) => {
-                    if (data.success) {
-                        console.log(data.data);
-                        var arr = data.data;
-                        arr.forEach((item, index) => {
-                            payment_status = item.payment_status == "partially paid" ? "partially paid(" + item.recieved + ")" : item.payment_status
-
-                            table.row.add([
-                                index + 1, // Assuming index should start from 1
-                                item.date.substring(0, 10),
-                                item.patient_id,
-                                item.name,
-                                item.total,
-                                payment_status,
-                                `<button class="btn btn-sm btn-primary" onclick="redirectTo('${item.bill_id}')">Edit</button>
-                                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" onclick="changeBillId('${item.bill_id}', ${item.total - item.recieved})" data-bs-target="#payment">
-  Pay
-</button>
-
-<button class="btn btn-primary" onclick="printBill(${item.bill_id})">Bill</button>
-<button class="btn btn-primary" onclick="printReceipt(${item.bill_id})">Receipt</button>
-<button class="btn btn-danger" onclick="deleteBill(${item.bill_id})">Delete</button>`,
-                            ]);
-                        });
-                        table.draw(false); // Draw the table after adding all rows
-                    }
-                });
+            initBillTable();
+            initBillFilters();
         });
+
+        // Paging, sorting and filtering all happen on the server (/get-opd-bill-list).
+        function initBillTable() {
+            table = new Tabulator("#bills-table", {
+                layout: "fitDataFill",
+                ajaxURL: "/get-opd-bill-list",
+                ajaxParams: function () {
+                    return {
+                        search: document.getElementById("billSearch").value.trim(),
+                        status: document.getElementById("statusFilter").value,
+                        dateFrom: document.getElementById("dateFrom").value,
+                        dateTo: document.getElementById("dateTo").value,
+                    };
+                },
+                pagination: true,
+                paginationMode: "remote",
+                paginationSize: 50,
+                paginationSizeSelector: [25, 50, 100],
+                paginationCounter: "rows",
+                sortMode: "remote",
+                filterMode: "remote",
+                headerFilterLiveFilterDelay: 400,
+                placeholder: "No bills found",
+                columns: [
+                    { title: "Bill No", field: "bill_no", headerFilter: "input", headerHozAlign: "center" },
+                    { title: "Bill Date", field: "date", headerHozAlign: "center" },
+                    { title: "Patient ID", field: "patient_id", headerFilter: "input", headerHozAlign: "center" },
+                    { title: "Patient Name", field: "name", headerFilter: "input", headerHozAlign: "center" },
+                    { title: "Total", field: "total", hozAlign: "right", headerHozAlign: "center" },
+                    {
+                        title: "Status", field: "payment_status", headerHozAlign: "center",
+                        formatter: function (cell) {
+                            const item = cell.getRow().getData();
+                            return item.payment_status == "partially paid"
+                                ? "partially paid(" + item.recieved + ")"
+                                : item.payment_status;
+                        },
+                    },
+                    {
+                        title: "Action", field: "actions", headerSort: false, headerHozAlign: "center",
+                        formatter: function (cell) {
+                            const item = cell.getRow().getData();
+                            return `<button class="btn btn-sm btn-primary" onclick="redirectTo('${item.bill_id}')">Edit</button>
+                                <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="modal" onclick="changeBillId('${item.bill_id}', ${item.total - item.recieved})" data-bs-target="#payment">Pay</button>
+                                <button class="btn btn-sm btn-primary" onclick="printBill(${item.bill_id})">Bill</button>
+                                <button class="btn btn-sm btn-primary" onclick="printReceipt(${item.bill_id})">Receipt</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteBill(${item.bill_id})">Delete</button>`;
+                        },
+                    },
+                ],
+            });
+        }
+
+        function initBillFilters() {
+            const reload = () => table.setData();
+
+            let searchTimer;
+            document.getElementById("billSearch").addEventListener("input", function () {
+                clearTimeout(searchTimer);
+                searchTimer = setTimeout(reload, 400);
+            });
+            ["statusFilter", "dateFrom", "dateTo"].forEach((id) =>
+                document.getElementById(id).addEventListener("change", reload)
+            );
+
+            document.getElementById("clearBillFilters").addEventListener("click", function () {
+                document.querySelectorAll("#bill-filters input, #bill-filters select")
+                    .forEach((input) => { input.value = ""; });
+                table.clearHeaderFilter();
+                table.clearSort();
+                reload();
+            });
+        }
 
         function printBill(bill_id) {
             fetch(`/fetch-bill-by-id?bill_id=${bill_id}`, {
@@ -316,7 +331,6 @@
 
                     // Function to convert number to words
                     const numberToWords = (num) => {
-                        console.log(num)
                         const a = [
                             '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine',
                             'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'
@@ -476,6 +490,7 @@
             <div class="bill-inner-container">
 
             <div class="bill-details">
+                <div><strong>Bill No:</strong> ${data.data.bill_no}</div>
                 <div><strong>Patient Name:</strong> ${patient_name} (${patient_id}) </div>
                 <div><strong>Billing Date:</strong> ${new Date(bill_date).toLocaleDateString('en-GB')}</div>
             </div>
@@ -666,6 +681,7 @@
             <div class="receipt-inner-container">
 
             <div class="receipt-details">
+                <div><strong>Bill No:</strong> ${data.data.bill_no}</div>
                 <div><strong>Patient Name:</strong> ${patient_name} (${patient_id}) </div>
                 <div><strong>Receipt Date:</strong> ${new Date(bill_date).toLocaleDateString('en-GB')}</div>
             </div>
@@ -741,8 +757,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Refresh the table
-                    window.location.reload();
+                    table.replaceData();
                 } else {
                     alert('Error deleting bill: ' + (data.error || 'Unknown error'));
                 }

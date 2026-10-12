@@ -57,7 +57,7 @@
                                 <h2>IPD Transaction Report</h2>
                                 <ul class="breadcrumb">
                                     <li class="breadcrumb-item">
-                                        <a href="index.html"
+                                        <a href="/index"
                                             ><i class="fa fa-dashboard"></i
                                         ></a>
                                     </li>
@@ -200,6 +200,13 @@
                 const table = new Tabulator("#transaction-table", {
                     layout: "fitColumns",
                     movableColumns: true,
+                    // The whole period is loaded (totals and downloads need every row);
+                    // pagination only limits how many rows are drawn at once.
+                    pagination: "local",
+                    paginationSize: 50,
+                    paginationSizeSelector: [25, 50, 100],
+                    paginationCounter: "rows",
+                    placeholder: "No transactions for this period",
                     downloadConfig: {
                         pdf: {
                             orientation: "portrait",
@@ -225,8 +232,8 @@
                             }
                         },
                         {
-                            title: "IPD Appointment ID",
-                            field: "ipd_appointment_id",
+                            title: "Bill No",
+                            field: "bill_no",
                             headerFilter: "input",
                             headerHozAlign: "center",
                         },

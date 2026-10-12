@@ -47,7 +47,7 @@
                                 <h2>All Patient</h2>
                                 <ul class="breadcrumb">
                                     <li class="breadcrumb-item">
-                                        <a href="index.html"
+                                        <a href="/index"
                                             ><i class="fa fa-dashboard"></i
                                         ></a>
                                     </li>
@@ -424,7 +424,6 @@ document.addEventListener("DOMContentLoaded", () => {
                             return response.json();
                         })
                         .then((data) => {
-                            console.log("Patient added successfully:", data);
 
                             window.location.href = `/patient-complaints?patientId=${patientId}&doctorId=${doctorId}`;
                         })
@@ -477,7 +476,6 @@ document.addEventListener("DOMContentLoaded", () => {
                             return response.json();
                         })
                         .then((data) => {
-                            console.log("Patient added successfully:", data);
 
                             window.location.href = `/all-patients`;
                         })

@@ -4,8 +4,17 @@ const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
 const session = require('express-session');
 const methodOverride = require('method-override');
+const util = require('util');
+const { DatabaseError } = require('pg');
 
 dotenv.config();
+
+// Print Postgres errors as one readable line instead of dumping every
+// internal field (length, severity, file: 'numutils.c', ...) to the terminal.
+DatabaseError.prototype[util.inspect.custom] = function () {
+  const extra = [this.detail, this.hint].filter(Boolean).join(' ');
+  return `DatabaseError [${this.code}]: ${this.message}${extra ? ` (${extra})` : ''}`;
+};
 
 const userRoutes = require('./routes/userRoutes');
 const doctorRoutes = require('./routes/doctorRoutes');
@@ -41,6 +50,12 @@ app.set('view engine', 'ejs');
 
 // Static files middleware
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Lets the shared navbar highlight the current page
+app.use((req, res, next) => {
+  res.locals.currentPath = req.path;
+  next();
+});
 
 // Route handlers
 app.use('/', userRoutes);

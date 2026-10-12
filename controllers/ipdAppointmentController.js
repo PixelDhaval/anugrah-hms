@@ -1,42 +1,45 @@
 const pool = require('../config/db');
+const { paginate } = require('../utils/tableQuery');
 
 exports.getIpdAppointments = async (req, res) => {
-    const client = await pool.connect();
-    const result = await client.query(`
-        SELECT 
-            ipd_appointments.*,
-            patients.name as patient_name,
-            beds.bed_no as bed_number,
-            doctors.name as doctor_name,
-            rooms.room_no as room_number,
-            room_types.room_type as room_type,
-            TO_CHAR(ipd_appointments.appointment_date, 'DD-MM-YYYY') as appointment_date
-        FROM ipd_appointments 
-        JOIN patients ON ipd_appointments.patient_id = patients.patient_id 
-        JOIN beds ON ipd_appointments.bed_id = beds.bed_id 
-        JOIN rooms ON beds.room_id = rooms.id 
-        JOIN room_types ON rooms.room_type_id = room_types.id 
-        JOIN doctors ON ipd_appointments.doctor_id = doctors.doctor_id
-        ORDER BY ipd_appointments.appointment_date DESC`);
-    client.release();
+    try {
+        const result = await pool.query(`
+            SELECT 
+                ipd_appointments.*,
+                patients.name as patient_name,
+                beds.bed_no as bed_number,
+                doctors.name as doctor_name,
+                rooms.room_no as room_number,
+                room_types.room_type as room_type,
+                TO_CHAR(ipd_appointments.appointment_date, 'DD-MM-YYYY') as appointment_date
+            FROM ipd_appointments 
+            JOIN patients ON ipd_appointments.patient_id = patients.patient_id 
+            JOIN beds ON ipd_appointments.bed_id = beds.bed_id 
+            JOIN rooms ON beds.room_id = rooms.id 
+            JOIN room_types ON rooms.room_type_id = room_types.id 
+            JOIN doctors ON ipd_appointments.doctor_id = doctors.doctor_id
+            ORDER BY ipd_appointments.appointment_date DESC`);
 
-    res.render('ipd-appointments', { ipd_appointments: result.rows });
+        res.render('ipd-appointments', { ipd_appointments: result.rows });
+    } catch (error) {
+        console.error('Error fetching IPD appointments:', error);
+        res.status(500).send('Error fetching IPD appointments');
+    }
 };
 
 exports.createIpdAppointmentWindow = async (req, res) => {
     try {
-        const client = await pool.connect();
 
         // Get patients
-        const patientsResult = await client.query('SELECT patient_id, name FROM patients');
+        const patientsResult = await pool.query('SELECT patient_id, name FROM patients');
         const patients = patientsResult.rows;
 
         // Get room types
-        const roomTypesResult = await client.query('SELECT id, room_type FROM room_types');
+        const roomTypesResult = await pool.query('SELECT id, room_type FROM room_types');
         const roomTypes = roomTypesResult.rows;
 
         // Get available beds per room type (this is the crucial part)
-        const availableBedsResult = await client.query(
+        const availableBedsResult = await pool.query(
             `SELECT 
                 rt.id as room_type_id, 
                 rt.room_type, 
@@ -49,11 +52,10 @@ exports.createIpdAppointmentWindow = async (req, res) => {
         const availableBeds = availableBedsResult.rows;
 
         // Get doctors
-        const doctorsResult = await client.query('SELECT doctor_id, name FROM doctors');
+        const doctorsResult = await pool.query('SELECT doctor_id, name FROM doctors');
         const doctors = doctorsResult.rows;
 
 
-        client.release();
         res.render('create-ipd-appointment', {
             patients: patients,
             room_types: roomTypes,
@@ -68,21 +70,26 @@ exports.createIpdAppointmentWindow = async (req, res) => {
 };
 
 exports.createIpdAppointment = async (req, res) => {
-    const client = await pool.connect();
     const { patient_name, appointment_date, room_type, room_number, bed_number, admission_reason, doctor_name } = req.body;
-    const result = await client.query('INSERT INTO ipd_appointments (patient_id, appointment_date, bed_id, admission_reason, doctor_id) VALUES ($1, $2, $3, $4, $5)', [patient_name, appointment_date, bed_number, admission_reason, doctor_name]);
-    const bedResult = await client.query('UPDATE beds SET status = $1 WHERE bed_id = $2', ['occupied', bed_number]);
-    client.release();
-    res.redirect('/ipd-appointments');
+    try {
+        // Admission and bed status must change together
+        await pool.withTransaction(async (client) => {
+            await client.query('INSERT INTO ipd_appointments (patient_id, appointment_date, bed_id, admission_reason, doctor_id) VALUES ($1, $2, $3, $4, $5)', [patient_name, appointment_date, bed_number, admission_reason, doctor_name]);
+            await client.query('UPDATE beds SET status = $1 WHERE bed_id = $2', ['occupied', bed_number]);
+        });
+        res.redirect('/ipd-appointments');
+    } catch (error) {
+        console.error('Error creating IPD appointment:', error);
+        res.status(500).send('Error creating IPD appointment');
+    }
 };
 
 exports.getRoomsByRoomType = async (req, res) => {
     try {
         const roomTypeId = req.params.roomTypeId;
-        const client = await pool.connect();
         
         // Modified query to include room details and count of available beds
-        const result = await client.query(
+        const result = await pool.query(
             `SELECT 
                 r.id,
                 r.room_no,
@@ -105,7 +112,6 @@ exports.getRoomsByRoomType = async (req, res) => {
             total_beds: parseInt(room.total_beds) || 0
         })));
 
-        client.release();
     } catch (error) {
         console.error('Error fetching rooms:', error);
         res.status(500).json({ error: 'Error fetching rooms' });
@@ -115,10 +121,9 @@ exports.getRoomsByRoomType = async (req, res) => {
 exports.getAvailableBedsByRoom = async (req, res) => {
     try {
         const roomId = req.params.roomId;
-        const client = await pool.connect();
         
         // Query to get available beds for the selected room
-        const result = await client.query(
+        const result = await pool.query(
             `SELECT 
                 bed_id,
                 bed_no,
@@ -130,7 +135,6 @@ exports.getAvailableBedsByRoom = async (req, res) => {
         );
 
         res.json(result.rows);
-        client.release();
     } catch (error) {
         console.error('Error fetching beds:', error);
         res.status(500).json({ error: 'Error fetching beds' });
@@ -140,7 +144,6 @@ exports.getAvailableBedsByRoom = async (req, res) => {
 exports.viewIpdAppointment = async (req, res) => {
     try {
         var appointmentId = req.params.id;
-        console.log(appointmentId); // Debug log
         
         // Validate if appointmentId exists and is a valid number
         if (!appointmentId) {
@@ -149,10 +152,8 @@ exports.viewIpdAppointment = async (req, res) => {
         }
 
         appointmentId = parseInt(appointmentId);
-        console.log("appointmentId", appointmentId); // Debug log
 
-        const client = await pool.connect();
-        const result = await client.query(
+        const result = await pool.query(
             `SELECT 
                 ipd_appointments.*,
                 patients.patient_id as patient_id,
@@ -182,12 +183,12 @@ exports.viewIpdAppointment = async (req, res) => {
         );
 
         // Get investigations for dropdown
-        const investigations = await client.query(
+        const investigations = await pool.query(
             `SELECT id, investigation_name FROM investigations ORDER BY investigation_name ASC`
         );
 
         // Get appointment investigations
-        const appointmentInvestigations = await client.query(
+        const appointmentInvestigations = await pool.query(
             `SELECT 
                 i.*,
                 inv.investigation_name,
@@ -200,12 +201,12 @@ exports.viewIpdAppointment = async (req, res) => {
         );
 
         // Get indoor services for the dropdown
-        const indoor_services = await client.query(
+        const indoor_services = await pool.query(
             `SELECT id, indoor_service_name, rate FROM indoor_services ORDER BY indoor_service_name ASC`
         );
 
         // Get appointment particulars
-        const appointment_particulars = await client.query(
+        const appointment_particulars = await pool.query(
             `SELECT 
                 p.*,
                 s.indoor_service_name
@@ -216,17 +217,17 @@ exports.viewIpdAppointment = async (req, res) => {
             [appointmentId]
         );
 
-        const vitals = await client.query(
+        const vitals = await pool.query(
             `SELECT ipd_vitals.*, users.firstname || ' ' || users.lastname as user_name, TO_CHAR(vital_time, 'DD-MM-YYYY HH24:MI:SS') as vital_time FROM ipd_vitals LEFT JOIN users ON ipd_vitals.user_id = users.user_id WHERE ipd_appointment = $1 ORDER BY ipd_vitals.vital_time DESC`,
             [appointmentId]
         );
 
-        const complaints = await client.query(
+        const complaints = await pool.query(
             `SELECT ipd_complaints.*, users.firstname || ' ' || users.lastname as user_name, TO_CHAR(complaint_time, 'DD-MM-YYYY HH24:MI:SS') as complaint_time FROM ipd_complaints LEFT JOIN users ON ipd_complaints.user_id = users.user_id WHERE ipd_appointment_id = $1 ORDER BY ipd_complaints.complaint_time DESC`,
             [appointmentId]
         );
 
-        var opdHistory = await client.query(
+        var opdHistory = await pool.query(
             `SELECT 
                 p.*,
                 d.name,
@@ -239,7 +240,7 @@ exports.viewIpdAppointment = async (req, res) => {
         );
 
         // Fetch all medicines for the dropdown
-        const medicines = await client.query(
+        const medicines = await pool.query(
             `SELECT 
                 id,
                 name,
@@ -260,7 +261,6 @@ exports.viewIpdAppointment = async (req, res) => {
                     const withoutCurlyBraces = row.instructions.slice(2, -2);
                     // Split into array by ","
                     const medicineStrings = withoutCurlyBraces.split('","');
-                    console.log(medicineStrings);
                     // Parse each medicine string after cleaning quotes
                     row.medicines = medicineStrings.map(medicine => {
                         const cleanMedicine = medicine.replace(/\\/g, '');
@@ -276,7 +276,7 @@ exports.viewIpdAppointment = async (req, res) => {
             }
         });
 
-        const ipdTreatment = await client.query(
+        const ipdTreatment = await pool.query(
             `SELECT 
                 t.*, 
                 TO_CHAR(t.treatment_time, 'DD-MM-YYYY HH24:MI:SS') as treatment_time,
@@ -292,7 +292,7 @@ exports.viewIpdAppointment = async (req, res) => {
         // Use Promise.all to handle all medicine queries concurrently
         const treatmentWithMedicines = await Promise.all(
             ipdTreatment.rows.map(async (treatment) => {
-                const medicinesResult = await client.query(
+                const medicinesResult = await pool.query(
                     `SELECT p.*, m.name as medicine_name 
                     FROM ipd_prescriptions as p 
                     LEFT JOIN medicine as m ON p.medicine_id = m.id 
@@ -307,7 +307,7 @@ exports.viewIpdAppointment = async (req, res) => {
         );
 
         // Fetch notes
-        const notes = await client.query(
+        const notes = await pool.query(
             `SELECT 
                 n.*,
                 u.firstname || ' ' || u.lastname as user_name,
@@ -321,11 +321,11 @@ exports.viewIpdAppointment = async (req, res) => {
         );
 
         // Fetch tests
-        const tests = await client.query(
+        const tests = await pool.query(
             `SELECT tests_id, tests FROM tests ORDER BY tests ASC`
         );
 
-        const appointmentTests = await client.query(
+        const appointmentTests = await pool.query(
             `SELECT 
                 t.*,
                 ts.tests as test_name
@@ -341,7 +341,7 @@ exports.viewIpdAppointment = async (req, res) => {
         }
 
 
-        const transactionsResult = await client.query(
+        const transactionsResult = await pool.query(
             `SELECT 
                 t.*,
                 TO_CHAR(t.transaction_date, 'DD-MM-YYYY') as ipd_transaction_date,
@@ -357,7 +357,6 @@ exports.viewIpdAppointment = async (req, res) => {
             [appointmentId]
         );
 
-        client.release();
         res.render('view-ipd-appointment', {
             appointment: result.rows[0],
             vitals: vitals.rows,
@@ -396,9 +395,8 @@ exports.addIpdVital = async (req, res) => {
 
         var user_id = req.session.user_id;
 
-        const client = await pool.connect();
         
-        const result = await client.query(
+        const result = await pool.query(
             `INSERT INTO ipd_vitals 
             (ipd_appointment, bp, pulse, spo2, temp, weight, height, sugar, vital_time, user_id) 
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, CURRENT_TIMESTAMP, $9)
@@ -406,7 +404,6 @@ exports.addIpdVital = async (req, res) => {
             [appointment_id, bp, pulse, spo2, temperature, weight, height, sugar, user_id]
         );
 
-        client.release();
         res.json(result.rows[0]);
     } catch (error) {
         console.error('Error adding vital signs:', error);
@@ -419,10 +416,9 @@ exports.addComplaint = async (req, res) => {
         const { appointment_id, complaint } = req.body;
         const user_id = req.session.user_id; // Assuming you store user ID in session
 
-        const client = await pool.connect();
         
         // Insert the complaint
-        const result = await client.query(
+        const result = await pool.query(
             `INSERT INTO ipd_complaints 
             (ipd_appointment_id, complaint_desp, user_id, complaint_time) 
             VALUES ($1, $2, $3, CURRENT_TIMESTAMP)
@@ -431,7 +427,6 @@ exports.addComplaint = async (req, res) => {
 
         );
 
-        client.release();
         res.json(result.rows[0]);
     } catch (error) {
         console.error('Error adding complaint:', error);
@@ -442,9 +437,8 @@ exports.addComplaint = async (req, res) => {
 exports.getComplaints = async (req, res) => {
     try {
         const appointmentId = req.params.appointmentId;
-        const client = await pool.connect();
         
-        const result = await client.query(
+        const result = await pool.query(
             `SELECT 
                 c.id,
                 c.complaint,
@@ -458,7 +452,6 @@ exports.getComplaints = async (req, res) => {
         );
 
 
-        client.release();
         res.json(result.rows);
     } catch (error) {
         console.error('Error fetching complaints:', error);
@@ -521,9 +514,8 @@ exports.createPrescription = async (req, res) => {
 exports.createNote = async (req, res) => {
     try {
         const { appointment_id, note } = req.body;
-        const client = await pool.connect();
 
-        const result = await client.query(
+        const result = await pool.query(
             `INSERT INTO ipd_appointment_notes 
             (ipd_appointment_id, user_id, note, created_at) 
             VALUES ($1, $2, $3, CURRENT_TIMESTAMP)
@@ -531,7 +523,6 @@ exports.createNote = async (req, res) => {
             [appointment_id, req.session.user_id, note]
         );
 
-        client.release();
         res.json({ success: true, id: result.rows[0].id });
     } catch (error) {
         console.error('Error creating note:', error);
@@ -543,9 +534,8 @@ exports.updateNote = async (req, res) => {
     try {
         const noteId = req.params.id;
         const { note } = req.body;
-        const client = await pool.connect();
 
-        const result = await client.query(
+        const result = await pool.query(
             `UPDATE ipd_appointment_notes 
             SET note = $1, updated_at = CURRENT_TIMESTAMP 
             WHERE id = $2 AND user_id = $3
@@ -553,7 +543,6 @@ exports.updateNote = async (req, res) => {
             [note, noteId, req.session.user_id]
         );
 
-        client.release();
 
         if (result.rows.length === 0) {
             return res.status(403).json({ error: 'Not authorized to update this note' });
@@ -569,16 +558,14 @@ exports.updateNote = async (req, res) => {
 exports.deleteNote = async (req, res) => {
     try {
         const noteId = req.params.id;
-        const client = await pool.connect();
 
-        const result = await client.query(
+        const result = await pool.query(
             `DELETE FROM ipd_appointment_notes 
             WHERE id = $1 AND user_id = $2
             RETURNING id`,
             [noteId, req.session.user_id]
         );
 
-        client.release();
 
         if (result.rows.length === 0) {
             return res.status(403).json({ error: 'Not authorized to delete this note' });
@@ -594,10 +581,8 @@ exports.deleteNote = async (req, res) => {
 exports.createTest = async (req, res) => {
     try {
         const { appointment_id, test_id, note } = req.body;
-        const client = await pool.connect();
-        console.log(req.body);
 
-        const result = await client.query(
+        const result = await pool.query(
             `INSERT INTO ipd_appointment_tests 
             (ipd_appointment_id, test_id, note) 
             VALUES ($1, $2, $3)
@@ -605,7 +590,6 @@ exports.createTest = async (req, res) => {
             [appointment_id, test_id, note]
         );
 
-        client.release();
         res.json({ success: true, id: result.rows[0].id });
     } catch (error) {
         console.error('Error creating test:', error);
@@ -627,15 +611,13 @@ exports.uploadReport = async (req, res) => {
         // Move file to the reports directory
         await report.mv(`public/${filePath}`);
 
-        const client = await pool.connect();
-        await client.query(
+        await pool.query(
             `UPDATE ipd_appointment_tests 
             SET file_path = $1 
             WHERE id = $2`,
             [fileName, test_id]
         );
 
-        client.release();
         res.json({ success: true });
     } catch (error) {
         console.error('Error uploading report:', error);
@@ -646,16 +628,15 @@ exports.uploadReport = async (req, res) => {
 exports.deleteTest = async (req, res) => {
     try {
         const testId = req.params.id;
-        const client = await pool.connect();
 
         // Get file path before deleting
-        const fileResult = await client.query(
+        const fileResult = await pool.query(
             'SELECT file_path FROM ipd_appointment_tests WHERE id = $1',
             [testId]
         );
 
         // Delete the test record
-        await client.query('DELETE FROM ipd_appointment_tests WHERE id = $1', [testId]);
+        await pool.query('DELETE FROM ipd_appointment_tests WHERE id = $1', [testId]);
 
         // If there was a file, delete it
         if (fileResult.rows[0]?.file_path) {
@@ -666,7 +647,6 @@ exports.deleteTest = async (req, res) => {
             }
         }
 
-        client.release();
         res.json({ success: true });
     } catch (error) {
         console.error('Error deleting test:', error);
@@ -679,8 +659,7 @@ exports.addTransaction = async (req, res) => {
         const { appointment_id, amount, payment_method, transaction_date, transaction_type } = req.body;
         const user_id = req.session.user_id;
 
-        const client = await pool.connect();
-        const result = await client.query(
+        const result = await pool.query(
             `INSERT INTO ipd_appointment_transactions 
             (ipd_appointment_id, amount, payment_method, transaction_date, transaction_type, user_id) 
             VALUES ($1, $2, $3, $4, $5, $6) 
@@ -688,7 +667,6 @@ exports.addTransaction = async (req, res) => {
             [appointment_id, amount, payment_method, transaction_date, transaction_type, user_id]
         );
 
-        client.release();
         res.json(result.rows[0]);
     } catch (error) {
         console.error('Error adding transaction:', error);
@@ -701,8 +679,7 @@ exports.updateTransaction = async (req, res) => {
         const { amount, payment_method, transaction_date, transaction_type } = req.body;
         const transaction_id = req.params.id;
 
-        const client = await pool.connect();
-        const result = await client.query(
+        const result = await pool.query(
             `UPDATE ipd_appointment_transactions 
             SET amount = $1, payment_method = $2, transaction_date = $3, transaction_type = $4 
             WHERE id = $5 
@@ -710,7 +687,6 @@ exports.updateTransaction = async (req, res) => {
             [amount, payment_method, transaction_date, transaction_type, transaction_id]
         );
 
-        client.release();
         res.json(result.rows[0]);
     } catch (error) {
         console.error('Error updating transaction:', error);
@@ -721,14 +697,12 @@ exports.updateTransaction = async (req, res) => {
 exports.deleteTransaction = async (req, res) => {
     try {
         const transaction_id = req.params.id;
-        const client = await pool.connect();
         
-        await client.query(
+        await pool.query(
             'DELETE FROM ipd_appointment_transactions WHERE id = $1',
             [transaction_id]
         );
 
-        client.release();
         res.json({ success: true });
     } catch (error) {
         console.error('Error deleting transaction:', error);
@@ -783,7 +757,6 @@ exports.dischargePatient = async (req, res) => {
             [appointment_id]
         );
 
-        console.log(result);
 
         await client.query(
             `UPDATE patients 
@@ -807,10 +780,9 @@ exports.dischargePatient = async (req, res) => {
 exports.getBillData = async (req, res) => {
     try {
         const appointmentId = req.params.id;
-        const client = await pool.connect();
         
         // Get appointment details with patient and doctor info
-        const result = await client.query(
+        const result = await pool.query(
             `SELECT 
                 ipd_appointments.*,
                 patients.patient_id as patient_id,
@@ -832,7 +804,7 @@ exports.getBillData = async (req, res) => {
         );
 
         // Get appointment particulars
-        const particularsResult = await client.query(
+        const particularsResult = await pool.query(
             `SELECT 
                 p.*,
                 s.indoor_service_name
@@ -843,7 +815,6 @@ exports.getBillData = async (req, res) => {
             [appointmentId]
         );
 
-        client.release();
 
         if (result.rows.length === 0) {
             return res.status(404).json({ error: 'Appointment not found' });
@@ -868,9 +839,8 @@ exports.getBillData = async (req, res) => {
 exports.createInvestigation = async (req, res) => {
     try {
         const { appointment_id, investigation_id, results } = req.body;
-        const client = await pool.connect();
         
-        const result = await client.query(
+        const result = await pool.query(
             `INSERT INTO ipd_investigations 
             (ipd_appointment_id, investigation_id, investigation_time, results) 
             VALUES ($1, $2, CURRENT_TIMESTAMP, $3)
@@ -878,7 +848,6 @@ exports.createInvestigation = async (req, res) => {
             [appointment_id, investigation_id, results]
         );
 
-        client.release();
         res.json({ success: true, id: result.rows[0].id });
     } catch (error) {
         console.error('Error creating investigation:', error);
@@ -890,9 +859,8 @@ exports.updateInvestigation = async (req, res) => {
     try {
         const { results } = req.body;
         const investigation_id = req.params.id;
-        const client = await pool.connect();
         
-        const result = await client.query(
+        const result = await pool.query(
             `UPDATE ipd_investigations 
             SET results = $1 
             WHERE id = $2
@@ -900,7 +868,6 @@ exports.updateInvestigation = async (req, res) => {
             [results, investigation_id]
         );
 
-        client.release();
 
         if (result.rows.length === 0) {
             return res.status(404).json({ error: 'Investigation not found' });
@@ -916,14 +883,12 @@ exports.updateInvestigation = async (req, res) => {
 exports.deleteInvestigation = async (req, res) => {
     try {
         const investigation_id = req.params.id;
-        const client = await pool.connect();
         
-        const result = await client.query(
+        const result = await pool.query(
             'DELETE FROM ipd_investigations WHERE id = $1 RETURNING id',
             [investigation_id]
         );
 
-        client.release();
 
         if (result.rows.length === 0) {
             return res.status(404).json({ error: 'Investigation not found' });
@@ -1094,52 +1059,83 @@ exports.getIpdBillingList = async (req, res) => {
     res.render('ipd-billing-list');
 };
 
-exports.getIpdBillList = async (req, res) => {
-    const client = await pool.connect();
-    try {
-        const result = await client.query(`
-            WITH billing_summary AS (
-                SELECT 
-                    ia.id as appointment_id,
-                    ia.patient_id,
-                    p.name as patient_name,
-                    ia.status as appointment_status,
-                    COALESCE(SUM(ap.rate * ap.qty), 0) as total_bill_amount,
-                    COALESCE((
-                        SELECT SUM(CASE 
-                            WHEN t.transaction_type = 'credit' THEN t.amount 
-                            WHEN t.transaction_type = 'debit' THEN -t.amount 
-                            ELSE 0 
-                        END)
-                        FROM ipd_appointment_transactions t 
-                        WHERE t.ipd_appointment_id = ia.id
-                    ), 0) as total_paid_amount,
-                    TO_CHAR(ia.appointment_date, 'YYYY-MM-DD') as admission_date,
-                    TO_CHAR(ia.discharge_date, 'YYYY-MM-DD') as discharge_date
-                FROM ipd_appointments ia
-                JOIN patients p ON ia.patient_id = p.patient_id
-                LEFT JOIN ipd_appointment_particulars ap ON ia.id = ap.ipd_appointment_id
-                GROUP BY ia.id, ia.patient_id, p.name, ia.status, ia.appointment_date, ia.discharge_date
-            )
-            SELECT 
-                *,
-                (total_bill_amount - total_paid_amount) as remaining_amount
-            FROM billing_summary
-            ORDER BY admission_date DESC
-        `);
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+const IPD_BILL_STATUSES = ['Admitted', 'Pending', 'Paid'];
 
-        res.json({
-            success: true,
-            data: result.rows
-        });
+// One row per IPD admission with its billed, paid and remaining amounts.
+// bill_status: still admitted, or discharged with/without a balance left.
+const IPD_BILL_SUMMARY = `(
+    SELECT
+        ia.id AS appointment_id,
+        ia.bill_no,
+        ia.patient_id,
+        p.name AS patient_name,
+        p.phone,
+        ia.status AS appointment_status,
+        ia.appointment_date::date AS admission_day,
+        ia.discharge_date::date AS discharge_day,
+        TO_CHAR(ia.appointment_date, 'YYYY-MM-DD') AS admission_date,
+        TO_CHAR(ia.discharge_date, 'YYYY-MM-DD') AS discharge_date,
+        COALESCE(particulars.total, 0) AS total_bill_amount,
+        COALESCE(payments.total, 0) AS total_paid_amount,
+        COALESCE(particulars.total, 0) - COALESCE(payments.total, 0) AS remaining_amount,
+        CASE
+            WHEN ia.status IS DISTINCT FROM 'discharged' THEN 'Admitted'
+            WHEN COALESCE(particulars.total, 0) - COALESCE(payments.total, 0) <= 0 THEN 'Paid'
+            ELSE 'Pending'
+        END AS bill_status
+    FROM ipd_appointments ia
+    JOIN patients p ON ia.patient_id = p.patient_id
+    LEFT JOIN (
+        SELECT ipd_appointment_id, SUM(rate * qty) AS total
+        FROM ipd_appointment_particulars
+        GROUP BY ipd_appointment_id
+    ) particulars ON particulars.ipd_appointment_id = ia.id
+    LEFT JOIN (
+        SELECT ipd_appointment_id,
+               SUM(CASE WHEN transaction_type = 'credit' THEN amount
+                        WHEN transaction_type = 'debit' THEN -amount
+                        ELSE 0 END) AS total
+        FROM ipd_appointment_transactions
+        GROUP BY ipd_appointment_id
+    ) payments ON payments.ipd_appointment_id = ia.id
+) b`;
+
+// Paging, sorting and filtering for the IPD billing list (Tabulator remote mode)
+const ipdBillTable = {
+    select: `b.appointment_id, b.bill_no, b.patient_id, b.patient_name, b.appointment_status,
+             b.admission_date, b.discharge_date, b.total_bill_amount,
+             b.total_paid_amount, b.remaining_amount, b.bill_status`,
+    from: IPD_BILL_SUMMARY,
+    columns: {
+        bill_no: { sql: 'b.bill_no' },
+        patient_id: { sql: 'b.patient_id' },
+        patient_name: { sql: 'b.patient_name' },
+        admission_date: { sql: 'b.admission_day', filter: false },
+        discharge_date: { sql: 'b.discharge_day', filter: false },
+        total_bill_amount: { sql: 'b.total_bill_amount', filter: false },
+        total_paid_amount: { sql: 'b.total_paid_amount', filter: false },
+        remaining_amount: { sql: 'b.remaining_amount', filter: false },
+        bill_status: { sql: 'b.bill_status', filter: false },
+    },
+    search: ['b.bill_no', 'b.patient_id', 'b.patient_name', 'b.phone'],
+    extraFilters: (query, add) => {
+        const conditions = [];
+        if (DATE_PATTERN.test(query.dateFrom)) conditions.push(`b.admission_day >= ${add(query.dateFrom)}`);
+        if (DATE_PATTERN.test(query.dateTo)) conditions.push(`b.admission_day <= ${add(query.dateTo)}`);
+        if (IPD_BILL_STATUSES.includes(query.status)) conditions.push(`b.bill_status = ${add(query.status)}`);
+        return conditions;
+    },
+    defaultSort: 'b.admission_day DESC',
+    tieBreaker: 'b.appointment_id DESC',
+};
+
+exports.getIpdBillList = async (req, res) => {
+    try {
+        res.json(await paginate(pool, req.query, ipdBillTable));
     } catch (error) {
         console.error('Error fetching IPD bill list:', error);
-        res.status(500).json({ 
-            success: false, 
-            error: 'Error fetching IPD bill list' 
-        });
-    } finally {
-        client.release();
+        res.status(500).json({ error: 'Error fetching IPD bill list' });
     }
 };
 

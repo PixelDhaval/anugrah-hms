@@ -58,7 +58,7 @@
                                 <h2>Transaction Report</h2>
                                 <ul class="breadcrumb">
                                     <li class="breadcrumb-item">
-                                        <a href="index.html"
+                                        <a href="/index"
                                             ><i class="fa fa-dashboard"></i
                                         ></a>
                                     </li>
@@ -201,6 +201,13 @@
                 const table = new Tabulator("#transaction-table", {
                     layout: "fitColumns",
                     movableColumns: true,
+                    // The whole period is loaded (totals and downloads need every row);
+                    // pagination only limits how many rows are drawn at once.
+                    pagination: "local",
+                    paginationSize: 50,
+                    paginationSizeSelector: [25, 50, 100],
+                    paginationCounter: "rows",
+                    placeholder: "No transactions for this period",
                     // Add document title for PDF download
                     downloadConfig: {
                         pdf: {
@@ -231,8 +238,8 @@
                             }
                         },
                         {
-                            title: "Bill ID",
-                            field: "bill_id",
+                            title: "Bill No",
+                            field: "bill_no",
                             headerFilter: "input",
                             headerHozAlign: "center",
                         },
@@ -383,7 +390,8 @@
                             const totalRevenue = data.data.reduce((sum, item) => sum + parseFloat(item.recieved || 0), 0);
                             const pendingAmount = data.data.reduce((sum, item) => {
                                 if (item.payment_status !== "completed") {
-                                    return sum + (parseFloat(item.total || 0) - parseFloat(item.recieved || 0) - parseFloat(item.discountAmt || 0));
+                                    // total is already net of discount, so only subtract what was received
+                                    return sum + (parseFloat(item.total || 0) - parseFloat(item.recieved || 0));
                                 }
                                 return sum;
                             }, 0);

@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="../dist/assets/css/bootstrap.min.css" />
     <link rel="stylesheet" href="../dist/assets/vendor/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" href="../dist/assets/vendor/font-awesome/css/font-awesome.min.css" />
-    <link rel="stylesheet" href="../dist/assets/vendor/jquery-datatable/dataTables.bootstrap4.min.css" />
+    <link rel="stylesheet" href="../dist/assets/css/tabulator_bootstrap5.css" />
 
     <!-- MAIN Project CSS file -->
     <link rel="stylesheet" href="../dist/assets/css/main.css" />
@@ -28,13 +28,13 @@
                 <div class="block-header">
                     <div class="row">
                         <div class="col-lg-6 col-md-6 col-sm-12">
-                            <h2>IPD Payments List</h2>
+                            <h2>Indoor Billing</h2>
                             <ul class="breadcrumb">
                                 <li class="breadcrumb-item">
-                                    <a href="index.html"><i class="fa fa-dashboard"></i></a>
+                                    <a href="/index"><i class="fa fa-dashboard"></i></a>
                                 </li>
-                                <li class="breadcrumb-item">IPD Payments</li>
-                                <li class="breadcrumb-item active">Payments List</li>
+                                <li class="breadcrumb-item">Billing</li>
+                                <li class="breadcrumb-item active">Indoor Billing</li>
                             </ul>
                         </div>
                     </div>
@@ -84,21 +84,36 @@
                             </div>
 
                             <div class="body">
-                                <div class="table-responsive">
-                                    <table class="table table-hover js-basic-example dataTable table-custom table-striped" id="bills">
-                                        <thead>
-                                            <tr>
-                                                <th>Patient ID</th>
-                                                <th>Patient Name</th>
-                                                <th>Admission Date</th>
-                                                <th>Total Bill</th>
-                                                <th>Paid Amount</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody></tbody>
-                                    </table>
+                                <div class="row g-2 align-items-end mb-3" id="bill-filters">
+                                    <div class="col-md-4">
+                                        <label for="billSearch" class="form-label small mb-1">Search</label>
+                                        <input type="search" class="form-control form-control-sm" id="billSearch"
+                                            placeholder="Bill no (e.g. 25-26/IPD/00003), patient ID, name or phone" autocomplete="off">
+                                    </div>
+                                    <div class="col-6 col-md-2">
+                                        <label for="statusFilter" class="form-label small mb-1">Status</label>
+                                        <select class="form-control form-control-sm" id="statusFilter">
+                                            <option value="">All</option>
+                                            <option value="Admitted">Admitted</option>
+                                            <option value="Pending">Pending payment</option>
+                                            <option value="Paid">Paid</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6 col-md-2">
+                                        <label for="dateFrom" class="form-label small mb-1">Admitted from</label>
+                                        <input type="date" class="form-control form-control-sm" id="dateFrom">
+                                    </div>
+                                    <div class="col-6 col-md-2">
+                                        <label for="dateTo" class="form-label small mb-1">Admitted to</label>
+                                        <input type="date" class="form-control form-control-sm" id="dateTo">
+                                    </div>
+                                    <div class="col-6 col-md-auto">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="clearBillFilters">
+                                            <i class="fa fa-times"></i> Clear filters
+                                        </button>
+                                    </div>
                                 </div>
+                                <div id="bills-table"></div>
                             </div>
                         </div>
                     </div>
@@ -110,9 +125,9 @@
     <!-- Javascript -->
     <script src="../dist/assets/bundles/libscripts.bundle.js"></script>
     <script src="../dist/assets/bundles/vendorscripts.bundle.js"></script>
-    <script src="../dist/assets/bundles/datatablescripts.bundle.js"></script>
     <script src="../dist/assets/bundles/mainscripts.bundle.js"></script>
     <script src="../dist/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="../dist/assets/js/tabulator.min.js"></script>
     <script>
         function getSelectedPaymentMethod() {
             return document.querySelector('input[name="paymentMethod"]:checked').value;
@@ -137,7 +152,8 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    location.reload();
+                    bootstrap.Modal.getInstance(document.getElementById('payment')).hide();
+                    table.replaceData();
                 } else {
                     alert('Error processing payment: ' + data.error);
                 }
@@ -246,6 +262,7 @@
                                     <h2>IPD Bill</h2>
                                 </div>
                                 <div class="details">
+                                    <p><strong>Bill No:</strong> ${appointment.bill_no}</p>
                                     <p><strong>Patient Name:</strong> ${appointment.patient_name}</p>
                                     <p><strong>Patient ID:</strong> ${appointment.patient_id}</p>
                                     <p><strong>Admission Date:</strong> ${appointment.formatted_admission_date}</p>
@@ -395,6 +412,7 @@
                                     <h2>Payment Receipt</h2>
                                 </div>
                                 <div class="details">
+                                    <p><strong>Bill No:</strong> ${appointment.bill_no}</p>
                                     <p><strong>Patient Name:</strong> ${appointment.patient_name}</p>
                                     <p><strong>Patient ID:</strong> ${appointment.patient_id}</p>
                                     <p><strong>Admission Date:</strong> ${appointment.formatted_admission_date}</p>
@@ -445,48 +463,94 @@
                     alert('Error printing payment receipt');
                 });
         }
+        const money = (value) => parseFloat(value || 0).toFixed(2);
+        const STATUS_BADGES = { Admitted: 'badge-info', Pending: 'badge-warning', Paid: 'badge-success' };
+
+        var table;
         $(document).ready(() => {
-            const table = $('#bills').DataTable();
-
-            fetch('/get-ipd-bill-list')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        data.data.forEach(item => {
-                            const status = item.appointment_status === 'discharged' ? 
-                                (item.remaining_amount <= 0 ? 'Paid' : 'Pending') : 
-                                'Admitted';
-
-                            table.row.add([
-                                item.patient_id,
-                                item.patient_name,
-                                item.admission_date,
-                                parseFloat(item.total_bill_amount).toFixed(2),
-                                parseFloat(item.total_paid_amount).toFixed(2),
-                                `<div class="btn-group gap-2">
-                                    <button class="btn btn-sm btn-primary" onclick="printBill('${item.appointment_id}')">
-                                        <i class="fa fa-print"></i> Print Bill
-                                    </button>
-                                    <button class="btn btn-sm btn-info" onclick="printPaymentReceipt('${item.appointment_id}')">
-                                        <i class="fa fa-print"></i> Print Receipt
-                                    </button>
-                                    <a href="/view-ipd-appointment/${item.appointment_id}?tab=billings" class="btn btn-sm btn-secondary">
-                                        <i class="fa fa-edit"></i> Edit
-                                    </a>
-                                        <button class="btn btn-sm btn-success" onclick="showPaymentModal('${item.appointment_id}', ${item.remaining_amount})">
-                                            <i class="fa fa-money"></i> Pay
-                                        </button>
-                                </div>`
-                            ]);
-                        });
-                        table.draw(false);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error fetching bill list');
-                });
+            initBillTable();
+            initBillFilters();
         });
+
+        // Paging, sorting and filtering all happen on the server (/get-ipd-bill-list).
+        function initBillTable() {
+            table = new Tabulator('#bills-table', {
+                layout: 'fitDataFill',
+                ajaxURL: '/get-ipd-bill-list',
+                ajaxParams: function () {
+                    return {
+                        search: document.getElementById('billSearch').value.trim(),
+                        status: document.getElementById('statusFilter').value,
+                        dateFrom: document.getElementById('dateFrom').value,
+                        dateTo: document.getElementById('dateTo').value,
+                    };
+                },
+                pagination: true,
+                paginationMode: 'remote',
+                paginationSize: 50,
+                paginationSizeSelector: [25, 50, 100],
+                paginationCounter: 'rows',
+                sortMode: 'remote',
+                filterMode: 'remote',
+                headerFilterLiveFilterDelay: 400,
+                placeholder: 'No IPD bills found',
+                columns: [
+                    { title: 'Bill No', field: 'bill_no', headerFilter: 'input', headerHozAlign: 'center' },
+                    { title: 'Patient ID', field: 'patient_id', headerFilter: 'input', headerHozAlign: 'center' },
+                    { title: 'Patient Name', field: 'patient_name', headerFilter: 'input', headerHozAlign: 'center' },
+                    { title: 'Admission Date', field: 'admission_date', headerHozAlign: 'center' },
+                    { title: 'Discharge Date', field: 'discharge_date', headerHozAlign: 'center' },
+                    { title: 'Total Bill', field: 'total_bill_amount', hozAlign: 'right', headerHozAlign: 'center', formatter: (cell) => money(cell.getValue()) },
+                    { title: 'Paid Amount', field: 'total_paid_amount', hozAlign: 'right', headerHozAlign: 'center', formatter: (cell) => money(cell.getValue()) },
+                    { title: 'Balance', field: 'remaining_amount', hozAlign: 'right', headerHozAlign: 'center', formatter: (cell) => money(cell.getValue()) },
+                    {
+                        title: 'Status', field: 'bill_status', headerHozAlign: 'center',
+                        formatter: (cell) => `<span class="badge ${STATUS_BADGES[cell.getValue()] || 'badge-secondary'}">${cell.getValue()}</span>`,
+                    },
+                    {
+                        title: 'Action', field: 'actions', headerSort: false, headerHozAlign: 'center',
+                        formatter: function (cell) {
+                            const item = cell.getRow().getData();
+                            return `<div class="btn-group gap-2">
+                                <button class="btn btn-sm btn-primary" onclick="printBill('${item.appointment_id}')">
+                                    <i class="fa fa-print"></i> Print Bill
+                                </button>
+                                <button class="btn btn-sm btn-info" onclick="printPaymentReceipt('${item.appointment_id}')">
+                                    <i class="fa fa-print"></i> Print Receipt
+                                </button>
+                                <a href="/view-ipd-appointment/${item.appointment_id}?tab=billings" class="btn btn-sm btn-secondary">
+                                    <i class="fa fa-edit"></i> Edit
+                                </a>
+                                <button class="btn btn-sm btn-success" onclick="showPaymentModal('${item.appointment_id}', ${item.remaining_amount})">
+                                    <i class="fa fa-money"></i> Pay
+                                </button>
+                            </div>`;
+                        },
+                    },
+                ],
+            });
+        }
+
+        function initBillFilters() {
+            const reload = () => table.setData();
+
+            let searchTimer;
+            document.getElementById('billSearch').addEventListener('input', function () {
+                clearTimeout(searchTimer);
+                searchTimer = setTimeout(reload, 400);
+            });
+            ['statusFilter', 'dateFrom', 'dateTo'].forEach((id) =>
+                document.getElementById(id).addEventListener('change', reload)
+            );
+
+            document.getElementById('clearBillFilters').addEventListener('click', function () {
+                document.querySelectorAll('#bill-filters input, #bill-filters select')
+                    .forEach((input) => { input.value = ''; });
+                table.clearHeaderFilter();
+                table.clearSort();
+                reload();
+            });
+        }
     </script>
 </body>
 </html> 

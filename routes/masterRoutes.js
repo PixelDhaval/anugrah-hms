@@ -7,7 +7,7 @@ const userController = require('../controllers/userController');
 
 const tables = ['complaint', 'diagnosis', 'tests', 'advice'];
 
-router.get('/appointment-master', async (req, res) => {
+router.get('/appointment-master', userController.checkAuth, async (req, res) => {
     try {
         const promises = tables.map(table => masterController.getMostCommonItems(table));
         const [complaints, diagnosis, tests, advice] = await Promise.all(promises);
@@ -21,7 +21,7 @@ router.get('/appointment-master', async (req, res) => {
 
 tables.forEach(table => {
     router.post(`/api/add-${table}`,userController.checkAuth,  (req, res) => masterController.addItem(req, res, table));
-    router.delete(`/api/remove-${table}/:itemId`, (req, res) => {
+    router.delete(`/api/remove-${table}/:itemId`, userController.checkAuth, (req, res) => {
         masterController.removeItem(req, res, table);
     }); 
         router.get(`/api/most-common-${table}`, async (req, res) => {

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>AHMS :: All Patients</title>
+        <title>AHMS :: Daily Cash Collection</title>
         <meta charset="utf-8" />
         <meta
             name="viewport"
@@ -31,6 +31,9 @@
             rel="stylesheet"
             href="../dist/assets/css/tabulator_bootstrap5.css"
         />
+        <!-- Required for the PDF download -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
         <style>
             .tabulator {
@@ -50,16 +53,16 @@
                     <div class="block-header">
                         <div class="row">
                             <div class="col-lg-6 col-md-6 col-sm-12">
-                                <h2>Monthly OPD Report</h2>
+                                <h2>Daily Cash Collection</h2>
                                 <ul class="breadcrumb">
                                     <li class="breadcrumb-item">
-                                        <a href="index.html"
+                                        <a href="/index"
                                             ><i class="fa fa-dashboard"></i
                                         ></a>
                                     </li>
-                                    <li class="breadcrumb-item">OPD Report</li>
+                                    <li class="breadcrumb-item">Reports</li>
                                     <li class="breadcrumb-item active">
-                                        Monthly OPD Report
+                                        Daily Cash Collection
                                     </li>
                                 </ul>
                             </div>
@@ -69,6 +72,7 @@
                                         <button
                                             type="button"
                                             class="btn btn-primary"
+                                            id="download-pdf"
                                         >
                                             <i class="fa fa-download"></i>
                                             Download as PDF
@@ -76,6 +80,7 @@
                                         <button
                                             type="button"
                                             class="btn btn-secondary"
+                                            id="download-excel"
                                         >
                                             <i class="fa fa-download"></i>
                                             Download as an Excel File
@@ -89,12 +94,12 @@
                         <div class="col-md-12">
                             <div class="card patients-list">
                                 <div class="header">
-                                    <h2>OPD Report</h2>
+                                    <h2>Cash Collection</h2>
                                 </div>
                                 <div class="body">
                                     <div class="row">
                                         <div class="col-lg-4 col-md-4 mb-4">
-                                            <label>Select Month</label>
+                                            <label>Select Date</label>
                                             <input
                                                 type="date"
                                                 class="form-control"
@@ -140,12 +145,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const table = new Tabulator("#opd-table", {
                     layout: "fitColumns",
+                    // The whole period is loaded (totals and downloads need every row);
+                    // pagination only limits how many rows are drawn at once.
+                    pagination: "local",
+                    paginationSize: 50,
+                    paginationSizeSelector: [25, 50, 100],
+                    paginationCounter: "rows",
+                    placeholder: "No bills for this period",
                     columns: [
                         {
                             title: "Sr No.",
                             field: "id",
                             headerHozAlign: "center",
                             formatter: "rownum"
+                        },
+                        {
+                            title: "Bill No",
+                            field: "bill_no",
+                            headerFilter: "input",
+                            headerHozAlign: "center",
                         },
                         {
                             title: "Patient ID",
@@ -176,18 +194,26 @@ document.addEventListener("DOMContentLoaded", () => {
                             }
                         },
                         {
-                            title: "total",
+                            title: "Bill Total",
                             field: "total",
                             headerHozAlign: "center",
-                            bottomCalc: "sum"
+                            hozAlign: "right",
+                            bottomCalc: "sum",
+                        },
+                        {
+                            title: "Received",
+                            field: "recieved",
+                            headerHozAlign: "center",
+                            hozAlign: "right",
+                            bottomCalc: "sum",
                         },
                         {
                             title: "Bill Status",
                             field: "status",
                             headerFilter: "list",
                             headerFilterParams: {
-                                values: ["pending", "completed"],
-                                clearable: true
+                                values: ["pending", "partially paid", "completed"],
+                                clearable: true,
                             },
                             headerHozAlign: "center",
                             formatter: function (cell) {
@@ -218,12 +244,29 @@ document.addEventListener("DOMContentLoaded", () => {
                     })
                         .then((response) => response.json())
                         .then((data) => {
-                            if(data.success = true){
+                            if (data.success) {
                                 table.setData(data.data);
                             } else {
                                 alert("Error fetching data");
                             }
-                        });
+                        })
+                        .catch(() => alert("Error fetching data"));
+                });
+
+                document.getElementById("download-pdf").addEventListener("click", function () {
+                    const day = $("#monthPicker").val();
+                    table.download("pdf", `cash_collection_${day}.pdf`, {
+                        orientation: "portrait",
+                        title: `Daily Cash Collection - ${day}`,
+                    });
+                });
+
+                document.getElementById("download-excel").addEventListener("click", function () {
+                    const day = $("#monthPicker").val();
+                    table.download("csv", `cash_collection_${day}.csv`, {
+                        delimiter: ",",
+                        bom: true, // so Excel reads the file as UTF-8
+                    });
                 });
 
                 $("#monthPicker").val(getFormattedDate()).change()

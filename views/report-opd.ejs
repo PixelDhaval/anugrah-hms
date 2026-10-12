@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>AHMS :: All Patients</title>
+        <title>AHMS :: Monthly OPD Report</title>
         <meta charset="utf-8" />
         <meta
             name="viewport"
@@ -58,7 +58,7 @@
                                 <h2>Monthly OPD Report</h2>
                                 <ul class="breadcrumb">
                                     <li class="breadcrumb-item">
-                                        <a href="index.html"
+                                        <a href="/index"
                                             ><i class="fa fa-dashboard"></i
                                         ></a>
                                     </li>
@@ -74,6 +74,7 @@
                                         <button
                                             type="button"
                                             class="btn btn-primary"
+                                            id="download-pdf"
                                         >
                                             <i class="fa fa-download"></i>
                                             Download as PDF
@@ -81,6 +82,7 @@
                                         <button
                                             type="button"
                                             class="btn btn-secondary"
+                                            id="download-excel"
                                         >
                                             <i class="fa fa-download"></i>
                                             Download as an Excel File
@@ -145,6 +147,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const table = new Tabulator("#opd-table", {
                     layout: "fitColumns",
+                    // The whole period is loaded (totals and downloads need every row);
+                    // pagination only limits how many rows are drawn at once.
+                    pagination: "local",
+                    paginationSize: 50,
+                    paginationSizeSelector: [25, 50, 100],
+                    paginationCounter: "rows",
+                    placeholder: "No bills for this period",
                     downloadConfig: {
                         pdf: {
                             orientation: "portrait",
@@ -162,6 +171,12 @@ document.addEventListener("DOMContentLoaded", () => {
                             field: "id",
                             headerHozAlign: "center",
                             formatter: "rownum"
+                        },
+                        {
+                            title: "Bill No",
+                            field: "bill_no",
+                            headerFilter: "input",
+                            headerHozAlign: "center",
                         },
                         {
                             title: "Patient ID",
@@ -186,15 +201,27 @@ document.addEventListener("DOMContentLoaded", () => {
                             headerHozAlign: "center",
                         },
                         {
-                            title: "total",
+                            title: "Total",
                             field: "total",
                             headerHozAlign: "center",
-                            bottomCalc: "sum"
+                            hozAlign: "right",
+                            bottomCalc: "sum",
+                        },
+                        {
+                            title: "Received",
+                            field: "recieved",
+                            headerHozAlign: "center",
+                            hozAlign: "right",
+                            bottomCalc: "sum",
                         },
                         {
                             title: "Bill Status",
                             field: "status",
-                            headerFilter: "input",
+                            headerFilter: "list",
+                            headerFilterParams: {
+                                values: ["pending", "partially paid", "completed"],
+                                clearable: true,
+                            },
                             headerHozAlign: "center",
                             formatter: function (cell) {
                                 const value = cell.getValue();
@@ -211,7 +238,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
 
                 // Add download button functionality
-                document.querySelector('.btn-primary').addEventListener('click', function() {
+                document.getElementById('download-pdf').addEventListener('click', function() {
                     const selectedMonth = $("#monthPicker").val() || 'all_time';
                     table.download("pdf", `opd_report_${selectedMonth}.pdf`, {
                         orientation: "portrait",
@@ -219,7 +246,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     });
                 });
                 
-                document.querySelector('.btn-secondary').addEventListener('click', function() {
+                document.getElementById('download-excel').addEventListener('click', function() {
                     const selectedMonth = $("#monthPicker").val() || 'all_time';
                     // Change from xlsx to csv format
                     table.download("csv", `opd_report_${selectedMonth}.csv`, {
@@ -242,13 +269,20 @@ document.addEventListener("DOMContentLoaded", () => {
                     })
                         .then((response) => response.json())
                         .then((data) => {
-                            if(data.success = true){
+                            if (data.success) {
                                 table.setData(data.data);
                             } else {
                                 alert("Error fetching data");
                             }
-                        });
+                        })
+                        .catch(() => alert("Error fetching data"));
                 });
+
+                // Open on the current month
+                const today = new Date();
+                $("#monthPicker")
+                    .val(`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`)
+                    .change();
             });
         </script>
     </body>

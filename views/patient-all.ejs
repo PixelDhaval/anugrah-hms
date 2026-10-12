@@ -53,7 +53,7 @@
                                 <h2>All Patient</h2>
                                 <ul class="breadcrumb">
                                     <li class="breadcrumb-item">
-                                        <a href="index.html"
+                                        <a href="/index"
                                             ><i class="fa fa-dashboard"></i
                                         ></a>
                                     </li>
@@ -78,6 +78,35 @@
                                     <h2>All Patients</h2>
                                 </div>
                                 <div class="body">
+                                    <div class="row g-2 align-items-end mb-3" id="patient-filters">
+                                        <div class="col-md-4">
+                                            <label for="patientSearch" class="form-label small mb-1">Search</label>
+                                            <input type="search" class="form-control form-control-sm" id="patientSearch"
+                                                placeholder="ID, name, phone or address" autocomplete="off">
+                                        </div>
+                                        <div class="col-6 col-md-2">
+                                            <label for="statusFilter" class="form-label small mb-1">Status</label>
+                                            <select class="form-control form-control-sm" id="statusFilter">
+                                                <option value="">All</option>
+                                                <option value="scheduled">Scheduled</option>
+                                                <option value="billing">Billing</option>
+                                                <option value="completed">Completed</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-6 col-md-2">
+                                            <label for="visitedFrom" class="form-label small mb-1">Last visit from</label>
+                                            <input type="date" class="form-control form-control-sm" id="visitedFrom">
+                                        </div>
+                                        <div class="col-6 col-md-2">
+                                            <label for="visitedTo" class="form-label small mb-1">Last visit to</label>
+                                            <input type="date" class="form-control form-control-sm" id="visitedTo">
+                                        </div>
+                                        <div class="col-6 col-md-auto">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" id="clearPatientFilters">
+                                                <i class="fa fa-times"></i> Clear filters
+                                            </button>
+                                        </div>
+                                    </div>
                                     <div id="patient-table"></div>
                                 </div>
                             </div>
@@ -304,199 +333,238 @@
             });
             var table;
             document.addEventListener("DOMContentLoaded", function () {
-                fetchPatients();
+                initPatientTable();
+                initPatientFilters();
             });
-            function fetchPatients() {
-                fetch("/fetch-patients")
-                    .then((response) => response.json())
-                    .then((patientData) => {
-                        console.log(patientData)
-                        table = new Tabulator("#patient-table", {
-                            data: patientData,
-                            layout: "fitDataFill",
-                            
-                        pagination: "local",
-                        paginationSize: 50,
-                            columns: [
-                                {
-                                    title: "ID",
-                                    field: "patient_id",
-                                    headerFilter: "input",
-                                    headerHozAlign: "center",
-                                },
-                                {
-                                    title: "Name",
-                                    field: "name",
-                                    headerFilter: "input",
-                                    headerHozAlign: "center",
-                                },
 
-                                {
-                                    title: "Number",
-                                    field: "phone",
-                                    headerFilter: "input",
-                                    headerHozAlign: "center",
-                                },
-                                {
-                                    title: "Last Visit",
-                                    field: "last_visited",
-                                    headerFilter: "input",
-                                    headerHozAlign: "center",
-                                },
-                                {
-                                    title: "Doctor Assigned",
-                                    field: "doctor_assigned",
-                                    headerFilter: "input",
-                                    headerHozAlign: "center",
-                                },
-                                {
-                                    title: "Doctor ID",
-                                    field: "doctor_id",
-                                    visible: false,
-                                },
-                                {
-                                    title: "Actions",
-                                    field: "actions",
-                                    headerHozAlign: "center",
-                                    formatter: function (
-                                        cell,
-                                        formatterParams,
-                                        onRendered
+            // Paging, sorting and filtering all happen on the server (/fetch-patients).
+            function initPatientTable() {
+                const doctorNames = Array.from(
+                    document.querySelectorAll("#editDoctorAssigned option")
+                )
+                    .map((option) => option.value.trim())
+                    .filter(Boolean);
+
+                table = new Tabulator("#patient-table", {
+                    layout: "fitDataFill",
+                    ajaxURL: "/fetch-patients",
+                    ajaxParams: function () {
+                        return {
+                            search: document.getElementById("patientSearch").value.trim(),
+                            status: document.getElementById("statusFilter").value,
+                            visitedFrom: document.getElementById("visitedFrom").value,
+                            visitedTo: document.getElementById("visitedTo").value,
+                        };
+                    },
+                    pagination: true,
+                    paginationMode: "remote",
+                    paginationSize: 50,
+                    paginationSizeSelector: [25, 50, 100],
+                    paginationCounter: "rows",
+                    sortMode: "remote",
+                    filterMode: "remote",
+                    headerFilterLiveFilterDelay: 400,
+                    placeholder: "No patients found",
+                    columns: [
+                        {
+                            title: "ID",
+                            field: "patient_id",
+                            headerFilter: "input",
+                            headerHozAlign: "center",
+                        },
+                        {
+                            title: "Name",
+                            field: "name",
+                            headerFilter: "input",
+                            headerHozAlign: "center",
+                        },
+
+                        {
+                            title: "Number",
+                            field: "phone",
+                            headerFilter: "input",
+                            headerHozAlign: "center",
+                        },
+                        {
+                            title: "Last Visit",
+                            field: "last_visited",
+                            headerHozAlign: "center",
+                        },
+                        {
+                            title: "Doctor Assigned",
+                            field: "doctor_assigned",
+                            headerFilter: "list",
+                            headerFilterParams: { values: doctorNames, clearable: true },
+                            headerHozAlign: "center",
+                        },
+                        {
+                            title: "Doctor ID",
+                            field: "doctor_id",
+                            visible: false,
+                        },
+                        {
+                            title: "Actions",
+                            field: "actions",
+                            headerSort: false,
+                            headerHozAlign: "center",
+                            formatter: function (
+                                cell,
+                                formatterParams,
+                                onRendered
+                            ) {
+                                const data = cell.getRow().getData();
+                                let buttons = `
+                                <button class="btn btn-sm btn-primary edit-btn"><i class="fa fa-pencil"></i> Edit</button>
+                                
+                            `;
+
+                                if (
+                                    data.appointment_status ===
+                                    "completed"
+                                ) {
+                                    buttons += `
+                                <button class="btn btn-sm btn-primary new-appointment-btn" data-patientid="${data.patient_id}" data-doctorid="${data.doctor_id}" data-w="${data.weight}"><i class="fa fa-calendar-plus"></i> New Appointment</button>
+                                `;
+                                } else if (
+                                    data.appointment_status ==
+                                    "scheduled"
+                                ) {
+                                    buttons += ` <button class="btn btn-sm btn-secondary" disabled><i class="fa fa-calendar-plus"></i>Scheduled</button>`;
+                                    buttons += ` <button class="btn btn-sm btn-danger" onclick="cancelAppointment('${data.patient_id}')"><i class="fa fa-calendar-plus"></i>Cancel</button>`;
+                                } else if (
+                                    data.appointment_status == "billing"
+                                ) {
+                                    buttons +=
+                                        `<a class="btn btn-sm btn-info billing-btn" href="billing/` +
+                                        data.patient_id +
+                                        `"><i class="fa fa-dollar-sign"></i> Billing</a>`;
+                                    buttons += ` <button class="btn btn-sm btn-danger" onclick="cancelAppointment('${data.patient_id}')"><i class="fa fa-calendar-plus"></i>Cancel</button>`;
+                                }
+
+                                return buttons;
+                            },
+                            cellClick: function (e, cell) {
+                                const actionButton =
+                                    e.target.closest("button");
+
+                                if (actionButton) {
+                                    const data = cell
+                                        .getRow()
+                                        .getData();
+                                    if (
+                                        actionButton.classList.contains(
+                                            "new-appointment-btn"
+                                        )
                                     ) {
-                                        const data = cell.getRow().getData();
-                                        let buttons = `
-                                        <button class="btn btn-sm btn-primary edit-btn"><i class="fa fa-pencil"></i> Edit</button>
-                                        
-                                    `;
-
-                                        if (
-                                            data.appointment_status ===
-                                            "completed"
-                                        ) {
-                                            buttons += `
-                                        <button class="btn btn-sm btn-primary new-appointment-btn" data-patientid="${data.patient_id}" data-doctorid="${data.doctor_id}" data-w="${data.weight}"><i class="fa fa-calendar-plus"></i> New Appointment</button>
-                                        `;
-                                        } else if (
-                                            data.appointment_status ==
-                                            "scheduled"
-                                        ) {
-                                            buttons += ` <button class="btn btn-sm btn-secondary" disabled><i class="fa fa-calendar-plus"></i>Scheduled</button>`;
-                                            buttons += ` <button class="btn btn-sm btn-danger" onclick="cancelAppointment('${data.patient_id}')"><i class="fa fa-calendar-plus"></i>Cancel</button>`;
-                                        } else if (
-                                            data.appointment_status == "billing"
-                                        ) {
-                                            buttons +=
-                                                `<a class="btn btn-sm btn-info billing-btn" href="billing/` +
-                                                data.patient_id +
-                                                `"><i class="fa fa-dollar-sign"></i> Billing</a>`;
-                                            buttons += ` <button class="btn btn-sm btn-danger" onclick="cancelAppointment('${data.patient_id}')"><i class="fa fa-calendar-plus"></i>Cancel</button>`;
+                                        const patientId =
+                                            actionButton.getAttribute(
+                                                "data-patientid"
+                                            );
+                                        const doctorId =
+                                            actionButton.getAttribute(
+                                                "data-doctorid"
+                                            );
+                                            const weight =
+                                            actionButton.getAttribute(
+                                                "data-w"
+                                            );
+                                        if (patientId && doctorId) {
+                                            window.location.href = `/patient-complaints?patientId=${patientId}&doctorId=${doctorId}&w=${weight}`;
+                                        } else {
+                                            console.error(
+                                                "Patient ID or Doctor ID not found."
+                                            );
+                                        }
+                                    } else if (
+                                        actionButton.classList.contains(
+                                            "edit-btn"
+                                        )
+                                    ) {
+                                        // Populate the edit modal fields
+                                        document.getElementById(
+                                            "editName"
+                                        ).value = data.name;
+                                        document.getElementById(
+                                            "editAge"
+                                        ).value = data.age;
+                                        document.getElementById(
+                                            "editAddress"
+                                        ).value = data.address;
+                                        document.getElementById(
+                                            "editPhoneNo"
+                                        ).value = data.phone;
+                                        document.getElementById(
+                                            "editWeight"
+                                        ).value = data.weight;
+                                        document.getElementById(
+                                            "editGender"
+                                        ).value = data.gender;
+                                        if (data.last_visited) {
+                                            const dateParts =
+                                                data.last_visited
+                                                    .split("T")[0]
+                                                    .split("-");
+                                            const formattedDate = `${dateParts[0]}-${dateParts[1]}-${dateParts[2]}`;
+                                            document.getElementById(
+                                                "editLastVisit"
+                                            ).value = formattedDate;
+                                        } else {
+                                            document.getElementById(
+                                                "editLastVisit"
+                                            ).value = "";
                                         }
 
-                                        return buttons;
-                                    },
-                                    cellClick: function (e, cell) {
-                                        const actionButton =
-                                            e.target.closest("button");
+                                        document.getElementById(
+                                            "editDoctorAssigned"
+                                        ).value = data.doctor_assigned;
 
-                                        if (actionButton) {
-                                            const data = cell
-                                                .getRow()
-                                                .getData();
-                                            if (
-                                                actionButton.classList.contains(
-                                                    "new-appointment-btn"
+                                        document.getElementById(
+                                            "editPatientForm"
+                                        ).dataset.rowId =
+                                            data.patient_id;
+
+                                        const editModal =
+                                            new bootstrap.Modal(
+                                                document.getElementById(
+                                                    "editPatientModal"
                                                 )
-                                            ) {
-                                                const patientId =
-                                                    actionButton.getAttribute(
-                                                        "data-patientid"
-                                                    );
-                                                const doctorId =
-                                                    actionButton.getAttribute(
-                                                        "data-doctorid"
-                                                    );
-                                                    const weight =
-                                                    actionButton.getAttribute(
-                                                        "data-w"
-                                                    );
-                                                if (patientId && doctorId) {
-                                                    window.location.href = `/patient-complaints?patientId=${patientId}&doctorId=${doctorId}&w=${weight}`;
-                                                } else {
-                                                    console.error(
-                                                        "Patient ID or Doctor ID not found."
-                                                    );
-                                                }
-                                            } else if (
-                                                actionButton.classList.contains(
-                                                    "edit-btn"
-                                                )
-                                            ) {
-                                                // Populate the edit modal fields
-                                                document.getElementById(
-                                                    "editName"
-                                                ).value = data.name;
-                                                document.getElementById(
-                                                    "editAge"
-                                                ).value = data.age;
-                                                document.getElementById(
-                                                    "editAddress"
-                                                ).value = data.address;
-                                                document.getElementById(
-                                                    "editPhoneNo"
-                                                ).value = data.phone;
-                                                document.getElementById(
-                                                    "editWeight"
-                                                ).value = data.weight;
-                                                document.getElementById(
-                                                    "editGender"
-                                                ).value = data.gender;
-                                                if (data.last_visited) {
-                                                    const dateParts =
-                                                        data.last_visited
-                                                            .split("T")[0]
-                                                            .split("-");
-                                                    const formattedDate = `${dateParts[0]}-${dateParts[1]}-${dateParts[2]}`;
-                                                    document.getElementById(
-                                                        "editLastVisit"
-                                                    ).value = formattedDate;
-                                                } else {
-                                                    document.getElementById(
-                                                        "editLastVisit"
-                                                    ).value = "";
-                                                }
+                                            );
+                                        editModal.show();
+                                    } else if (
+                                        actionButton.classList.contains(
+                                            "billing-btn"
+                                        )
+                                    ) {
+                                        window.location.href = `/`; //link of billing page
+                                    }
+                                }
+                            },
+                        },
+                    ],
+                });
+            }
 
-                                                document.getElementById(
-                                                    "editDoctorAssigned"
-                                                ).value = data.doctor_assigned;
+            function initPatientFilters() {
+                const reload = () => table.setData();
 
-                                                document.getElementById(
-                                                    "editPatientForm"
-                                                ).dataset.rowId =
-                                                    data.patient_id;
+                let searchTimer;
+                document.getElementById("patientSearch").addEventListener("input", function () {
+                    clearTimeout(searchTimer);
+                    searchTimer = setTimeout(reload, 400);
+                });
+                ["statusFilter", "visitedFrom", "visitedTo"].forEach((id) =>
+                    document.getElementById(id).addEventListener("change", reload)
+                );
 
-                                                const editModal =
-                                                    new bootstrap.Modal(
-                                                        document.getElementById(
-                                                            "editPatientModal"
-                                                        )
-                                                    );
-                                                editModal.show();
-                                            } else if (
-                                                actionButton.classList.contains(
-                                                    "billing-btn"
-                                                )
-                                            ) {
-                                                window.location.href = `/`; //link of billing page
-                                            }
-                                        }
-                                    },
-                                },
-                            ],
-                        });
-                    })
-                    .catch((error) => {
-                        console.error("Error fetching patient data:", error);
-                    });
+                document.getElementById("clearPatientFilters").addEventListener("click", function () {
+                    document.getElementById("patientSearch").value = "";
+                    document.getElementById("statusFilter").value = "";
+                    document.getElementById("visitedFrom").value = "";
+                    document.getElementById("visitedTo").value = "";
+                    table.clearHeaderFilter();
+                    table.clearSort();
+                    reload();
+                });
             }
 
             function cancelAppointment(patient__id) {
@@ -552,7 +620,7 @@
                         .then((response) => response.json())
                         .then((data) => {
                             if (data.success) {
-                                fetchPatients();
+                                table.replaceData();
                                 const editModal = bootstrap.Modal.getInstance(
                                     document.getElementById("editPatientModal")
                                 );

@@ -34,7 +34,7 @@
                                 <h2>Create Prescription</h2>
                                 <ul class="breadcrumb">
                                     <li class="breadcrumb-item">
-                                        <a href="index.html"><i class="fa fa-dashboard"></i></a>
+                                        <a href="/index"><i class="fa fa-dashboard"></i></a>
                                     </li>
                                     <li class="breadcrumb-item">
                                         Create Prescription
@@ -754,7 +754,6 @@
 
         function importMedicines(instructions) {
             const medicines = cleanAndParseJSON(instructions);
-            console.log(medicines);
 
             // Clear existing medicine fields if any
             $("#medicine-container").empty();
@@ -977,7 +976,6 @@
                     `/api/patient/${patientId}/appointment/${appointmentId}`
                 );
                 const data = await response.json();
-                console.log(data)
                 document.getElementById("patientName").value =
                     data.patient.name;
                 document.getElementById("patientAge").value =
@@ -1015,15 +1013,10 @@
 
                     medList = data.medList;
 
-                    console.log("old: ", data.oldPrescription);
-
-                    console.log("Patient Complaints:", patientComplaints);
                     document.getElementById("medical-history").value =
                         data.patient.medical_history;
                     fetchComplaints(patientComplaints);
                     processOldPrescription(data.oldPrescription);
-                } else {
-                    console.log("No appointments found for this patient.");
                 }
             } catch (err) {
                 console.error("Error fetching patient data:", err);
@@ -1046,10 +1039,13 @@
                 })
                     .then((response) => response.json())
                     .then((data) => {
-                        console.log(data);
-                        importMedicines(data.prescription);
-
-
+                        if (!data.success) {
+                            alert("Could not load the previous prescription.");
+                        } else if (!data.prescription) {
+                            alert("No previous prescription found for this patient.");
+                        } else {
+                            importMedicines(data.prescription);
+                        }
                     })
                     .catch((err) => {
                         console.error(
@@ -1066,7 +1062,6 @@
             oldPrescription.forEach((prescription, index) => {
                 const prescriptionDate = new Date(prescription.prescription_date);
                 const formattedDate = `${prescriptionDate.getDate()}-${prescriptionDate.getMonth() + 1}-${prescriptionDate.getFullYear()}`;
-                console.log("Prescription Date:", prescription);
 
                 // Get vital signs from appointment data if available
                 const vitals = prescription.appointment_data || {};
@@ -1350,7 +1345,6 @@
                     container.innerHTML = "";
 
                     // Log fetched complaint data to ensure it's correct
-                    console.log("Fetched complaint data:", complaintData);
 
                     // Check if complaintData is an array and has elements
                     if (
@@ -1737,7 +1731,6 @@
         }
 
         function printDiv(divId, arr) {
-            console.log(arr)
             var vitals = "";
             if (arr.bp != "" || arr.pulse != "" || arr.spo2 !== "" || arr.temp != "" || arr.sugar != "" || arr.habits != "") {
                 vitals += `<div class="info-row" > <b>Vitals:</b> &nbsp &nbsp<span>`
@@ -2077,13 +2070,11 @@
                     electro_cg_1: document.getElementById("electro_cg_1").value,
                     echo_cg_1: document.getElementById("echo_cg_1").value
                 };
-                console.log(dosage)
 
                 printDiv("content", prescriptionData);
 
                 try {
                     // Send data to backend endpoint for processing and generating PDF
-                    console.log(prescriptionData)
                     const response = await fetch(
                         `/prescription/generate-pdf?patient_id=${patientId}&appointment_id=${appointmentId}`,
                         {
@@ -2097,7 +2088,6 @@
 
                     if (response.ok) {
                         const result = await response.json();
-                        console.log("Prescription generated:", result);
                         window.location.href = "/billing/" + patientId;
                     } else {
                         console.error(
@@ -2189,7 +2179,6 @@
 
                 try {
                     // Send data to backend endpoint for processing and generating PDF
-                    console.log(prescriptionData)
                     const response = await fetch(
                         `/prescription/generate-pdf?patient_id=${patientId}&appointment_id=${appointmentId}`,
                         {
@@ -2203,7 +2192,6 @@
 
                     if (response.ok) {
                         const result = await response.json();
-                        console.log("Prescription generated:", result);
                         window.location.href = "/billing/" + patientId;
                     } else {
                         console.error(

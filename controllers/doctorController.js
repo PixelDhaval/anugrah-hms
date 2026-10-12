@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const { withTransaction } = pool;
 const bcrypt = require('bcrypt'); // For hashing passwords
 
 exports.addDoctorForm = (req, res) => {
@@ -7,14 +8,11 @@ exports.addDoctorForm = (req, res) => {
 
 exports.getAllDoctors = async (req, res) => {
     try {
-        const client = await pool.connect();
-        const result = await client.query(`
+        const result = await pool.query(`
             SELECT name, specialization, website, encode(doctor_img, 'base64') AS doctor_img, user_id
             FROM doctors WHERE delete = false
         `);
 
-        // Ensure client is released even if an error occurs
-        client.release();
 
         result.rows.forEach(row => {
             if (row.doctor_img) {
@@ -32,8 +30,7 @@ exports.getAllDoctors = async (req, res) => {
 exports.getUserDetails = async (req, res) => {
     const userId = req.params.userId;
     try {
-        const client = await pool.connect();
-        const result = await client.query(`
+        const result = await pool.query(`
             SELECT u.user_id, u.username, u.firstname, u.lastname, u.dob, u.age, u.gender, u.mobile, 
                    d.website, d.email, d.specialization as speciality, d.doctor_img
             FROM users u
@@ -42,7 +39,6 @@ exports.getUserDetails = async (req, res) => {
         `, [userId]);
 
         const user = result.rows[0];
-        client.release();
         res.json(user);
     } catch (error) {
         console.error('Error fetching user details:', error);
@@ -55,61 +51,53 @@ exports.updateUserAndDoctor = async (req, res) => {
     const { Fname, Lname, birthdate, age, gender, phoneno, email, speciality, weburl } = req.body;
     const image = req.file;
 
-    let client;
     try {
-        client = await pool.connect();
-        await client.query('BEGIN');
-
-        const userUpdateQuery = `
-            UPDATE users
-            SET firstname = $1, lastname = $2, dob = $3, age = $4, gender = $5, mobile = $6
-            WHERE user_id = $7
-        `;
-        const userUpdateValues = [Fname, Lname, birthdate, age, gender, phoneno, userId];
-        await client.query(userUpdateQuery, userUpdateValues);
-
-        let doctorUpdateQuery;
-        let doctorUpdateValues;
-
-        if (image) {
-            doctorUpdateQuery = `
-                UPDATE doctors
-                SET name = $1, specialization = $2, website = $3, doctor_img = $4, email = $5
-                WHERE user_id = $6
+        await withTransaction(async (client) => {
+            const userUpdateQuery = `
+                UPDATE users
+                SET firstname = $1, lastname = $2, dob = $3, age = $4, gender = $5, mobile = $6
+                WHERE user_id = $7
             `;
-            doctorUpdateValues = [
-                `${Fname} ${Lname}`,
-                speciality,
-                weburl,
-                image.buffer,
-                email,
-                userId
-            ];
-        } else {
-            doctorUpdateQuery = `
-                UPDATE doctors
-                SET name = $1, specialization = $2, website = $3, email = $4
-                WHERE user_id = $5
-            `;
-            doctorUpdateValues = [
-                `${Fname} ${Lname}`,
-                speciality,
-                weburl,
-                email,
-                userId
-            ];
-        }
+            const userUpdateValues = [Fname, Lname, birthdate, age, gender, phoneno, userId];
+            await client.query(userUpdateQuery, userUpdateValues);
 
-        await client.query(doctorUpdateQuery, doctorUpdateValues);
+            let doctorUpdateQuery;
+            let doctorUpdateValues;
 
-        await client.query('COMMIT');
+            if (image) {
+                doctorUpdateQuery = `
+                    UPDATE doctors
+                    SET name = $1, specialization = $2, website = $3, doctor_img = $4, email = $5
+                    WHERE user_id = $6
+                `;
+                doctorUpdateValues = [
+                    `${Fname} ${Lname}`,
+                    speciality,
+                    weburl,
+                    image.buffer,
+                    email,
+                    userId
+                ];
+            } else {
+                doctorUpdateQuery = `
+                    UPDATE doctors
+                    SET name = $1, specialization = $2, website = $3, email = $4
+                    WHERE user_id = $5
+                `;
+                doctorUpdateValues = [
+                    `${Fname} ${Lname}`,
+                    speciality,
+                    weburl,
+                    email,
+                    userId
+                ];
+            }
+
+            await client.query(doctorUpdateQuery, doctorUpdateValues);
+        });
         res.status(200).json({ message: 'Records updated successfully' });
     } catch (error) {
         console.error('Error updating records:', error);
-        if (client) {
-            await client.query('ROLLBACK');
-            client.release();
-        }
         res.status(500).json({ error: 'Internal server error' });
     }
 };
@@ -119,24 +107,16 @@ exports.updateDoctorCredentials = async (req, res) => {
     const { userId } = req.params;
 
     try {
-        const client = await pool.connect();
-        await client.query('BEGIN');
-
         // Hash password before storing
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const upd_query = 'UPDATE users SET username = $1, password = $2 WHERE user_id = $3';
         const upd_values = [uname, hashedPassword, userId];
 
-        await client.query(upd_query, upd_values);
-        await client.query('COMMIT');
+        await pool.query(upd_query, upd_values);
         res.status(200).json({ message: 'Password updated successfully' });
     } catch (error) {
         console.error('Error updating credentials:', error);
-        if (client) {
-            await client.query('ROLLBACK');
-            client.release();
-        }
         res.status(500).json({ error: 'Internal server error' });
     }
 };

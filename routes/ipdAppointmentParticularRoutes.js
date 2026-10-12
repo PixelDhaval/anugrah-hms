@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
+const userController = require('../controllers/userController');
+
+// Every route here edits IPD bill line items, so all of them need a login
+router.use(userController.checkAuth);
 
 // Create a new IPD appointment particular
 router.post('/', async (req, res) => {
@@ -11,12 +15,10 @@ router.post('/', async (req, res) => {
             (ipd_appointment_id, indoor_service_id, rate, qty, remark) 
             VALUES ($1, $2, $3, $4, $5)
         `;
-        console.log(ipd_appointment_id, indoor_service_id, rate, qty, remark);
-        console.log(query);
         await db.query(query, [ipd_appointment_id, indoor_service_id, rate, qty, remark]);
         res.json({ message: 'Particular added successfully' });
     } catch (error) {
-        console.error(error);
+        console.error('Error adding IPD particular:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -34,7 +36,7 @@ router.put('/:id', async (req, res) => {
         await db.query(query, [indoor_service_id, rate, qty, remark, id]);
         res.json({ message: 'Particular updated successfully' });
     } catch (error) {
-        console.error(error);
+        console.error('Error updating IPD particular:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -47,7 +49,7 @@ router.delete('/:id', async (req, res) => {
         await db.query(query, [id]);
         res.json({ message: 'Particular deleted successfully' });
     } catch (error) {
-        console.error(error);
+        console.error('Error deleting IPD particular:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
