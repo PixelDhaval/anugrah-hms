@@ -2,11 +2,9 @@
 <html lang="en">
 
 <head>
-    <title>AHMS :: Create User</title>
+    <title>AHMS :: Dashboard</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="Iconic Bootstrap 4.5.0 Admin Template">
-    <meta name="author" content="WrapTheme, design by: ThemeMakker.com">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
 
     <!-- VENDOR CSS -->
@@ -16,248 +14,245 @@
 
     <!-- MAIN Project CSS file -->
     <link rel="stylesheet" href="../dist/assets/css/main.css">
-    <link rel="stylesheet" href="../dist/assets/css/tabulator_bootstrap5.css">
     <style>
-        .tabulator {
-            font-size: 12px;
-            text-align: center;
+        /* Chart colours: validated categorical slots 1-2 (blue, orange), stepped for dark mode */
+        .dash-viz {
+            --series-1: #2a78d6;
+            --series-2: #eb6834;
+            --grid: #ececea;
+            --axis: #c3c2b7;
+            --hover: rgba(0, 0, 0, 0.04);
+            --track: #f1f1ef;
         }
+        :root[data-theme="dark"] .dash-viz,
+        :root[data-theme="high-contrast"] .dash-viz {
+            --series-1: #3987e5;
+            --series-2: #d95926;
+            --grid: #2f2f2d;
+            --axis: #55554f;
+            --hover: rgba(255, 255, 255, 0.06);
+            --track: #2a2a28;
+        }
+
+        .dash-legend { display: flex; gap: 16px; font-size: 13px; margin-bottom: 8px; }
+        .dash-legend span { display: inline-flex; align-items: center; gap: 6px; }
+        .dash-swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; }
+
+        #visitsChart { position: relative; }
+        #visitsChart svg { display: block; width: 100%; height: auto; }
+        .dash-axis-text { font-size: 11px; fill: currentColor; opacity: 0.6; }
+        .dash-tooltip {
+            position: absolute; top: 0; pointer-events: none; z-index: 2;
+            background: var(--bs-body-bg, #fff); color: inherit;
+            border: 1px solid var(--axis); border-radius: 6px;
+            padding: 6px 10px; font-size: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12); white-space: nowrap;
+        }
+        .dash-tooltip-title { font-weight: 600; margin-bottom: 2px; }
+        .dash-tooltip-row { display: flex; align-items: center; gap: 6px; }
+        .dash-tooltip-row strong { margin-left: auto; padding-left: 12px; }
+
+        .dash-bar-row { display: grid; grid-template-columns: minmax(90px, 34%) 1fr auto; align-items: center; gap: 10px; padding: 5px 0; font-size: 13px; }
+        .dash-bar-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .dash-bar-track { display: block; height: 12px; background: var(--track); border-radius: 0 4px 4px 0; }
+        .dash-bar { display: block; height: 100%; min-width: 2px; background: var(--series-1); border-radius: 0 4px 4px 0; }
+        .dash-bar-value { font-variant-numeric: tabular-nums; text-align: right; min-width: 56px; }
+
+        .top_widget .number { font-variant-numeric: tabular-nums; }
+        .top_widget .content { padding-right: 56px; } /* keep long titles clear of the icon */
+        .header-dropdown .tab_btn.active { font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
+        .dash-table-toggle summary { cursor: pointer; font-size: 13px; margin-top: 8px; }
     </style>
 </head>
-
 
 <body data-theme="light" class="font-nunito">
 <div id="wrapper" class="theme-cyan">
 
     <%- include('navbar') %>
 
-
-    
-    <!-- mani page content body part -->
     <div id="main-content">
         <div class="container-fluid">
             <div class="block-header">
                 <div class="row">
                     <div class="col-lg-6 col-md-6 col-sm-12">
-                        <h2>Analytical</h2>
+                        <h2>Dashboard</h2>
                         <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="/index"><i class="fa fa-dashboard"></i></a></li>                            
-                            <li class="breadcrumb-item">Dashboard</li>
-                            <li class="breadcrumb-item active">Analytical</li>
+                            <li class="breadcrumb-item"><a href="/index"><i class="fa fa-dashboard"></i></a></li>
+                            <li class="breadcrumb-item active">Patient analytics</li>
                         </ul>
                     </div>
-                    <div class="col-lg-6 col-md-6 col-sm-12">
-                        <div class="d-flex flex-row-reverse">
-                            <div class="page_action">
-                                <button type="button" class="btn btn-primary"><i class="fa fa-download"></i> Download report</button>
-                                <button type="button" class="btn btn-secondary"><i class="fa fa-send"></i> Send report</button>
-                            </div>
-                            <div class="p-2 d-flex">
-                                
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
-            <div class="row clearfix row-deck">
-                <div class="col-xl-3 col-lg-4 col-md-12">
-                    <div class="row clearfix">
-                        <div class="col-lg-12 col-md-6">
-                            <div class="card top_widget">
-                                <div id="top_counter1" class="carousel slide" data-ride="carousel" data-interval="2500">
-                                    <div class="carousel-inner">
-                                        <div class="carousel-item active">
-                                            <div class="body">
-                                                <div class="icon"><i class="fa fa-user"></i></div>
-                                                <div class="content">
-                                                    <div class="text mb-2 text-uppercase">Total Patient</div>
-                                                    <h4 class="number mb-0">0 <span class="font-12 text-muted"><i class="fa fa-level-up"></i> 0</span></h4>
-                                                    <small class="text-muted">Analytics for last week</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-12 col-md-6">
-                            <div class="card top_widget">
-                                <div id="top_counter2" class="carousel slide" data-ride="carousel" data-interval="2000">
-                                    <div class="carousel-inner">
-                                        <div class="carousel-item active">
-                                            <div class="body">
-                                                <div class="icon"><i class="fa fa-user-md"></i></div>
-                                                <div class="content">
-                                                    <div class="text mb-2 text-uppercase">Operations</div>
-                                                    <h4 class="number mb-0">0 <span class="font-12 text-muted"><i class="fa fa-level-up"></i> 0</span></h4>
-                                                    <small class="text-muted">Analytics for last week</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-12 col-md-6">
-                            <div class="card top_widget">
-                                <div id="top_counter3" class="carousel slide" data-ride="carousel" data-interval="2300">
-                                    <div class="carousel-inner">
-                                        <div class="carousel-item active">
-                                            <div class="body">
-                                                <div class="icon"><i class="fa fa-eye"></i></div>
-                                                <div class="content">
-                                                    <div class="text mb-2 text-uppercase">Total Visitors</div>
-                                                    <h4 class="number mb-0">0 <span class="font-12 text-muted"><i class="fa fa-level-up"></i> 0</span></h4>
-                                                    <small class="text-muted">Analytics for last week</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-12 col-md-6">
-                            <div class="card top_widget">
-                                <div id="top_counter4" class="carousel slide" data-ride="carousel" data-interval="2300">
-                                    <div class="carousel-inner">
-                                        <div class="carousel-item active">
-                                            <div class="body">
-                                                <div class="icon"><i class="fa fa-thumbs-o-up"></i></div>
-                                                <div class="content">
-                                                    <div class="text mb-2 text-uppercase">Happy Clients</div>
-                                                    <h4 class="number mb-0">0</h4>
-                                                    <small class="text-muted">Analytics for last week</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-9 col-lg-8 col-md-12">
-                    <div class="card">
-                        <div class="header">
-                            <h2>Total Revenue</h2>
-                            <ul class="header-dropdown">
-                                <li><a class="tab_btn" href="javascript:void(0);" title="Weekly">W</a></li>
-                                <li><a class="tab_btn" href="javascript:void(0);" title="Monthly">M</a></li>
-                                <li><a class="tab_btn active" href="javascript:void(0);" title="Yearly">Y</a></li>
-                                <li class="dropdown">
-                                    <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"></a>
-                                    <ul class="dropdown-menu dropdown-menu-right">
-                                        <li><a href="javascript:void(0);">Action</a></li>
-                                        <li><a href="javascript:void(0);">Another Action</a></li>
-                                        <li><a href="javascript:void(0);">Something else</a></li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="body">
-                            <div class="row clearfix">
-                                <div class="col-md-4">
-                                    <div class="body primary-bg text-light">
-                                        <h4><i class="icon-wallet"></i> ₹ 0</h4>
-                                        <span>Operation Income</span>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="body secondary-bg text-light">
-                                        <h4><i class="icon-wallet"></i> ₹ 0</h4>
-                                        <span>Pharmacy Income</span>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="body bg-danger text-light">
-                                        <h4><i class="icon-wallet"></i> ₹ 0</h4>
-                                        <span>Hospital Expenses</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="apex-chart-line-column"></div>
-                        </div>
-                    </div>
-                </div>
+            <div class="alert alert-danger" id="dashboardError" hidden>
+                Could not load the dashboard data. Please refresh the page.
             </div>
 
-
-
+            <!-- Headline numbers -->
             <div class="row clearfix">
-                <div class="col-lg-12">
+                <div class="col-xl-3 col-lg-6 col-md-6">
+                    <div class="card top_widget">
+                        <div class="body">
+                            <div class="icon"><i class="fa fa-users"></i></div>
+                            <div class="content">
+                                <div class="text mb-2 text-uppercase">Total patients</div>
+                                <h4 class="number mb-0" id="statPatients">–</h4>
+                                <small class="text-muted" id="statPatientsNote">&nbsp;</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-6 col-md-6">
+                    <div class="card top_widget">
+                        <div class="body">
+                            <div class="icon"><i class="fa fa-calendar-check-o"></i></div>
+                            <div class="content">
+                                <div class="text mb-2 text-uppercase">Today's OPD appointments</div>
+                                <h4 class="number mb-0" id="statToday">–</h4>
+                                <small class="text-muted" id="statTodayNote">&nbsp;</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-6 col-md-6">
+                    <div class="card top_widget">
+                        <div class="body">
+                            <div class="icon"><i class="fa fa-bed"></i></div>
+                            <div class="content">
+                                <div class="text mb-2 text-uppercase">Admitted now (IPD)</div>
+                                <h4 class="number mb-0" id="statAdmitted">–</h4>
+                                <small class="text-muted" id="statAdmittedNote">&nbsp;</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-6 col-md-6">
+                    <div class="card top_widget">
+                        <div class="body">
+                            <div class="icon"><i class="fa fa-stethoscope"></i></div>
+                            <div class="content">
+                                <div class="text mb-2 text-uppercase">OPD visits this month</div>
+                                <h4 class="number mb-0" id="statVisits">–</h4>
+                                <small class="text-muted" id="statVisitsNote">&nbsp;</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visits over time -->
+            <div class="row clearfix">
+                <div class="col-12">
                     <div class="card">
                         <div class="header">
-                            <h2>Patients Status</h2>
+                            <h2>Patient visits</h2>
                             <ul class="header-dropdown">
-                                <li class="dropdown">
-                                    <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"></a>
-                                    <ul class="dropdown-menu dropdown-menu-right">
-                                        <li><a href="javascript:void(0);">Action</a></li>
-                                        <li><a href="javascript:void(0);">Another Action</a></li>
-                                        <li><a href="javascript:void(0);">Something else</a></li>
-                                    </ul>
-                                </li>
+                                <li><a class="tab_btn active" href="javascript:void(0);" data-range="daily" title="Last 30 days, per day">30 days</a></li>
+                                <li><a class="tab_btn" href="javascript:void(0);" data-range="monthly" title="Last 12 months, per month">12 months</a></li>
                             </ul>
+                        </div>
+                        <div class="body dash-viz">
+                            <div class="dash-legend">
+                                <span><span class="dash-swatch" style="background: var(--series-1)"></span>OPD visits</span>
+                                <span><span class="dash-swatch" style="background: var(--series-2)"></span>New patients registered</span>
+                            </div>
+                            <div id="visitsChart">
+                                <div class="dash-tooltip" id="visitsTooltip" hidden></div>
+                            </div>
+                            <details class="dash-table-toggle">
+                                <summary>Show as table</summary>
+                                <div id="visitsTable" class="table-responsive mt-2"></div>
+                            </details>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Who the patients are -->
+            <div class="row clearfix">
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="header"><h2>Patients by gender</h2></div>
+                        <div class="body dash-viz" id="genderBars"></div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="header"><h2>Patients by age group</h2></div>
+                        <div class="body dash-viz" id="ageBars"></div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="header"><h2>Top complaints <small class="text-muted">last 90 days</small></h2></div>
+                        <div class="body dash-viz" id="complaintBars"></div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="header"><h2>OPD appointments by doctor <small class="text-muted">this month</small></h2></div>
+                        <div class="body dash-viz" id="doctorBars"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IPD -->
+            <div class="row clearfix">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="header">
+                            <h2>Currently admitted patients</h2>
                         </div>
                         <div class="body">
                             <p class="float-md-right">
-                                <span class="badge badge-success">3 Admit</span>
-                                <span class="badge badge-default">2 Discharge</span>
+                                <span class="badge badge-success" id="admittedBadge">– admitted</span>
+                                <span class="badge badge-default" id="dischargedBadge">– discharged this month</span>
                             </p>
                             <div class="table-responsive table_middel">
                                 <table class="table m-b-0">
                                     <thead class="thead-dark">
                                         <tr>
-                                            <th>#</th>
-                                            <th>Patients</th>
-                                            <th>Adress</th>
-                                            <th>START Date</th>
-                                            <th>END Date</th>
-                                            <th>Priority</th>
-                                            <th>Progress</th>
-                                            <th>Status</th>
+                                            <th>Patient</th>
+                                            <th>Patient ID</th>
+                                            <th>Room / Bed</th>
+                                            <th>Doctor</th>
+                                            <th>Admitted on</th>
+                                            <th>Stay</th>
+                                            <th></th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        
+                                    <tbody id="admittedRows">
+                                        <tr><td colspan="7" class="text-center text-muted">Loading…</td></tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
-                </div>                
+                </div>
             </div>
         </div>
     </div>
-    
 </div>
- <!-- Javascript -->
- <script src="../dist/assets/bundles/libscripts.bundle.js"></script>
- <script src="../dist/assets/bundles/vendorscripts.bundle.js"></script>
- <script>
-document.addEventListener("DOMContentLoaded", () => {
-            fetch('get-user-name')
+
+<!-- Javascript -->
+<script src="../dist/assets/bundles/libscripts.bundle.js"></script>
+<script src="../dist/assets/bundles/vendorscripts.bundle.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        fetch('get-user-name')
             .then(response => response.json())
             .then(data => {
                 document.getElementById("login-name").innerHTML = data.name
-                if(data.gender == "female"){
+                if (data.gender == "female") {
                     document.getElementById("login-img").src = "../dist/assets/images/user-f.jpg"
-                } else if (data.gender == "male"){
-                document.getElementById("login-img").src = "../dist/assets/images/user-m.jpg"
-
+                } else if (data.gender == "male") {
+                    document.getElementById("login-img").src = "../dist/assets/images/user-m.jpg"
                 }
             })
-        })</script>
-
- <!-- page vendor js file -->
- <script src="../dist/assets/bundles/apexcharts.bundle.js"></script>
-
- <!-- page js file -->
- <script src="../dist/assets/bundles/mainscripts.bundle.js"></script>
- <script src="../../js/hospital/index.js"></script>
- <script src="../dist/assets/js/bootstrap.bundle.min.js"></script>
+    })
+</script>
+<script src="../dist/assets/bundles/mainscripts.bundle.js"></script>
+<script src="../dist/assets/js/bootstrap.bundle.min.js"></script>
+<script src="/js/hospital/dashboard.js"></script>
 </body>
+
 </html>

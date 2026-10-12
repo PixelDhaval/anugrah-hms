@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
+const dashboardController = require('../controllers/dashboardController');
 
 router.get('/login', (req, res) => {
     res.render('login');
@@ -15,6 +16,8 @@ router.get('/', userController.checkAuth, (req, res) => {
 router.get('/index', userController.checkAuth, (req, res) => {
     res.render("index");
 });
+
+router.get('/dashboard-data', userController.checkAuth, dashboardController.getDashboardData);
 
 router.get('/create-users', userController.checkAuth, (req, res) => {
     res.render('create-users');  
