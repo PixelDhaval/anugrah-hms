@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>AHMS :: IPD Transaction Report</title>
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        />
+        <meta
+            name="description"
+            content="Iconic Bootstrap 4.5.0 Admin Template"
+        />
+        <meta name="author" content="WrapTheme, design by: ThemeMakker.com" />
+        <link rel="icon" href="favicon.ico" type="image/x-icon" />
+
+        <!-- VENDOR CSS -->
+        <link rel="stylesheet" href="../dist/assets/css/bootstrap.min.css" />
+        <link
+            rel="stylesheet"
+            href="../dist/assets/vendor/bootstrap/css/bootstrap.min.css"
+        />
+        <link
+            rel="stylesheet"
+            href="../dist/assets/vendor/font-awesome/css/font-awesome.min.css"
+        />
+
+        <!-- MAIN Project CSS file -->
+        <link rel="stylesheet" href="../dist/assets/css/main.css" />
+        <link
+            rel="stylesheet"
+            href="../dist/assets/css/tabulator_bootstrap5.css"
+        />
+
+        <!-- Add required libraries for export functionality -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
+        <style>
+            .tabulator {
+                font-size: 12px;
+                text-align: center;
+            }
+        </style>
+    </head>
+
+    <body data-theme="light" class="font-nunito">
+        <div id="wrapper" class="theme-cyan">
+            <%- include('navbar') %>
+
+            <!--main page content body part-->
+            <div id="main-content">
+                <div class="container-fluid">
+                    <div class="block-header">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <h2>IPD Transaction Report</h2>
+                                <ul class="breadcrumb">
+                                    <li class="breadcrumb-item">
+                                        <a href="index.html"
+                                            ><i class="fa fa-dashboard"></i
+                                        ></a>
+                                    </li>
+                                    <li class="breadcrumb-item">Reports</li>
+                                    <li class="breadcrumb-item active">
+                                        IPD Transaction Report
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <div class="d-flex flex-row-reverse">
+                                    <div class="page_action">
+                                        <button
+                                            type="button"
+                                            class="btn btn-primary"
+                                            id="download-pdf"
+                                        >
+                                            <i class="fa fa-download"></i>
+                                            Download as PDF
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="btn btn-secondary"
+                                            id="download-excel"
+                                        >
+                                            <i class="fa fa-download"></i>
+                                            Download as CSV
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row clearfix">
+                        <div class="col-md-12">
+                            <div class="card patients-list">
+                                <div class="header">
+                                    <h2>IPD Transaction Report</h2>
+                                </div>
+                                <div class="body">
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-4 mb-4">
+                                            <label>From Date</label>
+                                            <input
+                                                type="date"
+                                                class="form-control"
+                                                id="fromDate"
+                                            />
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 mb-4">
+                                            <label>To Date</label>
+                                            <input
+                                                type="date"
+                                                class="form-control"
+                                                id="toDate"
+                                            />
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 mb-4 d-flex align-items-end">
+                                            <button id="searchBtn" class="btn btn-primary">
+                                                <i class="fa fa-search"></i> Search
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <div class="card bg-success text-white">
+                                                <div class="card-body">
+                                                    <h5 class="card-title">Total Transactions</h5>
+                                                    <h3 id="totalTransactions">0</h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="card bg-primary text-white">
+                                                <div class="card-body">
+                                                    <h5 class="card-title">Total Revenue</h5>
+                                                    <h3 id="totalRevenue">₹0</h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="card bg-info text-white">
+                                                <div class="card-body">
+                                                    <h5 class="card-title">Average Transaction</h5>
+                                                    <h3 id="avgTransaction">₹0</h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Add loading spinner -->
+                                    <div id="loading-indicator" class="text-center my-5" style="display: none;">
+                                        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <p class="mt-2">Loading data, please wait...</p>
+                                    </div>
+                                    
+                                    <div id="transaction-table"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Javascript -->
+        <script src="../dist/assets/bundles/libscripts.bundle.js"></script>
+        <script src="../dist/assets/bundles/vendorscripts.bundle.js"></script>
+        <!-- page vendor js file -->
+        <script src="../dist/assets/bundles/apexcharts.bundle.js"></script>
+        <!-- page js file -->
+        <script src="../dist/assets/bundles/mainscripts.bundle.js"></script>
+        <script src="../../js/hospital/index.js"></script>
+        <script src="../dist/assets/js/bootstrap.bundle.min.js"></script>
+        <script src="../dist/assets/js/tabulator.min.js"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                // Set default date values (current month)
+                const today = new Date();
+                const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+                
+                document.getElementById('fromDate').valueAsDate = firstDayOfMonth;
+                document.getElementById('toDate').valueAsDate = today;
+                
+                // Get user name for navbar
+                fetch('get-user-name')
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById("login-name").innerHTML = data.name
+                        if(data.gender == "female"){
+                            document.getElementById("login-img").src = "../dist/assets/images/user-f.jpg"
+                        } else if (data.gender == "male"){
+                            document.getElementById("login-img").src = "../dist/assets/images/user-m.jpg"
+                        }
+                    })
+                    
+                // Initialize tabulator
+                const table = new Tabulator("#transaction-table", {
+                    layout: "fitColumns",
+                    movableColumns: true,
+                    downloadConfig: {
+                        pdf: {
+                            orientation: "portrait",
+                            title: "IPD Transaction Report",
+                            filename: "ipd_transaction_report"
+                        }
+                    },
+                    columns: [
+                        {
+                            title: "Sr No.",
+                            field: "id",
+                            headerHozAlign: "center",
+                            formatter: "rownum"
+                        },
+                        {
+                            title: "Date",
+                            field: "date",
+                            headerFilter: "input",
+                            headerHozAlign: "center",
+                            sorter: "date",
+                            sorterParams: {
+                                format: "YYYY-MM-DD"
+                            }
+                        },
+                        {
+                            title: "IPD Appointment ID",
+                            field: "ipd_appointment_id",
+                            headerFilter: "input",
+                            headerHozAlign: "center",
+                        },
+                        {
+                            title: "Patient ID",
+                            field: "patient_id",
+                            headerFilter: "input",
+                            headerHozAlign: "center",
+                        },
+                        {
+                            title: "Patient Name",
+                            field: "patient_name",
+                            headerFilter: "input",
+                            headerHozAlign: "center",
+                        },
+                        {
+                            title: "Doctor Name",
+                            field: "doctor_name",
+                            headerFilter: "input",
+                            headerHozAlign: "center",
+                        },
+                        {
+                            title: "Payment Method",
+                            field: "payment_method",
+                            headerFilter: "list",
+                            headerFilterParams: {
+                                values: ["CASH", "UPI", "CARD"],
+                                clearable: true
+                            },
+                            headerHozAlign: "center",
+                        },
+                        {
+                            title: "Amount",
+                            field: "amount",
+                            headerHozAlign: "center",
+                            formatter: "money",
+                            formatterParams: {
+                                symbol: "₹",
+                                precision: 2
+                            },
+                            bottomCalc: "sum",
+                            bottomCalcFormatter: "money",
+                            bottomCalcFormatterParams: {
+                                symbol: "₹",
+                                precision: 2
+                            }
+                        },
+                        {
+                            title: "Transaction Type",
+                            field: "transaction_type",
+                            headerHozAlign: "center",
+                        },
+                        {
+                            title: "Actions",
+                            headerSort: false,
+                            headerHozAlign: "center",
+                            hozAlign: "center",
+                            formatter: function(cell) {
+                                const appointmentId = cell.getRow().getData().ipd_appointment_id;
+                                return `<a href="/view-ipd-appointment/${appointmentId}" class="btn btn-sm btn-info"><i class="fa fa-eye"></i> View</a>`;
+                            }
+                        }
+                    ],
+                });
+                
+                // Handle search button click
+                document.getElementById("searchBtn").addEventListener("click", () => {
+                    const fromDate = document.getElementById("fromDate").value;
+                    const toDate = document.getElementById("toDate").value;
+                    
+                    if (!fromDate || !toDate) {
+                        alert("Please select both from and to dates");
+                        return;
+                    }
+                    
+                    if (new Date(fromDate) > new Date(toDate)) {
+                        alert("From date cannot be greater than to date");
+                        return;
+                    }
+                    
+                    const data = {
+                        fromDate: fromDate,
+                        toDate: toDate
+                    };
+                    
+                    // Show loading indicator
+                    $("#loading-indicator").show();
+                    $("#transaction-table").hide();
+                    
+                    fetch("/get-ipd-transaction-report", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(data),
+                    })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if (data.success) {
+                            table.setData(data.data);
+                            
+                            // Update summary cards
+                            const totalTransactions = data.data.length;
+                            const totalRevenue = data.data.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+                            const avgTransaction = totalTransactions > 0 ? totalRevenue / totalTransactions : 0;
+                            
+                            document.getElementById("totalTransactions").textContent = totalTransactions;
+                            document.getElementById("totalRevenue").textContent = '₹' + totalRevenue.toFixed(2);
+                            document.getElementById("avgTransaction").textContent = '₹' + avgTransaction.toFixed(2);
+                        } else {
+                            alert("Error fetching data");
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error:", error);
+                        alert("An error occurred while fetching data");
+                    })
+                    .finally(() => {
+                        // Hide loading indicator and show table
+                        $("#loading-indicator").hide();
+                        $("#transaction-table").show();
+                    });
+                });
+                
+                // Download handlers
+                document.getElementById("download-pdf").addEventListener("click", function() {
+                    // Create a title with date range
+                    const fromDate = document.getElementById("fromDate").value;
+                    const toDate = document.getElementById("toDate").value;
+                    const titleWithDate = `IPD Transaction Report (${fromDate} to ${toDate})`;
+                    
+                    // Download with custom configuration
+                    table.download("pdf", `ipd_transaction_report_${fromDate}_to_${toDate}.pdf`, {
+                        orientation: "portrait",
+                        title: titleWithDate
+                    });
+                });
+                
+                document.getElementById("download-excel").addEventListener("click", function() {
+                    const fromDate = document.getElementById("fromDate").value;
+                    const toDate = document.getElementById("toDate").value;
+                    
+                    // Use CSV instead of XLSX
+                    table.download("csv", `ipd_transaction_report_${fromDate}_to_${toDate}.csv`, {
+                        delimiter: ",",
+                        bom: true
+                    });
+                });
+                
+                // Trigger search on page load
+                document.getElementById("searchBtn").click();
+            });
+        </script>
+    </body>
+</html>

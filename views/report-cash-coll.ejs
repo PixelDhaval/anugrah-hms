@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>AHMS :: All Patients</title>
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        />
+        <meta
+            name="description"
+            content="Iconic Bootstrap 4.5.0 Admin Template"
+        />
+        <meta name="author" content="WrapTheme, design by: ThemeMakker.com" />
+        <link rel="icon" href="favicon.ico" type="image/x-icon" />
+
+        <!-- VENDOR CSS -->
+        <link rel="stylesheet" href="../dist/assets/css/bootstrap.min.css" />
+        <link
+            rel="stylesheet"
+            href="../dist/assets/vendor/bootstrap/css/bootstrap.min.css"
+        />
+        <link
+            rel="stylesheet"
+            href="../dist/assets/vendor/font-awesome/css/font-awesome.min.css"
+        />
+
+        <!-- MAIN Project CSS file -->
+        <link rel="stylesheet" href="../dist/assets/css/main.css" />
+        <link
+            rel="stylesheet"
+            href="../dist/assets/css/tabulator_bootstrap5.css"
+        />
+
+        <style>
+            .tabulator {
+                font-size: 12px;
+                text-align: center;
+            }
+        </style>
+    </head>
+
+    <body data-theme="light" class="font-nunito">
+        <div id="wrapper" class="theme-cyan">
+            <%- include('navbar') %>
+
+            <!--main page content body part-->
+            <div id="main-content">
+                <div class="container-fluid">
+                    <div class="block-header">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <h2>Monthly OPD Report</h2>
+                                <ul class="breadcrumb">
+                                    <li class="breadcrumb-item">
+                                        <a href="index.html"
+                                            ><i class="fa fa-dashboard"></i
+                                        ></a>
+                                    </li>
+                                    <li class="breadcrumb-item">OPD Report</li>
+                                    <li class="breadcrumb-item active">
+                                        Monthly OPD Report
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <div class="d-flex flex-row-reverse">
+                                    <div class="page_action">
+                                        <button
+                                            type="button"
+                                            class="btn btn-primary"
+                                        >
+                                            <i class="fa fa-download"></i>
+                                            Download as PDF
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="btn btn-secondary"
+                                        >
+                                            <i class="fa fa-download"></i>
+                                            Download as an Excel File
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row clearfix">
+                        <div class="col-md-12">
+                            <div class="card patients-list">
+                                <div class="header">
+                                    <h2>OPD Report</h2>
+                                </div>
+                                <div class="body">
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-4 mb-4">
+                                            <label>Select Month</label>
+                                            <input
+                                                type="date"
+                                                class="form-control"
+                                                id="monthPicker"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div id="opd-table"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Javascript -->
+        <!--Javascript-->
+        <script src="../dist/assets/bundles/libscripts.bundle.js"></script>
+        <script src="../dist/assets/bundles/vendorscripts.bundle.js"></script>
+        <!-- page vendor js file -->
+        <script src="../dist/assets/bundles/apexcharts.bundle.js"></script>
+        <!-- page js file -->
+        <script src="../dist/assets/bundles/mainscripts.bundle.js"></script>
+        <script src="../../js/hospital/index.js"></script>
+        <script src="../dist/assets/js/bootstrap.bundle.min.js"></script>
+        <script src="../dist/assets/js/tabulator.min.js"></script>
+        <script>
+document.addEventListener("DOMContentLoaded", () => {
+            fetch('get-user-name')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("login-name").innerHTML = data.name
+                if(data.gender == "female"){
+                    document.getElementById("login-img").src = "../dist/assets/images/user-f.jpg"
+                } else if (data.gender == "male"){
+                document.getElementById("login-img").src = "../dist/assets/images/user-m.jpg"
+
+                }
+            })
+        })
+            document.addEventListener("DOMContentLoaded", function () {
+                const opdData = [];
+
+                const table = new Tabulator("#opd-table", {
+                    layout: "fitColumns",
+                    columns: [
+                        {
+                            title: "Sr No.",
+                            field: "id",
+                            headerHozAlign: "center",
+                            formatter: "rownum"
+                        },
+                        {
+                            title: "Patient ID",
+                            field: "patient_id",
+                            headerFilter: "input",
+                            headerHozAlign: "center",
+                        },
+                        {
+                            title: "Patient Name",
+                            field: "name",
+                            headerFilter: "input",
+                            headerHozAlign: "center",
+                        },
+                        {
+                            title: "Doctor Assigned",
+                            field: "doctor",
+                            headerHozAlign: "center",
+                            headerFilter: "input"
+                        },
+                        {
+                            title: "Payment Mode",
+                            field: "mode",
+                            headerHozAlign: "center",
+                            headerFilter: "list",
+                            headerFilterParams: {
+                                values: ["CASH", "UPI", "CARD"], // Available payment modes
+                                clearable: true // Allows clearing the filter
+                            }
+                        },
+                        {
+                            title: "total",
+                            field: "total",
+                            headerHozAlign: "center",
+                            bottomCalc: "sum"
+                        },
+                        {
+                            title: "Bill Status",
+                            field: "status",
+                            headerFilter: "list",
+                            headerFilterParams: {
+                                values: ["pending", "completed"],
+                                clearable: true
+                            },
+                            headerHozAlign: "center",
+                            formatter: function (cell) {
+                                const value = cell.getValue();
+                                let badgeClass;
+                                if (value === "pending")
+                                    badgeClass = "badge-warning";
+                                else if (value === "completed")
+                                    badgeClass = "badge-success";
+                                else badgeClass = "badge-primary";
+                                return `<span class="badge ${badgeClass}">${value}</span>`;
+                            },
+                        },
+                    ],
+                });
+
+                $("#monthPicker").change(() => {
+                    const selectedMonth = $("#monthPicker").val();
+                    var data = {
+                        date: selectedMonth
+                    }
+                    fetch("/get-cash-collection", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(data),
+                    })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if(data.success = true){
+                                table.setData(data.data);
+                            } else {
+                                alert("Error fetching data");
+                            }
+                        });
+                });
+
+                $("#monthPicker").val(getFormattedDate()).change()
+            });
+            function getFormattedDate() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-based, so add 1
+    const day = String(today.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+}
+        </script>
+    </body>
+</html>

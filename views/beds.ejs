@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>AHMS :: Appointments</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Iconic Bootstrap 4.5.0 Admin Template">
+    <meta name="author" content="WrapTheme, design by: ThemeMakker.com">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <!-- VENDOR CSS -->
+    <link rel="stylesheet" href="../dist/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../dist/assets/vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../dist/assets/vendor/font-awesome/css/font-awesome.min.css">
+
+    <!-- MAIN Project CSS file -->
+    <link rel="stylesheet" href="../dist/assets/css/main.css">
+    <link rel="stylesheet" href="../dist/assets/css/tabulator_bootstrap5.css">
+    <style>
+        .tabulator {
+            font-size: 12px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body data-theme="light" class="font-nunito">
+    <div id="wrapper" class="theme-cyan">
+
+        <!-- Page Loader -->
+        <%- include('navbar') %>
+
+
+        <!--main page content body part-->
+        <div id="main-content">
+            <div class="container-fluid">
+                <div class="block-header">
+                    <div class="row">
+                        <div class="col-lg-12 d-flex justify-content-between">
+                            <h2>Beds</h2>
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createBedModal">Create Bed</button>
+                        </div>
+                        
+
+                    </div>
+                </div>
+                <div class="row clearfix">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="body">
+                                <table class="table table-bordered table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Bed no</th>
+                                            <th>Room no</th>
+                                            <th>Room Type</th>
+                                            <th>Floor no</th>
+                                            <th>Rate</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <% beds.forEach(bed => { %>
+                                            <tr>
+                                                <td><%= bed.bed_no %></td>
+                                                <td><%= bed.room_no %></td>
+                                                <td><%= bed.room_type %></td>
+                                                <td><%= bed.floor_no %></td>
+                                                <td><%= bed.rate %></td>
+                                                <td><%= bed.status %></td>
+                                                <td>
+
+
+                                                        <button type="button" class="btn btn-primary edit-button" data-toggle="modal" data-target="#editBedModal" data-id="<%= bed.bed_id %>" data-bed-no="<%= bed.bed_no %>" data-room-id="<%= bed.room_id %>">Edit</button>
+                                                        <a href="/beds/<%= bed.bed_id %>/delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this room type?')">Delete</a>
+                                                    </td>
+
+                                                </tr>
+                                        <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+
+            </div>
+        </div>
+        <!-- Edit Appointment Modal -->
+        <div class="modal fade" id="createBedModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+
+                        <h5 class="modal-title">Create Bed</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="createBedForm" method="POST" action="/beds">
+                            <div class="form-group">
+                                <label for="bedNo">Bed No:</label>
+                                <input type="text" class="form-control" id="bedNo" name="bed_no" required>  
+                            </div>
+                            <div class="form-group">
+                                <label for="roomNo">Room No:</label>
+                                <select name="room_id" id="roomNo" class="form-control" required>
+                                    <% rooms.forEach(room => { %>
+                                        <option value="<%= room.id %>"><%= room.room_no %> - <%= room.room_type %> (Floor <%= room.floor_no %>)</option>
+                                    <% }) %>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn btn-secondary">Create</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Edit Floor Modal -->
+        <div class="modal fade" id="editBedModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+
+                        <h5 class="modal-title">Edit Bed</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editBedForm" method="POST">
+                            <input type="hidden" id="bedId" name="id">
+                            <div class="form-group">
+                                    <label for="editBedNo">Bed No:</label>
+
+                                <input type="text" class="form-control" id="editBedNo" name="bed_no" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editRoomNo">Room No:</label>
+                                <select name="room_id" id="editRoomNo" class="form-control" required>
+                                    <% rooms.forEach(room => { %>
+                                        <option value="<%= room.id %>"><%= room.room_no %> - <%= room.room_type %> (Floor <%= room.floor_no %>)</option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <!-- Javascript -->
+    <script src="../dist/assets/bundles/libscripts.bundle.js"></script>
+    <script src="../dist/assets/bundles/vendorscripts.bundle.js"></script>
+
+    <!-- page vendor js file -->
+    <script src="../dist/assets/bundles/apexcharts.bundle.js"></script>
+
+    <!-- page js file -->
+    <script src="../dist/assets/bundles/mainscripts.bundle.js"></script>
+    <script src="../../js/hospital/index.js"></script>
+    <script src="../dist/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="../dist/assets/js/tabulator.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        $('.edit-button').on('click', function() {
+            const bedId = $(this).data('id');
+            const bedNo = $(this).data('bed-no');
+            const roomId = $(this).data('room-id');
+
+
+            $('#bedId').val(bedId);
+            $('#editBedNo').val(bedNo);
+            $('#editRoomNo').val(roomId);
+
+
+        });
+
+        $('#editBedForm').submit(function(event) {
+            event.preventDefault(); // Prevent default form submission
+            const formData = $(this).serialize();
+            const url = `/beds/${$('#bedId').val()}`; // Construct the URL for PUT request
+            $.ajax({
+
+                type: 'POST',
+                url: url,
+                data: formData,
+                success: function(response) {
+                    // Handle successful update (e.g., close modal, refresh table)
+                    $('#editBedModal').modal('hide');
+                    location.reload(); // Refresh the page to reflect changes
+                },
+
+                error: function(error) {
+                    // Handle errors (e.g., display error message)
+                    console.error('Error updating bed:', error);
+                    alert('Error updating bed. Please try again.');
+
+                }
+            });
+        });
+    });
+    </script>
+
+    <!-- Create Floor Modal -->
+    
+
+    </body>
+
+</html>

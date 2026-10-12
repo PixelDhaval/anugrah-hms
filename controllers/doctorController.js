@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const bcrypt = require('bcrypt'); // For hashing passwords
 
 exports.addDoctorForm = (req, res) => {
     res.render('doctor-add');
@@ -9,8 +10,10 @@ exports.getAllDoctors = async (req, res) => {
         const client = await pool.connect();
         const result = await client.query(`
             SELECT name, specialization, website, encode(doctor_img, 'base64') AS doctor_img, user_id
-            FROM doctors
+            FROM doctors WHERE delete = false
         `);
+
+        // Ensure client is released even if an error occurs
         client.release();
 
         result.rows.forEach(row => {
@@ -31,17 +34,18 @@ exports.getUserDetails = async (req, res) => {
     try {
         const client = await pool.connect();
         const result = await client.query(`
-            SELECT u.user_id,u.username,u.firstname, u.lastname, u.dob, u.age, u.gender, u.mobile, 
+            SELECT u.user_id, u.username, u.firstname, u.lastname, u.dob, u.age, u.gender, u.mobile, 
                    d.website, d.email, d.specialization as speciality, d.doctor_img
             FROM users u
             LEFT JOIN doctors d ON u.user_id = d.user_id
-            WHERE u.user_id = $1`, [userId]);
+            WHERE u.user_id = $1 AND u.delete = false
+        `, [userId]);
 
         const user = result.rows[0];
         client.release();
-        res.json(user); 
-    } catch (err) {
-        console.error('Error fetching user details', err);
+        res.json(user);
+    } catch (error) {
+        console.error('Error fetching user details:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
@@ -50,8 +54,10 @@ exports.updateUserAndDoctor = async (req, res) => {
     const userId = req.params.userId;
     const { Fname, Lname, birthdate, age, gender, phoneno, email, speciality, weburl } = req.body;
     const image = req.file;
+
+    let client;
     try {
-        const client = await pool.connect();
+        client = await pool.connect();
         await client.query('BEGIN');
 
         const userUpdateQuery = `
@@ -59,15 +65,7 @@ exports.updateUserAndDoctor = async (req, res) => {
             SET firstname = $1, lastname = $2, dob = $3, age = $4, gender = $5, mobile = $6
             WHERE user_id = $7
         `;
-        const userUpdateValues = [
-            Fname,
-            Lname,
-            birthdate,
-            age,
-            gender,
-            phoneno,
-            userId
-        ];
+        const userUpdateValues = [Fname, Lname, birthdate, age, gender, phoneno, userId];
         await client.query(userUpdateQuery, userUpdateValues);
 
         let doctorUpdateQuery;
@@ -105,13 +103,13 @@ exports.updateUserAndDoctor = async (req, res) => {
         await client.query(doctorUpdateQuery, doctorUpdateValues);
 
         await client.query('COMMIT');
-        client.release();
-
         res.status(200).json({ message: 'Records updated successfully' });
     } catch (error) {
         console.error('Error updating records:', error);
-        await client.query('ROLLBACK');
-        client.release();
+        if (client) {
+            await client.query('ROLLBACK');
+            client.release();
+        }
         res.status(500).json({ error: 'Internal server error' });
     }
 };
@@ -124,18 +122,21 @@ exports.updateDoctorCredentials = async (req, res) => {
         const client = await pool.connect();
         await client.query('BEGIN');
 
+        // Hash password before storing
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         const upd_query = 'UPDATE users SET username = $1, password = $2 WHERE user_id = $3';
-        const upd_values = [uname, password, userId];
+        const upd_values = [uname, hashedPassword, userId];
 
         await client.query(upd_query, upd_values);
         await client.query('COMMIT');
-        client.release();
-
         res.status(200).json({ message: 'Password updated successfully' });
     } catch (error) {
-        console.error('Error updating Credentials:', error);
-        await client.query('ROLLBACK');
-        client.release();
+        console.error('Error updating credentials:', error);
+        if (client) {
+            await client.query('ROLLBACK');
+            client.release();
+        }
         res.status(500).json({ error: 'Internal server error' });
     }
 };

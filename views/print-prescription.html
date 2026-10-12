@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prescription</title>
+</head>
+<style>
+    *{
+        font-size: 20px;
+    }
+    .container{
+        width: 18.08cm;
+        margin-top: 250px;
+        padding: 0 50px 0 80px;
+    }
+    .patient-detials{
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+    }
+</style>
+<body>
+    <div class="container">
+        <div class="patient-detials">
+            <div>
+                <b>ID:</b> <span id="pat-id">P2408101</span><br>
+               <b> Name:</b> <span id="pat-name">TEST</span><br>    
+            </div>
+            <div>
+                <b>Date:</b> <span id="date">06/08/2024</span>
+            </div>
+        </div>
+        <div class="complaints">
+            <h3>Complaints:</h3>
+            <div id="complaints"></div>
+        </div>
+        <div class="medication">
+            <h3>Medication:</h3>
+            <div id="medication">TABLET 10NOS 2 TIMES A DAY BEFORE LUNCH</div>
+        </div>
+        <div class="test">
+            <h3>Tests Required:</h3>
+            <div id="test"></div>
+        </div>
+        <div class="advice">
+            <h3>Advice:</h3>
+            <div id="advice"></div>
+        </div>
+        <div class="diagnosis">
+            <h3>Diagnosis:</h3>
+            <div id="diagnosis"></div>
+        </div>
+    </div>
+</body>
+</html>

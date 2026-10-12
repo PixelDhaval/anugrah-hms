@@ -1,0 +1,2035 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>AHMS :: Home</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="Iconic Bootstrap 4.5.0 Admin Template" />
+    <meta name="author" content="WrapTheme, design by: ThemeMakker.com" />
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+
+    <!-- VENDOR CSS -->
+    <link rel="stylesheet" href="../dist/assets/vendor/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../dist/assets/vendor/font-awesome/css/font-awesome.min.css" />
+
+    <!-- MAIN Project CSS file -->
+    <link rel="stylesheet" href="../dist/assets/css/main.css" />
+    <link rel="stylesheet" href="../dist/assets/css/select2.min.css" />
+    <link rel="stylesheet" href="../richtexteditor/rte_theme_default.css" />
+
+</head>
+<style></style>
+
+<body data-theme="light" class="font-nunito">
+    <div id="wrapper" class="theme-cyan">
+        <%- include('navbar') %>
+
+            <!--main page content body part-->
+            <div id="main-content">
+                <div class="container-fluid">
+                    <div class="block-header">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <h2>Create Prescription</h2>
+                                <ul class="breadcrumb">
+                                    <li class="breadcrumb-item">
+                                        <a href="index.html"><i class="fa fa-dashboard"></i></a>
+                                    </li>
+                                    <li class="breadcrumb-item">
+                                        Create Prescription
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <button type="button" class="btn btn-primary" id="old-prescription"
+                                    data-bs-toggle="modal" data-bs-target="#oldPrescription">
+                                    View Old Prescription
+                                </button>
+                                <div class="modal fade" id="oldPrescription" tabindex="-1"
+                                    aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-xl">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title fs-5" id="exampleModalLabel">
+                                                    Old Prescription
+                                                </h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div id="prescription-container"></div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                    Close
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row clearfix">
+                        <div class="col-md-12">
+                            <form id="prescriptionForm">
+                                <div class="card patients-list">
+                                    <div class="body">
+                                        <h5>Complaints</h5>
+
+                                        <div class="input-group mt-3">
+                                            <input type="text" class="form-control" placeholder="Enter Complaint"
+                                                id="customComplaint" />
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button"
+                                                    onclick="addCustomComplaint()">
+                                                    Add
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="form-group mt-3">
+                                            <div class="input-group mt-3 mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="icon-magnifier"></i></span>
+                                                </div>
+                                                <input type="text" class="form-control" placeholder="Search Complaint"
+                                                    id="searchInput" onkeyup="searchComplaints()" />
+                                            </div>
+                                            <div class="selected-buttons mb-3" id="selected-buttons-complaint"></div>
+                                            <div class="most-common" id="mostCommonButtons-complaint"></div>
+                                            <div class="invalid-feedback">
+                                                Please provide patient's
+                                                complaints.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card patients-list">
+                                    <div class="header">
+                                        <h2>Create Prescription</h2>
+                                    </div>
+
+                                    <div class="body">
+                                        <div class="form-row">
+                                            <div class="form-group col-md-3">
+                                                <label for="patientName">Patient Name</label>
+                                                <input type="text" class="form-control" id="patientName"
+                                                    placeholder="Enter patient's name" required />
+                                                <div class="invalid-feedback">
+                                                    Please enter the patient's
+                                                    name.
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group col-md-3">
+                                                <label for="patientAge">Age</label>
+                                                <input type="text" class="form-control" id="patientAge"
+                                                    placeholder="Enter patient's age" required />
+                                                <div class="invalid-feedback">
+                                                    Please enter the patient's
+                                                    age.
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group col-md-3">
+                                                <label for="patientGender">Gender</label>
+                                                <select class="form-control" id="patientGender" required>
+                                                    <option value="" disabled selected>
+                                                        Select gender
+                                                    </option>
+                                                    <option value="Male">
+                                                        Male
+                                                    </option>
+                                                    <option value="Female">
+                                                        Female
+                                                    </option>
+                                                    <option value="Other">
+                                                        Other
+                                                    </option>
+                                                </select>
+                                                <div class="invalid-feedback">
+                                                    Please select the patient's
+                                                    gender.
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-md-3">
+                                                <label for="patientWeight">Weight</label>
+                                                <input type="text" class="form-control" id="patientWeight"
+                                                    placeholder="Enter patient's age" />
+                                                <div class="invalid-feedback">
+                                                    Please enter the patient's
+                                                    age.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-2">
+                                                <div class="input-group">
+                                                    <span class="input-group-text" id="">BP</span>
+                                                    <input type="text" class="form-control" id="bp" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="input-group">
+                                                    <span class="input-group-text" id="">Pulse</span>
+                                                    <input type="text" class="form-control" id="pulse" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="input-group">
+                                                    <span class="input-group-text" id="">SpO2</span>
+                                                    <input type="text" class="form-control" id="spo2" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="input-group">
+                                                    <span class="input-group-text" id="">Temp</span>
+                                                    <input type="text" class="form-control" id="temp" />
+                                                    <span class="input-group-text" id="">C</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="input-group">
+                                                    <span class="input-group-text" id="">Sugar</span>
+                                                    <input type="text" class="form-control" id="sugar" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="btn-group btn-group-toggle my-3 d-flex align-items-center"
+                                                    data-toggle="buttons">
+                                                    Habits:
+                                                    <label class="btn btn-outline-primary habits" id="smoking">
+                                                        <input type="checkbox" class="" value="Smoking">
+                                                        Smoking
+                                                    </label>
+                                                    <label class="btn btn-outline-primary habits" id="alcohol">
+                                                        <input type="checkbox" class="" value="Alcohol">
+                                                        Alcohol
+                                                    </label>
+                                                    <label class="btn btn-outline-primary habits" id="tobacco">
+                                                        <input type="checkbox" class="" value="Tobacco">
+                                                        Tobacco
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="medical-history">Medical History</label>
+                                            <textarea class="form-control" id="medical-history" rows="5"
+                                                placeholder="Enter dosage instructions" required></textarea>
+                                            <div class="invalid-feedback">
+                                                Please provide the dosage
+                                                instructions.
+                                            </div>
+                                        </div>
+
+                                        <div id="medicine-container"></div>
+                                        <button type="button" class="btn btn-primary mt-3" id="add-medicine">
+                                            Add Medicine
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="body">
+                                        <div class="mb-3">
+                                            <label for="electro_cg_check" class="form-label">Electro Cardiogram</label>
+                                            <input type="checkbox" id="electro_cg_check" value="true">
+                                            <div id="electro_cg_1_container">
+                                                <input type="text" class="form-control"  name="electro_cg_1" id="electro_cg_1">
+                                            </div>
+                                            <div id="electro_cg_container" class="d-none">
+                                                <textarea class="form-control" id="electro_cg" rows="3">
+                                                &lt;h2 style="text-align: center; margin:125px 0 0 0"&gt;ECG Report&lt;/h2&gt;
+                                                &lt;p&gt;&lt;strong&gt;Rate:&lt;/strong&gt; &lt;/p&gt;
+                                                &lt;p&gt;&lt;strong&gt;Rhythm:&lt;/strong&gt; &lt;/p&gt;
+                                                &lt;p&gt;&lt;strong&gt;Axis:&lt;/strong&gt; &lt;/p&gt;
+                                                &lt;p&gt;&lt;strong&gt;P waves:&lt;/strong&gt; &lt;/p&gt;
+                                                &lt;p&gt;&lt;strong&gt;Q waves:&lt;/strong&gt; &lt;/p&gt;
+                                                &lt;p&gt;&lt;strong&gt;QRS complexes:&lt;/strong&gt; &lt;/p&gt;
+                                                &lt;p&gt;&lt;strong&gt;ST segments &amp; T waves:&lt;/strong&gt; &lt;/p&gt;
+                                                &lt;p&gt;&lt;strong&gt;QT interval:&lt;/strong&gt; &lt;/p&gt;
+                                                &lt;p&gt;&lt;strong&gt;Conclusion:&lt;/strong&gt; &lt;/p&gt;
+                                            </textarea>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="echo_cg_check" class="form-label">Echo Cardiogram</label>
+                                            <input type="checkbox" id="echo_cg_check" value="true">
+                                            <div id="echo_cg_1_container">
+                                                <input type="text" class="form-control"  name="echo_cg_1" id="echo_cg_1">
+                                            </div>
+                                            <div id="echo_cg_container" class="d-none">
+
+                                                <textarea class="form-control" id="echo_cg" rows="3">
+                                                &lt;h2 style="text-align: center; margin:125px 0 0 0"&gt;Echo Cardiogram Report&lt;/h2&gt;
+                                                &lt;p&gt;&lt;strong&gt;Left Ventricle (LV):&lt;/strong&gt; Normal size and wall thickness, good systolic function, ejection fraction (EF) ~XX%&lt;/p&gt;
+                                                &lt;p&gt;&lt;strong&gt;Right Ventricle (RV):&lt;/strong&gt; Normal size and function&lt;/p&gt;
+                                                &lt;p&gt;&lt;strong&gt;Left Atrium (LA):&lt;/strong&gt; Normal size&lt;/p&gt;
+                                                &lt;p&gt;&lt;strong&gt;Right Atrium (RA):&lt;/strong&gt; Normal size&lt;/p&gt;
+                                                &lt;p&gt;&lt;strong&gt;Aortic Valve:&lt;/strong&gt; Normal structure and function, no stenosis or regurgitation&lt;/p&gt;
+                                                &lt;p&gt;&lt;strong&gt;Mitral Valve:&lt;/strong&gt; Normal structure and function, no stenosis or regurgitation&lt;/p&gt;
+                                                &lt;p&gt;&lt;strong&gt;Tricuspid Valve:&lt;/strong&gt; Normal structure and function, no significant regurgitation&lt;/p&gt;
+                                                &lt;p&gt;&lt;strong&gt;Pulmonary Valve:&lt;/strong&gt; Normal structure and function&lt;/p&gt;
+                                                &lt;p&gt;&lt;strong&gt;Pericardium:&lt;/strong&gt; No pericardial effusion&lt;/p&gt;
+                                                &lt;p&gt;&lt;strong&gt;Pulmonary Artery Pressure (PAP):&lt;/strong&gt; Normal (~XX mmHg)&lt;/p&gt;
+                                                &lt;p&gt;&lt;strong&gt;Wall Motion Abnormalities:&lt;/strong&gt; None detected&lt;/p&gt;
+                                                &lt;p&gt;&lt;strong&gt;Doppler Findings:&lt;/strong&gt; Normal blood flow velocities, no significant gradient&lt;/p&gt;
+                                                &lt;p&gt;&lt;strong&gt;Conclusion:&lt;/strong&gt; Normal echocardiogram with no significant abnormalities&lt;/p&gt;
+                                            </textarea>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card patients-list">
+                                    <div class="body">
+                                        <h5>Tests</h5>
+
+                                        <!--Tests-->
+                                        <div class="input-group mt-3">
+                                            <input type="text" class="form-control" placeholder="Enter Test"
+                                                id="customTest" />
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button"
+                                                    onclick="addCustomTest()">
+                                                    Add
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="form-group mt-3">
+                                            <div class="input-group mt-3 mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="icon-magnifier"></i></span>
+                                                </div>
+                                                <input type="text" class="form-control" placeholder="Search tests"
+                                                    id="searchInputTests" onkeyup="searchTests()" />
+                                            </div>
+                                            <div class="selected-buttons mb-3" id="selected-buttons-tests"></div>
+                                            <div class="most-common" id="mostCommonButtons-tests"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card patients-list">
+                                    <div class="body">
+                                        <h5>Diagnosis</h5>
+
+                                        <!-- Diagnosis -->
+                                        <div class="input-group mt-3">
+                                            <input type="text" class="form-control" placeholder="Enter Diagnosis"
+                                                id="customDiagnosis" />
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button"
+                                                    onclick="addCustomDiagnosis()">
+                                                    Add
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="form-group mt-3">
+                                            <div class="input-group mt-3 mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="icon-magnifier"></i></span>
+                                                </div>
+                                                <input type="text" class="form-control" placeholder="Search Diagnosis"
+                                                    id="searchInputDiagnosis" onkeyup="searchDiagnosis()" />
+                                            </div>
+                                            <div class="selected-buttons mb-3" id="selected-buttons-diagnosis"></div>
+                                            <div class="most-common" id="mostCommonButtons-diagnosis"></div>
+                                            <div class="invalid-feedback">
+                                                Please provide Diagnosis.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card patients-list">
+                                    <div class="body">
+                                        <h5>Advice</h5>
+
+                                        <div class="input-group mt-3">
+                                            <input type="text" class="form-control" placeholder="Enter Advice"
+                                                id="customAdvice" />
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button"
+                                                    onclick="addCustomAdvice()">
+                                                    Add
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="form-group mt-3">
+                                            <div class="input-group mt-3 mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="icon-magnifier"></i></span>
+                                                </div>
+                                                <input type="text" class="form-control" placeholder="Search Advice"
+                                                    id="searchInputAdvice" onkeyup="searchAdvice()" />
+                                            </div>
+                                            <div class="selected-buttons mb-3" id="selected-buttons-advice"></div>
+                                            <div class="most-common" id="mostCommonButtons-advice"></div>
+                                        </div>
+
+                                        <div class="d-flex justify-content-start mt-3 mb-3">
+
+                                            <button type="submit" class="btn btn-primary m-1" id="submitBtn">
+                                                Save and Print
+                                            </button>
+                                            <button type="button" class="btn btn-secondary m-1" id="updatePrescription">
+                                                Save
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+    <!-- Javascript -->
+    <script src="../dist/assets/bundles/libscripts.bundle.js"></script>
+    <script src="../dist/assets/bundles/vendorscripts.bundle.js"></script>
+
+    <!-- page vendor js file -->
+    <script src="../dist/assets/bundles/apexcharts.bundle.js"></script>
+
+    <!-- page js file -->
+    <script src="../dist/assets/bundles/mainscripts.bundle.js"></script>
+    <script src="../../js/hospital/index.js"></script>
+    <script src="../dist/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="../dist/assets/js/select2.min.js"></script>
+
+    <script src="../richtexteditor/rte.js"></script>
+    <script src="../richtexteditor/plugins/all_plugins.js"></script>
+    <script>
+        var editor1 = new RichTextEditor("#electro_cg", { toolbar: "basic" });
+        var editor2 = new RichTextEditor("#echo_cg", { toolbar: "basic" });
+        document.getElementById('bp').addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, ''); // Remove non-digit characters
+            if (value.length > 3) {
+                value = value.slice(0, 3) + '/' + value.slice(3, 6);
+            }
+            e.target.value = value;
+        });
+        var prescriptionId;
+
+        let medicineCount = 0;
+
+        // Function to add a new set of fields
+        function addMedicineFields() {
+            medicineCount++;
+
+            let fieldHTML = `
+        <div class="form-row align-items-end" id="medicine-${medicineCount}">
+            <div class="form-group col-md-3">
+                <label for="medicine-${medicineCount}-name">Medicine</label>
+                <select class="form-control" id="medicine-${medicineCount}-name" name="medicine[${medicineCount}][name]" required>
+                    <option value="" disabled selected></option>
+                </select>
+            </div>
+            <div class="form-group col-md-1">
+                <label for="medicine-${medicineCount}-nos">Nos</label>
+                <input type="number" class="form-control" id="medicine-${medicineCount}-nos" name="medicine[${medicineCount}][nos]" required>
+            </div>
+           
+            <div class="form-group col-md-7" id="medicine-${medicineCount}-standard-fields">
+                <div class="row">
+                    <div class="col-auto">
+                        <label for="medicine-${medicineCount}-dose-qty">Dose Qty</label>
+                        <input type="number" class="form-control" id="medicine-${medicineCount}-dose-qty" 
+                               name="medicine[${medicineCount}][dose_qty]" required step="0.1">
+                    </div>
+                    <div class="col-auto">
+                        <label>Doses</label>
+                        <div class="doses-group">
+                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                <label class="btn btn-outline-primary">
+                                    <input type="checkbox" id="medicine-${medicineCount}-morning" 
+                                           name="medicine[${medicineCount}][doses][morning]" value="morning"> Morning
+                                </label>
+                                <label class="btn btn-outline-primary">
+                                    <input type="checkbox" id="medicine-${medicineCount}-afternoon" 
+                                           name="medicine[${medicineCount}][doses][afternoon]" value="afternoon"> Afternoon
+                                </label>
+                                <label class="btn btn-outline-primary">
+                                    <input type="checkbox" id="medicine-${medicineCount}-evening" 
+                                           name="medicine[${medicineCount}][doses][evening]" value="evening"> Evening
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <label>Timing</label>
+                        <div class="btn-group btn-group-toggle d-flex" data-toggle="buttons">
+                            <label class="btn btn-outline-secondary flex-fill">
+                                <input type="radio" id="medicine-${medicineCount}-after" 
+                                       name="medicine[${medicineCount}][timing]" value="After" required> After
+                            </label>
+                            <label class="btn btn-outline-secondary flex-fill">
+                                <input type="radio" id="medicine-${medicineCount}-before" 
+                                       name="medicine[${medicineCount}][timing]" value="Before"> Before
+                            </label>
+                            <label class="btn btn-outline-secondary flex-fill">
+                                <input type="radio" id="medicine-${medicineCount}-with" 
+                                       name="medicine[${medicineCount}][timing]" value="With"> With
+                            </label>
+                            <label class="btn btn-outline-secondary flex-fill">
+                                <input type="radio" id="medicine-${medicineCount}-if-required" 
+                                       name="medicine[${medicineCount}][timing]" value="If Required"> If Required
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group col-md-7" id="medicine-${medicineCount}-custom-fields" style="display: none;">
+                <div class="row">
+                    <div class="col-md-12">
+                        <label for="medicine-${medicineCount}-custom-doses">Custom Dose Instructions</label>
+                        <input type="text" class="form-control" id="medicine-${medicineCount}-custom-doses" 
+                               name="medicine[${medicineCount}][custom_doses]" placeholder="Enter custom dose instructions">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group col-md-1">
+                <button type="button" class="btn btn-danger btn-remove-medicine">Remove</button>
+            </div>
+             <div class="form-group col-md-12">
+                <label for="medicine-${medicineCount}-is-custom">Custom</label>
+                    <input class="" type="checkbox" id="medicine-${medicineCount}-is-custom" 
+                           name="medicine[${medicineCount}][is_custom]" onchange="toggleCustomDose(${medicineCount})">
+            </div>
+            
+        </div>
+    `;
+
+            $("#medicine-container").append(fieldHTML);
+
+            // Populate the medicine dropdown
+            medList.map((item) => {
+                var option = new Option(item.name, item.name);
+                $(`#medicine-${medicineCount}-name`).append(option);
+            });
+
+            // Initialize Select2
+            $(`#medicine-${medicineCount}-name`).select2({
+                placeholder: "Select or add a medicine",
+                tags: true,
+                allowClear: true,
+                createTag: function (params) {
+                    var term = $.trim(params.term);
+                    if (term === "") {
+                        return null;
+                    }
+                    return {
+                        id: term,
+                        text: term,
+                        newTag: true,
+                    };
+                },
+            });
+
+            function setSelect2SearchBoxValue(e) {
+                var select2Data = $(e.target).select2("data");
+                if (select2Data.length > 0) {
+                    var selectedText = select2Data[0].text;
+
+                    // Access the search box and set its value
+                    var searchBox =
+                        $(e.target).data("select2").dropdown.$search ||
+                        $(e.target).data("select2").selection.$search;
+                    searchBox.val(selectedText);
+                    searchBox.trigger("keyup");
+                }
+            }
+
+            // Bind the function to the select2:open event
+            $(`#medicine-${medicineCount}-name`).on("select2:open", setSelect2SearchBoxValue);
+
+            // Handle medicine change event
+            $(`#medicine-${medicineCount}-name`).change(() => {
+                var selectedMedicine = $(
+                    `#medicine-${medicineCount}-name`
+                ).val();
+                medList.map((item) => {
+                    if (item.name === selectedMedicine) {
+                        $(`#medicine-${medicineCount}-nos`).val(item.qty);
+                        $(`#medicine-${medicineCount}-dose-qty`).val(
+                            item.dose_qty
+                        );
+                        $(`#medicine-${medicineCount}-morning`).prop(
+                            "checked",
+                            false
+                        );
+                        $(`#medicine-${medicineCount}-afternoon`).prop(
+                            "checked",
+                            false
+                        );
+                        $(`#medicine-${medicineCount}-evening`).prop(
+                            "checked",
+                            false
+                        );
+
+                        // Set checkboxes based on doses string
+                        const doses = item.doses
+                            .split(",")
+                            .map((dose) => dose.trim());
+                        doses.forEach((dose) => {
+                            $(`#medicine-${medicineCount}-${dose}`).prop(
+                                "checked",
+                                true
+                            );
+                        });
+
+                        // Ensure Bootstrap button styles are updated
+                        $(
+                            `#medicine-${medicineCount} .btn-group-toggle input[type="checkbox"]`
+                        ).each(function () {
+                            if ($(this).prop("checked")) {
+                                $(this).closest("label").addClass("active");
+                            } else {
+                                $(this)
+                                    .closest("label")
+                                    .removeClass("active");
+                            }
+                        });
+
+                        // Set radio buttons
+                        $(
+                            `input[name='medicine[${medicineCount}][timing]'][value='${item.timing}']`
+                        ).prop("checked", true);
+
+                        // Ensure Bootstrap button styles are updated
+                        $(
+                            `#medicine-${medicineCount} .btn-group-toggle input[type="radio"]`
+                        ).each(function () {
+                            if ($(this).prop("checked")) {
+                                $(this).closest("label").addClass("active");
+                            } else {
+                                $(this)
+                                    .closest("label")
+                                    .removeClass("active");
+                            }
+                        });
+                    }
+                });
+            });
+        }
+
+        function importMedicines(instructions) {
+            const medicines = cleanAndParseJSON(instructions);
+            console.log(medicines);
+
+            // Clear existing medicine fields if any
+            $("#medicine-container").empty();
+            medicineCount = 0;
+
+            medicines.forEach((medData) => {
+                // Add a new set of fields
+                addMedicineFields();
+
+                // Populate the fields with the prescription data
+                const medicineIndex = medicineCount;
+
+                $(`#medicine-${medicineIndex}-name`).val(medData.name).trigger("change");
+                $(`#medicine-${medicineIndex}-nos`).val(medData.nos);
+                $(`#medicine-${medicineIndex}-dose-qty`).val(medData.dose_qty);
+                $(`#medicine-${medicineIndex}-is-custom`).prop("checked", medData.is_custom || medData.is_custom == "1").trigger("change");
+                $(`#medicine-${medicineIndex}-custom-doses`).val(medData.custom_doses);
+
+                // Set doses checkboxes
+                const doses = medData.doses.split(",").map((dose) => dose.trim());
+                doses.forEach((dose) => {
+                    $(`#medicine-${medicineIndex}-${dose}`).prop("checked", true);
+                });
+
+                // Set the timing radio button
+                $(`input[name='medicine[${medicineIndex}][timing]'][value='${medData.timing}']`).prop("checked", true);
+
+                // Update Bootstrap button styles for checkboxes
+                $(`#medicine-${medicineIndex} .btn-group-toggle input[type="checkbox"]`).each(function () {
+                    if ($(this).prop("checked")) {
+                        $(this).closest("label").addClass("active");
+                    } else {
+                        $(this).closest("label").removeClass("active");
+                    }
+                });
+
+                // Update Bootstrap button styles for radio buttons
+                $(`#medicine-${medicineIndex} .btn-group-toggle input[type="radio"]`).each(function () {
+                    if ($(this).prop("checked")) {
+                        $(this).closest("label").addClass("active");
+                    } else {
+                        $(this).closest("label").removeClass("active");
+                    }
+                });
+            });
+        }
+
+
+        // Event listener to add fields
+        $("#add-medicine").click(() => addMedicineFields());
+
+        // Event listener to remove fields
+        $(document).on("click", ".btn-remove-medicine", function () {
+            $(this).closest(".form-row").remove();
+        });
+
+        // Function to clean and parse the JSON string
+        function cleanAndParseJSON(data) {
+            // Remove the outer curly braces and split the string into an array of strings
+            if (data == "{}") {
+                return []
+            }
+            const jsonArray = data
+                .slice(1, -1)
+                .split('","')
+                .map((str) =>
+                    str
+                        .replace(/\\\"/g, '"')
+                        .replace(/\"{/g, "{")
+                        .replace(/}\"/g, "}")
+                );
+
+            // Parse each string into an object
+            return jsonArray.map((str) => JSON.parse(str));
+        }
+
+        function processOldPrescription(oldPrescription) {
+            const prescriptionContainer = document.getElementById("prescription-container");
+            prescriptionContainer.innerHTML = ""; // Clear previous contents
+
+            oldPrescription.forEach((prescription, index) => {
+                const prescriptionDate = new Date(prescription.prescription_date);
+                const formattedDate = `${prescriptionDate.getDate()}-${prescriptionDate.getMonth() + 1}-${prescriptionDate.getFullYear()}`;
+
+                // Get vital signs from appointment data if available
+                const vitals = prescription.appointment_data || {};
+                const vitalsHtml = `
+                <div class="vitals-info">
+                    <strong class="text-primary">Vitals:</strong>
+                    <div class="row">
+                        ${vitals.bp ? `<div class="col-md-2"><strong>BP:</strong> ${vitals.bp} mmHg</div>` : ''}
+                        ${vitals.pulse ? `<div class="col-md-2"><strong>Pulse:</strong> ${vitals.pulse} bpm</div>` : ''}
+                        ${vitals.spo2 ? `<div class="col-md-2"><strong>SpO2:</strong> ${vitals.spo2}%</div>` : ''}
+                        ${vitals.temp ? `<div class="col-md-2"><strong>Temp:</strong> ${vitals.temp}°F</div>` : ''}
+                        ${vitals.sugar ? `<div class="col-md-2"><strong>Sugar:</strong> ${vitals.sugar} mg/dL</div>` : ''}
+                    </div>
+                    ${vitals.complaints ? `<div><strong>Complaints:</strong> ${vitals.complaints}</div>` : ''}
+                </div>`;
+
+                const instructions = cleanAndParseJSON(prescription.instructions);
+                const medicines = instructions.map((instruction) => ({
+                    name: instruction.name,
+                    qty: instruction.nos, // Assuming this is quantity
+                    dose_qty: instruction.dose_qty,
+                    doses: instruction.doses.split(",").map((dose) => dose.trim()),
+                    timing: instruction.timing,
+                    is_custom: instruction.is_custom,
+                    custom_doses: instruction.custom_doses
+                }));
+
+                const prescriptionContainerHTML = `
+           <div class="prescription-item card mb-3">
+                <div class="card-header">
+                    <h5 class="card-title text-secondary">Prescription Date: ${formattedDate}</h5>
+                </div>
+                <div class="card-body">
+                    ${vitalsHtml}
+                    <hr>
+                    <h6 class="card-subtitle mb-2 text-muted text-primary">Medicines:</h6>
+                    <ul class="list-group text-secondary">
+                        ${medicines.map((medicine) => `
+                            <li class="list-group-item">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong class="text-secondary">Medicine:</strong> ${medicine.name}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong class="text-secondary">Qty:</strong> ${medicine.qty}
+                                    </div>
+                                </div>` + (medicine.is_custom ? `
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <strong class="text-secondary">Custom Dose Instructions:</strong> ${medicine.custom_doses}
+                                    </div>
+                                </div>
+                                ` : `
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <strong class="text-secondary">Dose Qty:</strong> ${medicine.dose_qty}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong class="text-secondary">Doses:</strong> ${medicine.doses.join(", ")}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong class="text-secondary">Timing:</strong> ${medicine.timing}
+                                    </div>
+                                </div>`) + `
+                            </li>
+                        `).join("")}
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <strong>Advice:</strong> <span class="text-secondary">${prescription.advice}</span>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Tests:</strong> <span class="text-secondary">${prescription.medical_test}</span>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Diagnosis:</strong> <span class="text-secondary">${prescription.diagnosis}</span>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <button class="btn btn-primary btn-sm import-medicines-btn" data-index="${index}">Import Medicines</button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-secondary btn-sm import-vitals-btn" data-index="${index}">Import Vitals</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+                prescriptionContainer.innerHTML += prescriptionContainerHTML;
+            });
+
+            // Attach event listeners for the import buttons
+            document.querySelectorAll(".import-medicines-btn").forEach((button) => {
+                button.addEventListener("click", (event) => {
+                    const index = event.target.getAttribute("data-index");
+                    const medicinesToImport = cleanAndParseJSON(oldPrescription[index].instructions);
+
+                    // Call addMedicineFields for each medicine in the selected prescription
+                    importMedicines(oldPrescription[index].instructions);
+                    const modal = document.getElementById('oldPrescription');
+                    const bootstrapModal = bootstrap.Modal.getInstance(modal);
+                    bootstrapModal.hide();
+                });
+            });
+
+            // Add event listeners for importing vitals
+            document.querySelectorAll(".import-vitals-btn").forEach((button) => {
+                button.addEventListener("click", (event) => {
+                    const index = event.target.getAttribute("data-index");
+                    const vitals = oldPrescription[index].appointment_data || {};
+                    
+                    // Import vitals into the current form
+                    if (vitals.bp) document.getElementById("bp").value = vitals.bp;
+                    if (vitals.pulse) document.getElementById("pulse").value = vitals.pulse;
+                    if (vitals.spo2) document.getElementById("spo2").value = vitals.spo2;
+                    if (vitals.temp) document.getElementById("temp").value = vitals.temp;
+                    if (vitals.sugar) document.getElementById("sugar").value = vitals.sugar;
+                    
+                    const modal = document.getElementById('oldPrescription');
+                    const bootstrapModal = bootstrap.Modal.getInstance(modal);
+                    bootstrapModal.hide();
+                });
+            });
+        }
+
+        // Handle form submission
+        $("#prescriptionForm").submit(function (event) {
+            event.preventDefault();
+            const groupedData = groupFormData();
+            console.log(groupedData);
+        });
+
+        // Function to group form data by medicine
+        function toggleCustomDose(medicineCount) {
+            const isCustom = document.getElementById(`medicine-${medicineCount}-is-custom`).checked;
+            const standardFields = document.getElementById(`medicine-${medicineCount}-standard-fields`);
+            const customFields = document.getElementById(`medicine-${medicineCount}-custom-fields`);
+
+            if (isCustom) {
+                standardFields.style.display = 'none';
+                customFields.style.display = 'block';
+
+                // Make standard fields not required
+                document.getElementById(`medicine-${medicineCount}-dose-qty`).required = false;
+                document.querySelectorAll(`input[name="medicine[${medicineCount}][timing]"]`).forEach(radio => radio.required = false);
+
+                // Make custom dose field required
+                document.getElementById(`medicine-${medicineCount}-custom-doses`).required = true;
+            } else {
+                standardFields.style.display = 'block';
+                customFields.style.display = 'none';
+
+                // Make standard fields required
+                document.getElementById(`medicine-${medicineCount}-dose-qty`).required = true;
+                document.querySelectorAll(`input[name="medicine[${medicineCount}][timing]"]`)[0].required = true;
+
+                // Make custom dose field not required
+                document.getElementById(`medicine-${medicineCount}-custom-doses`).required = false;
+            }
+        }
+
+        function groupFormData() {
+            const formData = $("#prescriptionForm").serializeArray();
+            const groupedData = {};
+
+            formData.forEach((field) => {
+                const [fullKey, index, key, subKey] = field.name.match(/medicine\[(\d+)\]\[(\w+)\](?:\[(\w+)\])?/) || [];
+
+                if (!groupedData[index]) {
+                    groupedData[index] = {
+                        is_custom: false,
+                        custom_doses: '',
+                        doses: []
+                    };
+                }
+
+                if (key === 'is_custom') {
+                    groupedData[index].is_custom = true;
+                } else if (key === 'custom_doses') {
+                    groupedData[index].custom_doses = field.value;
+                } else if (key === 'doses') {
+                    groupedData[index].doses.push(subKey);
+                } else {
+                    groupedData[index][key] = field.value;
+                }
+            });
+
+            return Object.values(groupedData).map(medicine => {
+                if (medicine.is_custom) {
+                    return {
+                        name: medicine.name,
+                        nos: medicine.nos,
+                        is_custom: true,
+                        custom_doses: medicine.custom_doses,
+                        dose_qty: '',
+                        doses: '',
+                        timing: ''
+                    };
+                } else {
+                    return {
+                        name: medicine.name,
+                        nos: medicine.nos,
+                        is_custom: false,
+                        custom_doses: '',
+                        dose_qty: medicine.dose_qty,
+                        doses: medicine.doses.join(', '),
+                        timing: medicine.timing
+                    };
+                }
+            });
+        }
+
+        // Function to populate fields from the array of dictionaries
+        function populateFields(medicineArray) {
+            medicineArray.forEach((medicine) =>
+                addMedicineFields(medicine)
+            );
+        }
+
+        var medList;
+        // Example usage
+
+        document.addEventListener("DOMContentLoaded", () => {
+            fetch("get-user-name")
+                .then((response) => response.json())
+                .then((data) => {
+                    document.getElementById("login-name").innerHTML =
+                        data.name;
+                    if (data.gender == "female") {
+                        document.getElementById("login-img").src =
+                            "../dist/assets/images/user-f.jpg";
+                    } else if (data.gender == "male") {
+                        document.getElementById("login-img").src =
+                            "../dist/assets/images/user-m.jpg";
+                    }
+                });
+        });
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+        let billId;
+        let patientId;
+        let appointmentId;
+        document.addEventListener("DOMContentLoaded", async () => {
+            patientId = getQueryParam("patientId");
+            appointmentId = getQueryParam("appointmentId");
+
+            try {
+                const response = await fetch(
+                    `/api/patient/${patientId}/appointment/${appointmentId}`
+                );
+                const data = await response.json();
+                console.log(data);
+                document.getElementById("patientName").value =
+                    data.patient.name;
+
+                document.getElementById("patientAge").value =
+                    data.patient.age;
+                document.getElementById("patientGender").value =
+                    data.patient.gender;
+                document.getElementById("patientWeight").value =
+                    data.patient.weight;
+                document.getElementById("pulse").value =
+                    data.appointmentData.pulse;
+                document.getElementById("spo2").value =
+                    data.appointmentData.spo2;
+                document.getElementById("bp").value =
+                    data.appointmentData.bp;
+                document.getElementById("temp").value =
+                    data.appointmentData.temp;
+                document.getElementById("sugar").value =
+                    data.appointmentData.sugar;
+                const habitsArray = data.patient.habits.split(',').map(habit => habit.trim());
+
+                if (habitsArray.includes("Smoking")) {
+                    document.getElementById("smoking").classList.add("active");
+                }
+                if (habitsArray.includes("Alcohol")) {
+                    document.getElementById("alcohol").classList.add("active");
+                }
+                if (habitsArray.includes("Tobacco")) {
+                    document.getElementById("tobacco").classList.add("active");
+                }
+                editor1.setHTMLCode(data.prescription.electro_cg);
+                editor2.setHTMLCode(data.prescription.echo_cg);
+                if (data.appointments.length > 0) {
+                    const complaints = data.appointments[0];
+                    const patientComplaints = complaints
+                        ? complaints.split(",").map((c) => c.trim())
+                        : [];
+                    const prescription = data.prescription;
+                    console.log(prescription);
+                    const testList = prescription.medical_test;
+                    const adviceList = prescription.advice;
+                    const diagnosisList = prescription.diagnosis
+                        ? prescription.medical_test
+                            .split(",")
+                            .map((c) => c.trim())
+                        : [];
+                    
+                    processOldPrescription(data.oldPrescription);
+                    console.log("Patient Complaints:", patientComplaints);
+                    document.getElementById("medical-history").value =
+                        data.patient.medical_history;
+                    prescriptionId = prescription.prescription_id;
+                    console.log(data.prescription);
+                    medList = data.medList;
+
+                    document.getElementById("electro_cg_1").value = prescription.electro_cg_1
+                    document.getElementById("echo_cg_1").value = prescription.echo_cg_1
+                    importMedicines(prescription.instructions)
+                    billId = prescription.bill_id
+                    fetchComplaints(patientComplaints);
+                    fetchTests(testList);
+                    fetchDiagnosis(diagnosisList);
+                    fetchAdvice(adviceList);
+                } else {
+                    console.log("No appointments found for this patient.");
+                }
+            } catch (err) {
+                console.error("Error fetching patient data:", err);
+            }
+        });
+
+        function toggleButtonSelection(button) {
+            if (button.classList.contains("btn-outline-secondary")) {
+                button.classList.remove("btn-outline-secondary");
+                button.classList.add("btn-secondary", "selected-button");
+                button.style.color = "white";
+            } else {
+                button.classList.remove("btn-secondary", "selected-button");
+                button.classList.add("btn-outline-secondary");
+                button.style.color = "";
+            }
+        }
+        function addButton(button, selectedButtonsId, mostCommonButtonsId) {
+            button.type = "button"; // Ensure the button does not submit the form
+            button.addEventListener("click", function (event) {
+                event.preventDefault(); // Prevent form submission
+
+                const selectedButtonsDiv =
+                    document.getElementById(selectedButtonsId);
+                const buttonText = button.innerText;
+
+                const existingButton = Array.from(
+                    selectedButtonsDiv.children
+                ).find((child) => child.innerText === buttonText);
+                if (existingButton) {
+                    selectedButtonsDiv.removeChild(existingButton);
+                    button.classList.remove(
+                        "btn-secondary",
+                        "selected-button"
+                    );
+                    button.classList.add("btn-outline-secondary");
+                    button.style.color = "";
+                } else {
+                    const newButton = document.createElement("button");
+                    newButton.className =
+                        "btn btn-secondary selected-button m-1";
+                    newButton.innerText = buttonText;
+                    newButton.onclick = function () {
+                        selectedButtonsDiv.removeChild(newButton);
+                        const originalButton = Array.from(
+                            document.querySelectorAll(
+                                `#${mostCommonButtonsId} button`
+                            )
+                        ).find((btn) => btn.innerText === buttonText);
+                        if (originalButton) {
+                            originalButton.classList.remove(
+                                "btn-secondary",
+                                "selected-button"
+                            );
+                            originalButton.classList.add(
+                                "btn-outline-secondary"
+                            );
+                            originalButton.style.color = "";
+                        }
+                    };
+                    selectedButtonsDiv.appendChild(newButton);
+                    button.classList.remove("btn-outline-secondary");
+                    button.classList.add(
+                        "btn-secondary",
+                        "selected-button"
+                    );
+                    button.style.color = "white";
+                }
+            });
+        }
+
+        function addCustomComplaint() {
+            const customComplaintInput =
+                document.getElementById("customComplaint");
+            const complaintText = customComplaintInput.value.trim();
+
+            if (complaintText === "") return;
+
+            fetch("/add-complaint", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ complaint: complaintText }),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        const selectedButtonsDiv = document.getElementById(
+                            "selected-buttons-complaint"
+                        );
+                        const mostCommonButtonsDiv =
+                            document.getElementById(
+                                "mostCommonButtons-complaint"
+                            );
+
+                        const newButton = document.createElement("button");
+                        newButton.className =
+                            "btn btn-secondary selected-button m-1";
+                        newButton.innerText = complaintText;
+                        newButton.onclick = function () {
+                            selectedButtonsDiv.removeChild(newButton);
+                        };
+
+                        selectedButtonsDiv.appendChild(newButton);
+
+                        const mostCommonButton =
+                            document.createElement("button");
+                        mostCommonButton.className =
+                            "btn btn-outline-secondary m-1";
+                        mostCommonButton.innerText = complaintText;
+                        mostCommonButton.onclick = function () {
+                            addButton(
+                                mostCommonButton,
+                                "selected-buttons-complaint",
+                                "mostCommonButtons-complaint"
+                            );
+                        };
+
+                        mostCommonButtonsDiv.appendChild(mostCommonButton);
+
+                        customComplaintInput.value = "";
+                    } else {
+                        console.error(
+                            "Error adding complaint:",
+                            data.error
+                        );
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error adding complaint:", error);
+                });
+        }
+
+        function searchComplaints() {
+            const searchInput = document
+                .getElementById("searchInput")
+                .value.toLowerCase();
+            const buttons = document.querySelectorAll(
+                "#mostCommonButtons-complaint button"
+            );
+
+            buttons.forEach((button) => {
+                const complaint = button.innerText.toLowerCase();
+                button.style.display = complaint.includes(searchInput)
+                    ? "inline-block"
+                    : "none";
+            });
+        }
+
+        function fetchComplaints(patientComplaintList = []) {
+            fetch("/fetch-complaints")
+                .then((response) => response.json())
+                .then((complaintData) => {
+                    const container = document.getElementById(
+                        "mostCommonButtons-complaint"
+                    );
+                    container.innerHTML = "";
+
+                    complaintData.forEach((complaintObj) => {
+                        const complaint = complaintObj.complaint;
+                        const button = document.createElement("button");
+                        button.className = "btn btn-outline-secondary m-1";
+                        button.textContent = complaint;
+                        button.onclick = function () {
+                            addButton(
+                                button,
+                                "selected-buttons-complaint",
+                                "mostCommonButtons-complaint"
+                            );
+                        };
+
+                        if (patientComplaintList.includes(complaint)) {
+                            button.classList.add(
+                                "btn-secondary",
+                                "selected-button"
+                            );
+                            button.style.color = "white";
+                        }
+
+                        container.appendChild(button);
+                    });
+                })
+                .catch((error) => {
+                    console.error("Error fetching complaints:", error);
+                });
+        }
+
+        // Tests
+        function addCustomTest() {
+            const customTestInput = document.getElementById("customTest");
+            const testText = customTestInput.value.trim();
+
+            if (testText === "") return;
+
+            fetch("prescription/add-test", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ test: testText }),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        const selectedButtonsDiv = document.getElementById(
+                            "selected-buttons-tests"
+                        );
+                        const mostCommonButtonsDiv =
+                            document.getElementById(
+                                "mostCommonButtons-tests"
+                            );
+
+                        const newButton = document.createElement("button");
+                        newButton.className =
+                            "btn btn-secondary selected-button mb-2";
+                        newButton.innerText = testText;
+                        newButton.onclick = function () {
+                            selectedButtonsDiv.removeChild(newButton);
+                        };
+
+                        selectedButtonsDiv.appendChild(newButton);
+
+                        const mostCommonButton =
+                            document.createElement("button");
+                        mostCommonButton.className =
+                            "btn btn-outline-secondary m-1";
+                        mostCommonButton.innerText = testText;
+                        mostCommonButton.onclick = function () {
+                            addButton(
+                                mostCommonButton,
+                                "selected-buttons-tests",
+                                "mostCommonButtons-tests"
+                            );
+                        };
+
+                        mostCommonButtonsDiv.appendChild(mostCommonButton);
+
+                        customTestInput.value = "";
+                    } else {
+                        console.error("Error adding test:", data.error);
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error adding test:", error);
+                });
+        }
+
+        function searchTests() {
+            const searchInput = document
+                .getElementById("searchInputTests")
+                .value.toLowerCase();
+            const buttons = document.querySelectorAll(
+                "#mostCommonButtons-tests button"
+            );
+
+            buttons.forEach((button) => {
+                const test = button.innerText.toLowerCase();
+                button.style.display = test.includes(searchInput)
+                    ? "inline-block"
+                    : "none";
+            });
+        }
+
+        function fetchTests(testList) {
+            fetch("/prescription/fetch-tests")
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(
+                            `HTTP error! status: ${response.status}`
+                        );
+                    }
+                    return response.json();
+                })
+                .then((testData) => {
+                    const container = document.getElementById(
+                        "mostCommonButtons-tests"
+                    );
+                    container.innerHTML = "";
+
+                    testData.forEach((testObj) => {
+                        const test = testObj.tests;
+                        const button = document.createElement("button");
+                        button.className = "btn btn-outline-secondary m-1";
+                        button.textContent = test;
+                        button.onclick = function () {
+                            addButton(
+                                button,
+                                "selected-buttons-tests",
+                                "mostCommonButtons-tests"
+                            );
+                        };
+                        if (testList.includes(test)) {
+                            button.classList.add(
+                                "btn-secondary",
+                                "selected-button"
+                            );
+                            button.style.color = "white";
+                        }
+                        container.appendChild(button);
+                    });
+                })
+                .catch((error) => {
+                    console.error("Error fetching tests:", error);
+                });
+        }
+
+        // Diagnosis
+        function addCustomDiagnosis() {
+            const customDiagnosisInput =
+                document.getElementById("customDiagnosis");
+            const diagnosisText = customDiagnosisInput.value.trim();
+
+            if (diagnosisText === "") return;
+
+            fetch("prescription/add-diagnosis", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ diagnosis: diagnosisText }),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        const selectedButtonsDiv = document.getElementById(
+                            "selected-buttons-diagnosis"
+                        );
+                        const mostCommonButtonsDiv =
+                            document.getElementById(
+                                "mostCommonButtons-diagnosis"
+                            );
+
+                        const newButton = document.createElement("button");
+                        newButton.className =
+                            "btn btn-secondary selected-button m-1";
+                        newButton.innerText = diagnosisText;
+                        newButton.onclick = function () {
+                            selectedButtonsDiv.removeChild(newButton);
+                        };
+
+                        selectedButtonsDiv.appendChild(newButton);
+
+                        const mostCommonButton =
+                            document.createElement("button");
+                        mostCommonButton.className =
+                            "btn btn-outline-secondary m-1";
+                        mostCommonButton.innerText = diagnosisText;
+                        mostCommonButton.onclick = function () {
+                            addButton(
+                                mostCommonButton,
+                                "selected-buttons-diagnosis",
+                                "mostCommonButtons-diagnosis"
+                            );
+                        };
+
+                        mostCommonButtonsDiv.appendChild(mostCommonButton);
+
+                        customDiagnosisInput.value = "";
+                    } else {
+                        console.error(
+                            "Error adding diagnosis:",
+                            data.error
+                        );
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error adding diagnosis:", error);
+                });
+        }
+
+        function searchDiagnosis() {
+            const searchInput = document
+                .getElementById("searchInputDiagnosis")
+                .value.toLowerCase();
+            const buttons = document.querySelectorAll(
+                "#mostCommonButtons-diagnosis button"
+            );
+
+            buttons.forEach((button) => {
+                const diagnosis = button.innerText.toLowerCase();
+                button.style.display = diagnosis.includes(searchInput)
+                    ? "inline-block"
+                    : "none";
+            });
+        }
+
+        function fetchDiagnosis(diagnosisList) {
+            fetch("/prescription/fetch-diagnosis")
+                .then((response) => response.json())
+                .then((diagnosisData) => {
+                    const container = document.getElementById(
+                        "mostCommonButtons-diagnosis"
+                    );
+                    container.innerHTML = "";
+
+                    diagnosisData.forEach((diagnosisObj) => {
+                        const diagnosis = diagnosisObj.diagnosis;
+                        const button = document.createElement("button");
+                        button.className = "btn btn-outline-secondary m-1";
+                        button.textContent = diagnosis;
+                        button.onclick = function () {
+                            addButton(
+                                button,
+                                "selected-buttons-diagnosis",
+                                "mostCommonButtons-diagnosis"
+                            );
+                        };
+                        if (diagnosisList.includes(diagnosis)) {
+                            button.classList.add(
+                                "btn-secondary",
+                                "selected-button"
+                            );
+                            button.style.color = "white";
+                        }
+                        container.appendChild(button);
+                    });
+                })
+                .catch((error) => {
+                    console.error("Error fetching diagnosis:", error);
+                });
+        }
+
+        //advice
+        function addCustomAdvice() {
+            const customAdviceInput =
+                document.getElementById("customAdvice");
+            const adviceText = customAdviceInput.value.trim();
+
+            if (adviceText === "") return;
+
+            fetch("/prescription/add-advice", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ advice: adviceText }),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        const selectedButtonsDiv = document.getElementById(
+                            "selected-buttons-advice"
+                        );
+                        const mostCommonButtonsDiv =
+                            document.getElementById(
+                                "mostCommonButtons-advice"
+                            );
+
+                        const newButton = document.createElement("button");
+                        newButton.className =
+                            "btn btn-secondary selected-button m-1";
+                        newButton.innerText = adviceText;
+                        newButton.onclick = function () {
+                            selectedButtonsDiv.removeChild(newButton);
+                        };
+                        selectedButtonsDiv.appendChild(newButton);
+
+                        const mostCommonButton =
+                            document.createElement("button");
+                        mostCommonButton.className =
+                            "btn btn-outline-secondary m-1";
+                        mostCommonButton.innerText = adviceText;
+                        mostCommonButton.onclick = function () {
+                            addButton(
+                                mostCommonButton,
+                                "selected-buttons-advice",
+                                "mostCommonButtons-advice"
+                            );
+                        };
+                        mostCommonButtonsDiv.appendChild(mostCommonButton);
+
+                        customAdviceInput.value = "";
+                    } else {
+                        console.error("Error adding advice:", data.error);
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error adding advice:", error);
+                });
+        }
+
+        function searchAdvice() {
+            const searchInput = document
+                .getElementById("searchInputAdvice")
+                .value.toLowerCase();
+            const buttons = document.querySelectorAll(
+                "#mostCommonButtons-advice button"
+            );
+
+            buttons.forEach((button) => {
+                const advice = button.innerText.toLowerCase();
+                button.style.display = advice.includes(searchInput)
+                    ? "inline-block"
+                    : "none";
+            });
+        }
+
+        function fetchAdvice(adviceList) {
+            fetch("/prescription/fetch-advice")
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(
+                            `HTTP error! status: ${response.status}`
+                        );
+                    }
+                    return response.json();
+                })
+                .then((adviceData) => {
+                    const container = document.getElementById(
+                        "mostCommonButtons-advice"
+                    );
+                    container.innerHTML = "";
+
+                    adviceData.forEach((adviceObj) => {
+                        const advice = adviceObj.advice;
+                        const button = document.createElement("button");
+                        button.className = "btn btn-outline-secondary m-1";
+                        button.textContent = advice;
+                        button.onclick = function () {
+                            addButton(
+                                button,
+                                "selected-buttons-advice",
+                                "mostCommonButtons-advice"
+                            );
+                        };
+                        if (adviceList.includes(advice)) {
+                            button.classList.add(
+                                "btn-secondary",
+                                "selected-button"
+                            );
+                            button.style.color = "white";
+                        }
+                        container.appendChild(button);
+                    });
+                })
+                .catch((error) => {
+                    console.error("Error fetching advice:", error);
+                });
+        }
+        function getFormattedDate() {
+            const today = new Date();
+            const day = String(today.getDate()).padStart(2, "0");
+            const month = String(today.getMonth() + 1).padStart(2, "0"); // January is 0!
+            const year = today.getFullYear();
+
+            return `${day}/${month}/${year}`;
+        }
+
+        function printDiv(divId, arr) {
+            console.log(arr)
+            var vitals = "";
+            if (arr.bp != "" || arr.pulse != "" || arr.spo2 !== "" || arr.temp != "" || arr.sugar != "" || arr.habits != "") {
+                vitals += `<div class="info-row" > <b>Vitals:</b> &nbsp &nbsp<span>`
+                if (arr.bp != "") {
+                    vitals += `<b>BP:</b> ${arr.bp} mmHg &nbsp &nbsp &nbsp &nbsp`;
+                }
+                if (arr.pulse != "") {
+                    vitals += `<b>Pulse:</b> ${arr.pulse} bpm &nbsp &nbsp &nbsp &nbsp`;
+                }
+                if (arr.spo2 != "") {
+                    vitals += `<b>SpO2:</b> ${arr.spo2}% &nbsp &nbsp &nbsp &nbsp`;
+                }
+                if (arr.temp != "") {
+                    vitals += `<b>Temp:</b> ${arr.temp}F &nbsp &nbsp &nbsp &nbsp`;
+                }
+                if (arr.sugar != "") {
+                    vitals += `<b>Sugar:</b> ${arr.sugar} mg/dL &nbsp &nbsp &nbsp &nbsp`;
+                }
+                var habits = ""
+                if (arr.habits != "") {
+                    habits += `<div class="info-row"><b>Habits:</b> ${arr.habits} </div>`;
+                }
+                vitals += `</span></div>`
+
+            }
+            var patientId = arr.patientId;
+            var patientName = arr.patientName;
+            var date = getFormattedDate();
+            var complaintsString =
+                arr.complaints && arr.complaints != ""
+                    ? `<div class="info-row">
+                    <strong>Complaints:</strong> ${arr.complaints.join(", ")}
+                </div>`
+                    : "";
+            var dosage = arr.dosage.map((item, i) => {
+                if (item.is_custom) {
+                    return `
+        <div class="med-row">
+            <div class="w-5">${i + 1}</div>
+            <div class="w-50">${item.name}</div>
+            <div class="w-10">${item.custom_doses}</div>
+            <div class="w-10">-</div>
+            <div class="w-10">${item.nos}</div>
+        </div>`;
+                }
+
+                var timing = item.timing == "If Required" ? "" : "lunch/dinner";
+                var doseString = item.doses.includes("morning")
+            ? (item.dose_qty == "0.5" ? "1/2" : (item.dose_qty))
+            : "0";
+        doseString += item.doses.includes("afternoon")
+            ? "-" + (item.dose_qty == "0.5" ? "1/2" : (item.dose_qty))
+            : "-0";
+        doseString += item.doses.includes("evening")
+            ? "-" + (item.dose_qty == "0.5" ? "1/2" : (item.dose_qty))
+            : "-0";
+
+                return `
+    <div class="med-row">
+        <div class="w-5">${i + 1}</div>
+        <div class="w-50">${item.name}</div>
+        <div class="w-10">${doseString}</div>
+        <div class="w-10">${item.timing} Meal</div>
+        <div class="w-10">${item.nos}</div>
+    </div>`;
+            });
+
+            var medical_history =
+                arr.medical_history && arr.medical_history != ""
+                    ? `
+        <div class="info-row">
+            <strong>Medical History:</strong> ${arr.medical_history}
+        </div>`
+                    : "";
+
+            var dosageString = dosage.join("");
+
+            var electro_cg = arr.electro_cg && arr.electro_cg != "" ?
+                `<div class="info-row">
+                <strong>Electro Cardiogram:</strong> ${arr.electro_cg}
+                </div>` : "";
+
+            var echo_cg = arr.echo_cg && arr.echo_cg != "" ?
+                `<div class="info-row">
+                <strong>Echo Cardiogram:</strong> ${arr.echo_cg}
+                </div>` : "";
+
+            var test =
+                arr.tests && arr.tests != ""
+                    ? `
+        <div class="info-row">
+            <strong>Tests Required:</strong> ${arr.tests}
+        </div>`
+                    : "";
+
+            var advice =
+                arr.advice && arr.advice != ""
+                    ? `
+        <div class="info-row">
+            <strong>Advice:</strong> ${arr.advice}
+        </div>`
+                    : "";
+
+            var diagnosis =
+                arr.diagnosis && arr.diagnosis != ""
+                    ? `
+        <div class="info-row">
+            <strong>Diagnosis:</strong> ${arr.diagnosis}
+        </div>`
+                    : "";
+
+            var doctor = `
+        Dr. ${document.getElementById("login-name").innerHTML
+                }<br>(M.B.B.S., M.D.)`;
+
+            var patientAge = document.getElementById("patientAge").value;
+            var patientGender =
+                document.getElementById("patientGender").value;
+            var patientWeight =
+                parseFloat(document.getElementById("patientWeight").value).toFixed(2);
+
+            const printWindow = window.open("", "", "");
+            printWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Prescription</title>
+        </head>
+        <style>
+            * {
+                font-size: 20px;
+            }
+            .patient-detials {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+            }
+            .doctor-sign {
+                text-align: right;
+                margin-top: 100px;
+            }
+            .container {
+                width: 18.08cm;
+                margin: 0;
+                padding: 0 50px 0 100px;
+            }
+            @media print {
+                body {
+                    margin: 0;
+                    padding: 0;
+                }
+                @page {
+                    margin: 220px 50px 50px 20px;
+                }
+                .container::before {
+                    content: "";
+                    display: block;
+                    height: 250px;
+                    margin-top: -250px;
+                    visibility: hidden;
+                }
+                .container {
+                    page-break-before: always;
+                }
+            }
+            .med-row {
+                display: flex;
+                padding: 10px 0;
+                border-bottom: 1px solid black;
+            }
+                .w-5{
+                    width:5%;
+                }
+            .w-50 {
+                width: 50%;
+                font-size: 18px;
+            }
+            .w-10 {
+                width: 15%;
+                text-align: center;
+                font-size: 18px;
+            }
+            .info-row {
+                display: flex;
+                padding: 10px 0;
+            }
+            .info-row strong {
+                width: 30%;
+            }
+        </style>
+        <body>
+            <div class="container">
+                <div class="patient-detials">
+                    <div>
+                        <b>ID:</b> <span id="pat-id">${patientId}</span><br>
+                        <b>Name:</b> <span id="pat-name">${patientName}</span><br>
+                        <b>Age:</b> ${patientAge} &nbsp &nbsp &nbsp &nbsp <b>Gender:</b> ${patientGender} &nbsp &nbsp &nbsp &nbsp <b>Weight:</b> ${parseFloat(patientWeight).toFixed(2)} KG
+                    </div>
+                    <div>
+                        <b>Date:</b> <span id="date">${date}</span>
+                    </div>
+                </div>
+                ${complaintsString}
+                ${medical_history}
+                ${vitals}
+                ${habits}
+                <div class="medication">
+                    <div class="med-row">
+                        <div class="w-5"><b>#</b></div>
+                        <div class="w-50"><b>Name</b></div>
+                        <div class="w-10"><b>Dose</b></div>
+                        <div class="w-10"><b>Timing</b></div>
+                        <div class="w-10"><b>Total</b></div>
+                    </div>
+                    ${dosageString}
+                </div>
+                ${electro_cg}
+                ${echo_cg}
+                ${test}
+                ${advice}
+                ${diagnosis}
+                <div class="doctor-sign">
+                    ${doctor}
+                </div>
+            </div>
+        </body>
+        </html>
+    `);
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.onload = function () {
+                printWindow.print();
+                printWindow.close();
+            };
+        }
+        function getSelectedHabits() {
+            // Array to store selected habits
+            var result = [];
+
+            // Select all habit checkboxes by class name
+            var checkboxes = document.querySelectorAll(".habits");
+
+            // Iterate through each checkbox and check if it's selected
+            checkboxes.forEach(function (checkbox) {
+                if (checkbox.classList.contains("active")) {
+
+                    result.push(checkbox.innerText);
+                }
+            });
+
+            // Convert the array to a comma-separated string
+            return result.join(", ");
+        }
+
+        document
+            .getElementById("updatePrescription")
+            .addEventListener("click", async function (event) {
+                event.preventDefault(); // Prevent default form submission
+
+                // Gather data from the form
+                const patientName =
+                    document.getElementById("patientName").value;
+                const medication = "";
+                const dosage = groupFormData();
+                dosage.pop()
+
+                // Fetch existing complaints (if not already stored during the initial data fetch)
+                const existingComplaints = Array.from(
+                    document.querySelectorAll(
+                        "#mostCommonButtons-complaint .btn-secondary"
+                    )
+                ).map((button) => button.textContent);
+
+                // Gather newly selected complaints, tests, diagnosis, and advice
+                const newSelectedComplaints = Array.from(
+                    document.querySelectorAll(
+                        "#selected-buttons-complaint .selected-button"
+                    )
+                ).map((button) => button.innerText);
+                const selectedTests = Array.from(
+                    document.querySelectorAll(
+                        "#selected-buttons-tests .selected-button"
+                    )
+                ).map((button) => button.innerText);
+                const selectedDiagnosis = Array.from(
+                    document.querySelectorAll(
+                        "#selected-buttons-diagnosis .selected-button"
+                    )
+                ).map((button) => button.innerText);
+                const selectedAdvice = Array.from(
+                    document.querySelectorAll(
+                        "#selected-buttons-advice .selected-button"
+                    )
+                ).map((button) => button.innerText);
+
+                // Combine existing and new complaints, ensuring no duplicates
+                const combinedComplaints = [
+                    ...new Set([
+                        ...existingComplaints,
+                        ...newSelectedComplaints,
+                    ]),
+                ];
+
+                // Prepare data to send to backend
+                const prescriptionData = {
+                    prescriptionId: prescriptionId,
+                    patientId: patientId,
+                    appointmentId: appointmentId,
+                    patientName: patientName,
+                    medication: medication,
+                    dosage: dosage,
+                    complaints: combinedComplaints,
+                    tests: selectedTests,
+                    diagnosis: selectedDiagnosis,
+                    advice: selectedAdvice,
+                    bp: document.getElementById("bp").value,
+                    pulse: document.getElementById("pulse").value,
+                    spo2: document.getElementById("spo2").value,
+                    temp: document.getElementById("temp").value,
+                    sugar: document.getElementById("sugar").value,
+                };
+
+                try {
+                    // Send data to backend endpoint for processing and generating PDF
+                    const response = await fetch(
+                        `/prescription/update-pdf?patient_id=${patientId}&appointment_id=${appointmentId}`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify(prescriptionData),
+                        }
+                    );
+
+                    // if (response.ok) {
+                    //     const result = await response.json();
+                    //     console.log("Prescription generated:", result);
+                    //     if (billId == undefined) {
+                    //         window.location.href = "/billing/" + patientId;
+                    //     } else {
+                    //         window.location.href = "/opd-billing?id=" + billId;
+
+                    //     }
+
+                    // } else {
+                    //     console.error(
+                    //         "Error generating prescription:",
+                    //         response.statusText
+                    //     );
+                    // }
+                } catch (error) {
+                    console.error("Error:", error);
+                }
+            });
+        document
+            .getElementById("prescriptionForm")
+            .addEventListener("submit", async function (event) {
+                event.preventDefault(); // Prevent default form submission
+
+                // Gather data from the form
+                const patientName =
+                    document.getElementById("patientName").value;
+                const medication = "";
+                const dosage = groupFormData();
+                dosage.pop()
+
+                // Fetch existing complaints (if not already stored during the initial data fetch)
+                const existingComplaints = Array.from(
+                    document.querySelectorAll(
+                        "#mostCommonButtons-complaint .btn-secondary"
+                    )
+                ).map((button) => button.textContent);
+
+                // Gather newly selected complaints, tests, diagnosis, and advice
+                const newSelectedComplaints = Array.from(
+                    document.querySelectorAll(
+                        "#selected-buttons-complaint .selected-button"
+                    )
+                ).map((button) => button.innerText);
+                const selectedTests = Array.from(
+                    document.querySelectorAll(
+                        "#selected-buttons-tests .selected-button"
+                    )
+                ).map((button) => button.innerText);
+                const selectedDiagnosis = Array.from(
+                    document.querySelectorAll(
+                        "#selected-buttons-diagnosis .selected-button"
+                    )
+                ).map((button) => button.innerText);
+                const selectedAdvice = Array.from(
+                    document.querySelectorAll(
+                        "#selected-buttons-advice .selected-button"
+                    )
+                ).map((button) => button.innerText);
+
+                // Combine existing and new complaints, ensuring no duplicates
+                const combinedComplaints = [
+                    ...new Set([
+                        ...existingComplaints,
+                        ...newSelectedComplaints,
+                    ]),
+                ];
+
+                // Prepare data to send to backend
+                const prescriptionData = {
+                    prescriptionId: prescriptionId,
+                    patientId: patientId,
+                    appointmentId: appointmentId,
+                    patientName: patientName,
+                    medication: medication,
+                    dosage: dosage,
+                    complaints: combinedComplaints,
+                    tests: selectedTests,
+                    diagnosis: selectedDiagnosis,
+                    advice: selectedAdvice,
+                    bp: document.getElementById("bp").value,
+                    pulse: document.getElementById("pulse").value,
+                    spo2: document.getElementById("spo2").value,
+                    temp: document.getElementById("temp").value,
+                    sugar: document.getElementById("sugar").value,
+                };
+
+                printDiv("content", prescriptionData);
+                try {
+                    // Send data to backend endpoint for processing and generating PDF
+                    const response = await fetch(
+                        `/prescription/update-pdf?patient_id=${patientId}&appointment_id=${appointmentId}`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify(prescriptionData),
+                        }
+                    );
+
+                    // if (response.ok) {
+                    //     const result = await response.json();
+                    //     console.log("Prescription generated:", result);
+                    //     if (billId ==
+                    //         window.location.href = "/opd-billing?id=" + billId;
+
+                    //     }
+                    // } else {
+                    //     console.error(
+                    //         "Error generating prescription:",
+                    //         response.statusText
+                    //     );
+                    // }
+                } catch (error) {
+                    console.error("Error:", error);
+                }
+            });
+    </script>
+</body>
+
+</html>

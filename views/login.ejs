@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Anugrah Hospital Management System</title>
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        />
+        <meta
+            name="description"
+            content="This software is designed by ADS VIZION"
+        />
+        <meta name="author" content="ADS VIZION" />
+
+        <link rel="icon" href="favicon.ico" type="image/x-icon" />
+        <!-- VENDOR CSS -->
+        <link
+            rel="stylesheet"
+            href="../dist/assets/vendor/bootstrap/css/bootstrap.min.css"
+        />
+        <link
+            rel="stylesheet"
+            href="../dist/assets/vendor/font-awesome/css/font-awesome.min.css"
+        />
+
+        <!-- MAIN CSS -->
+        <link rel="stylesheet" href="../dist/assets/css/main.css" />
+    </head>
+
+    <body data-theme="light" class="font-nunito">
+        <!-- WRAPPER -->
+        <div id="wrapper" class="theme-cyan">
+            <div class="vertical-align-wrap">
+                <div class="vertical-align-middle auth-main hospital">
+                    <div class="auth-box">
+                        <div class="top">
+                            <img
+                                src="../dist/assets/images/adslogo.png"
+                                alt="Iconic"
+                            />
+                        </div>
+                        <div class="card">
+                            <div class="header">
+                                <p class="lead">Login to your account</p>
+                            </div>
+                            <div class="body">
+                                <form
+                                    class="form-auth-small"
+                                    id="loginForm"
+                                    action="index.html"
+                                >
+                                    <div class="form-group">
+                                        <label
+                                            for="signin-email"
+                                            class="control-label sr-only"
+                                            >Username</label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            id="signin-email"
+                                            value=""
+                                            placeholder="Username"
+                                        />
+                                    </div>
+                                    <div class="form-group">
+                                        <label
+                                            for="signin-password"
+                                            class="control-label sr-only"
+                                            >Password</label
+                                        >
+                                        <input
+                                            type="password"
+                                            class="form-control"
+                                            id="signin-password"
+                                            value=""
+                                            placeholder="Password"
+                                        />
+                                    </div>
+                                    <div
+                                        class="alert alert-danger"
+                                        id="err"
+                                        role="alert"
+                                    >
+                                        Invalid Username or Password
+                                    </div>
+                                    <button
+                                        type="submit"
+                                        class="btn btn-primary btn-lg btn-block"
+                                    >
+                                        LOGIN
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END WRAPPER -->
+
+        <script>
+document.addEventListener("DOMContentLoaded", () => {
+            fetch('get-user-name')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("login-name").innerHTML = data.name
+                if(data.gender == "female"){
+                    document.getElementById("login-img").src = "../dist/assets/images/user-f.jpg"
+                } else if (data.gender == "male"){
+                document.getElementById("login-img").src = "../dist/assets/images/user-m.jpg"
+
+                }
+            })
+        })
+            var form = document.getElementById("loginForm");
+            var err = document.getElementById("err");
+            err.style.display = "none";
+
+            form.addEventListener("submit", function (event) {
+                event.preventDefault();
+                var username = document.getElementById("signin-email").value;
+                var password = document.getElementById("signin-password").value;
+                var data = {
+                    user: username,
+                    pass: password,
+                };
+                fetch(`/auth-login`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(data),
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if (data.success) {
+                            window.location.href = "/index";
+                        } else {
+                            err.innerHTML = data.err;
+                            err.style.display = "block";
+                            document.getElementById("signin-email").focus();
+                        }
+                    });
+            });
+        </script>
+    </body>
+</html>

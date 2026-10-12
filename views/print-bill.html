@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prescription</title>
+</head>
+<style>
+
+    *{
+        box-sizing: border-box;
+    }
+    .header{
+        justify-content: center;
+        text-align: center;
+        border: 1px solid black;
+    }
+
+    .container{
+        width: 100%
+    }
+    .detail{
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5em 1em;
+        border-inline: 1px solid black;
+        font-size: 18px;
+    
+    }
+    .billing{
+        border: 1px solid black;
+        
+        
+    }
+    .title{
+        border-inline: 1px solid black;
+        text-align: center;
+        font-size: 25px;
+        border-top: 1px solid black;
+        padding: 0.5em;
+    }
+    .row{
+        display: flex;
+    }
+    .w-70, .w-10{
+        padding: 0.5em
+    }
+    .w-70{
+        width: 70%;
+    }
+    .w-10{
+        width: 10%;
+        border-left: 1px solid black;
+    }
+    .part-w-70, .part-w-10{
+        padding: 0.5em;
+        height: 600px
+    }
+    .part-w-70{
+        width: 70%;
+    }
+    .part-w-10{
+        width: 10%;
+        border-left: 1px solid black;
+    }
+    .row-title{
+        text-align: center;
+        display: flex;
+        font-weight: bold;
+        border-bottom: 1px solid black;
+    }
+    .row-footer{
+        text-align: center;
+        display: flex;
+        font-weight: bold;
+        border-top: 1px solid black;
+    }
+    .w-90 {
+        width: 90%;
+        padding: 1em;
+        text-align: right;
+    }
+    
+</style>
+<body>
+    <div class="container">
+        <div class="header">
+            <H1 class="h2">ANUGRAH HOSPITAL</H1>
+            <h4>Plot no. 39/40 - 7D, Gandhidham (Kutch) 370 201</h4>
+        </div>
+        <div class="detail">
+            <div>No. <span id="bill-no"></span></div>
+            <div>Date: <span id="bill-date"></span></div>
+        </div>
+        <div class="detail">
+            <div> Patient Name: <span id="patient-name"></span></div>
+        </div>
+        <div class="title">
+            <b>BILL</b>
+        </div>
+        <div class="billing">
+            <div class="row-title">
+                <div class="w-70"> Particilar</div>
+                <div class="w-10">QTY</div>
+                <div class="w-10">Rate</div>
+                <div class="w-10">Total</div>
+            </div>
+            <div class="row">
+                <div id="particular" class="part-w-70"></div>
+                <div id="qty" class="part-w-10"></div>
+                <div id="rate" class="part-w-10"></div>
+                <div id="total" class="part-w-10"></div>
+            </div>
+            <div class="row-footer">
+                <div class="w-90">Total</div>
+                <div class="w-10"></div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

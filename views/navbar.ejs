@@ -1,0 +1,320 @@
+<div class="page-loader-wrapper">
+    <div class="loader">
+        <div class="m-t-30"><img src="../dist/assets/images/logo-icon.svg" width="48" height="48" alt="Iconic">
+        </div>
+        <p>Please wait...</p>
+    </div>
+</div>
+
+<!-- Top navbar div start -->
+<nav class="navbar navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-brand">
+            <button type="button" class="btn-toggle-offcanvas"><i class="fa fa-bars"></i></button>
+            <button type="button" class="btn-toggle-fullwidth"><i class="fa fa-bars"></i></button>
+            <a href="index.html">Anugrah</a>
+        </div>
+
+        <div class="navbar-right">
+            <form id="navbar-search" class="navbar-form search-form">
+                <input value="" class="form-control" placeholder="Search here..." type="text">
+                <button type="button" class="btn btn-default"><i class="icon-magnifier"></i></button>
+            </form>
+
+            <div id="navbar-menu">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a href="javascript:void(0);" class="dropdown-toggle icon-menu" data-toggle="dropdown">
+                            <i class="fa fa-bell"></i>
+                            <span class="notification-dot"></span>
+                        </a>
+                        <ul class="dropdown-menu notifications">
+                            <li class="header"><strong>You have 4 new Notifications</strong></li>
+                            <li>
+                                <a href="javascript:void(0);">
+                                    <div class="media">
+                                        <div class="media-left">
+                                            <i class="icon-info text-warning"></i>
+                                        </div>
+                                        <div class="media-body">
+                                            <p class="text">Campaign <strong>Holiday Sale</strong> is nearly
+                                                reach budget limit.</p>
+                                            <span class="timestamp">10:00 AM Today</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);">
+                                    <div class="media">
+                                        <div class="media-left">
+                                            <i class="icon-like text-success"></i>
+                                        </div>
+                                        <div class="media-body">
+                                            <p class="text">Your New Campaign <strong>Holiday Sale</strong> is
+                                                approved.</p>
+                                            <span class="timestamp">11:30 AM Today</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);">
+                                    <div class="media">
+                                        <div class="media-left">
+                                            <i class="icon-pie-chart text-info"></i>
+                                        </div>
+                                        <div class="media-body">
+                                            <p class="text">Website visits from Twitter is 27% higher than last
+                                                week.</p>
+                                            <span class="timestamp">04:00 PM Today</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);">
+                                    <div class="media">
+                                        <div class="media-left">
+                                            <i class="icon-info text-danger"></i>
+                                        </div>
+                                        <div class="media-body">
+                                            <p class="text">Error on website analytics configurations</p>
+                                            <span class="timestamp">Yesterday</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li class="footer"><a href="javascript:void(0);" class="more">See all
+                                    notifications</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="logout" class="icon-menu"><i class="fa fa-power-off"></i></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- main left menu -->
+<div id="left-sidebar" class="sidebar">
+    <button type="button" class="btn-toggle-offcanvas"><i class="fa fa-arrow-left"></i></button>
+    <div class="sidebar-scroll">
+        <div class="user-account">
+            <img src="../dist/assets/images/user.png" id="login-img" class="rounded-circle user-photo"
+                alt="User Profile Picture">
+            <div class="dropdown">
+                <span>Welcome,</span>
+                <a href="javascript:void(0);" class="dropdown-toggle user-name"
+                    data-toggle="dropdown"><strong>Hii, <span id="login-name"></span></strong></a>
+                <ul class="dropdown-menu dropdown-menu-right account">
+                    <li><a href="doctor-profile.html"><i class="icon-user"></i>My Profile</a></li>
+                    <li><a href="app-inbox.html"><i class="icon-envelope-open"></i>Messages</a></li>
+                    <li><a href="javascript:void(0);"><i class="icon-settings"></i>Settings</a></li>
+                    <li class="divider"></li>
+                    <li><a href="logout"><i class="icon-power"></i>Logout</a></li>
+                </ul>
+            </div>
+            <hr>
+            <ul class="row list-unstyled">
+                <li class="col-4">
+                    <small>Exp</small>
+                    <h6>14</h6>
+                </li>
+                <li class="col-4">
+                    <small>Awards</small>
+                    <h6>13</h6>
+                </li>
+                <li class="col-4">
+                    <small>Clients</small>
+                    <h6>213</h6>
+                </li>
+            </ul>
+        </div>
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs">
+            <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#menu">Menu</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#Chat"><i
+                        class="icon-book-open"></i></a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#setting"><i
+                        class="icon-settings"></i></a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#question"><i
+                        class="icon-question"></i></a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content padding-0">
+            <div class="tab-pane active" id="menu">
+                <nav id="left-sidebar-nav" class="sidebar-nav">
+                    <ul class="metismenu li_animation_delay">
+                        <li>
+                            <a href="/index" class=""><i class="fa fa-dashboard"></i><span>Dashboard</span></a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);" class="has-arrow"><i
+                                    class="fa fa-user"></i><span>Patients</span></a>
+                            <ul>
+                                <li>
+                                    <a href="/all-patients">All Patients</a>
+                                </li>
+                                <li>
+                                    <a href="/add-patient">Add Patient</a>
+                                </li>
+                                <!-- <li><a href="patient-profile.html">Patient Medical history and records</a></li> -->
+                                <!-- <li><a href="patient-invoice.html">Invoice</a></li> -->
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a href="javascript:void(0);" class="has-arrow"><i
+                                    class="fa fa-folder"></i><span>Appointments</span></a>
+                            <ul>
+                                <li>
+                                    <a href="/manage-appointment">All Appointment</a>
+                                </li>
+                                <li>
+                                    <a href="/create-prescriptions">Create Prescriptions</a>
+
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);" class="has-arrow"><i
+                                    class="fa fa-folder"></i><span>IPD Appointments</span></a>
+                            <ul>
+                                <li>
+                                    <a href="/ipd-appointments">IPD Appointment</a>
+                                </li>
+                            </ul>
+
+                        </li>
+
+                        <li class="">
+                            <a href="javascript:void(0);" class="has-arrow"><i
+                                    class="fa fa-building"></i><span>Room Allotment</span></a>
+                            <ul>
+                                <li>
+                                    <a href="/beds">Beds</a>
+                                </li>
+                                <li>
+                                    <a href="/room-type">Room Type</a>
+                                </li>
+                                <li class="">
+                                    <a href="/floors">Floors</a>
+                                </li>
+                                <li>
+                                    <a href="/rooms">Rooms</a>
+                                </li>
+                            </ul>
+
+                        </li>
+
+
+                        <li>
+                            <a href="javascript:void(0);" class="has-arrow"><i
+                                    class="fa fa-cc-visa"></i><span>Billing</span></a>
+                            <ul>
+                                <li>
+                                    <a href="/ipd-billing-list">Indoor Billing</a>
+                                </li>
+                                <li>
+
+                                    <a href="/opd-billing-list">OPD Billing</a>
+                                </li>
+                            </ul>
+
+                        </li>
+
+
+                        <li>
+                            <a href="javascript:void(0);" class="has-arrow"><i
+                                    class="fa fa-globe"></i><span>Reports</span></a>
+                            <ul>
+                                <li>
+                                    <a href="/report-opd">Monthly OPD Report</a>
+                                </li>
+                                <li>
+
+                                    <a href="/report-indoor">Monthly Indoor
+                                        Patients</a>
+                                </li>
+
+                                <li>
+                                    <a href="/report-cash-coll">Daily Cash Collection</a>
+                                </li>
+                                <li>
+                                    <a href="/report-transactions">OPD Transaction Report</a>
+                                </li>
+                                <li>
+                                    <a href="/report-ipd-transactions">IPD Transaction Report</a>
+                                </li>
+                            </ul>
+                        </li>
+
+
+                        <li>
+                            <a href="javascript:void(0);" class="has-arrow"><i
+                                    class="fa fa-user-md"></i><span>Doctors</span></a>
+                            <ul>
+                                <li>
+                                    <a href="/all-doctors">All Doctors</a>
+                                </li>
+                            </ul>
+
+                        </li>
+
+                        <li class="">
+                            <a href="javascript:void(0);" class="has-arrow"><i
+                                    class="fa fa-user"></i><span>Master</span></a>
+                            <ul>
+                                <li>
+                                    <a href="/appointment-master">Appointment Master</a>
+                                </li>
+                                <li>
+
+                                    <a href="/indoor-services">Indoor Service Master</a>
+                                </li>
+                                <li class="">
+
+                                    <a href="/opd-service-master">OPD Service Master</a>
+                                </li>
+                            </ul>
+                        </li>
+
+
+                        <li>
+                            <a href="javascript:void(0);" class="has-arrow"><i class="fa fa-tag"></i><span>User
+                                    Management</span></a>
+                            <ul>
+                                <li>
+                                    <a href="/create-users">Create Users</a>
+                                </li>
+                                <li>
+
+                                    <a href="/user-authentication">All User</a>
+                                </li>
+                            </ul>
+
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- rightbar icon div -->
+<div class="right_icon_bar">
+    <ul>
+        <li><a href="app-inbox.html"><i class="fa fa-envelope"></i></a></li>
+        <li><a href="app-chat.html"><i class="fa fa-comments"></i></a></li>
+        <li><a href="app-calendar.html"><i class="fa fa-calendar"></i></a></li>
+        <li><a href="manage-appointment.html"><i class="fa fa-folder"></i></a></li>
+        <li><a href="app-contact.html"><i class="fa fa-id-card"></i></a></li>
+        <li><a href="blog-list.html"><i class="fa fa-globe"></i></a></li>
+        <li><a href="javascript:void(0);"><i class="fa fa-plus"></i></a></li>
+        <li><a href="javascript:void(0);" class="right_icon_btn"><i class="fa fa-angle-right"></i></a></li>
+    </ul>
+</div>

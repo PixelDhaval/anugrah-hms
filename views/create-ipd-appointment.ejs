@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>AHMS :: Appointments</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Iconic Bootstrap 4.5.0 Admin Template">
+    <meta name="author" content="WrapTheme, design by: ThemeMakker.com">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <!-- VENDOR CSS -->
+    <link rel="stylesheet" href="../dist/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../dist/assets/vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../dist/assets/vendor/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../dist/assets/css/select2.min.css">
+    <!-- MAIN Project CSS file -->
+    <link rel="stylesheet" href="../dist/assets/css/main.css">
+    <link rel="stylesheet" href="../dist/assets/css/tabulator_bootstrap5.css">
+    <style>
+        .tabulator {
+            font-size: 12px;
+            text-align: center;
+        }
+
+        #loading-screen {
+            /* ... existing styles ... */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body data-theme="light" class="font-nunito">
+    <div id="wrapper" class="theme-cyan">
+
+        <%- include('navbar') %>
+        
+
+        <!--main page content body part-->
+        <div id="main-content">
+            <div class="container-fluid">
+                <div class="block-header">
+                    <div class="row">
+                        <div class="col-lg-12 d-flex justify-content-between">
+                            <h2>Create IPD Appointments</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <form action="/create-ipd-appointment" method="post">
+                    <div class="row my-2 clearfix">
+                        <div class="col-md-3">
+                            <label for="patient_name">Patient Name</label>
+
+                            <select name="patient_name" id="patient_name" class="form-control" required>
+                                <option value="">Select Patient</option>
+                                <% patients.forEach(patient=> { %>
+                                    <option value="<%= patient.patient_id %>">
+                                        <%= patient.patient_id %> - <%= patient.name %>
+                                    </option>
+                                    <% }) %>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+
+                            <label for="appointment_date">Appointment Date & Time</label>
+                            <input type="datetime-local" name="appointment_date" id="appointment_date" class="form-control" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="doctor_name">Doctor Assigned</label>
+                            <select name="doctor_name" id="doctor_name" class="form-control">
+                                <option value="">Select Doctor</option>
+                                <% doctors.forEach(doctor=> { %>
+                                    <option value="<%= doctor.doctor_id %>">
+                                        <%= doctor.name %>
+                                    </option>
+                                    <% }) %>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row my-2">
+                        <div class="col-md-3">
+
+                            <label for="room_type">Room Type</label>
+                            <select name="room_type" id="room_type" class="form-control" required>
+                                <option value="">Select Room Type</option>
+                                <% availableBeds.forEach(room_type=> { %>
+                                    <option value="<%= room_type.room_type_id %>">
+                                        <%= room_type.room_type %> (<%= room_type.available_beds %> beds available)
+                                    </option>
+                                    <% }) %>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="room_number">Room Number</label>
+                            <select name="room_number" id="room_number" class="form-control" required>
+                                <option value="">Select Room Number</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="bed_number">Bed Number</label>
+                            <select name="bed_number" id="bed_number" class="form-control" required>
+                                <option value="">Select Bed Number</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row my-2">
+                        <div class="col-md-6">
+                            <label for="admission_reason">Admission Reason</label>
+                            <textarea name="admission_reason" id="admission_reason" class="form-control" ></textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Create IPD Appointment</button>
+                </form>
+            </div>
+        </div>
+        <!-- Edit Appointment Modal -->
+
+
+
+    </div>
+    <div id="loading-screen"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+            <div class="spinner-border text-light" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+    <!-- Javascript -->
+    <script src="../dist/assets/bundles/libscripts.bundle.js"></script>
+    <script src="../dist/assets/bundles/vendorscripts.bundle.js"></script>
+
+    <!-- page vendor js file -->
+    <script src="../dist/assets/bundles/apexcharts.bundle.js"></script>
+
+    <!-- page js file -->
+    <script src="../dist/assets/bundles/mainscripts.bundle.js"></script>
+    <script src="../../js/hospital/index.js"></script>
+    <script src="../dist/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="../dist/assets/js/tabulator.min.js"></script>
+    <script src="../dist/assets/js/select2.min.js"></script>
+    <script>
+        function showLoadingScreen() {
+            $('#loading-screen').show();
+        }
+
+        function hideLoadingScreen() {
+            $('#loading-screen').hide();
+        }
+
+        $(document).ready(function () {
+            // Get URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const patientId = urlParams.get('patientId');
+            const doctorId = urlParams.get('doctorId');
+
+            // Initialize select2 with pre-selected values if available
+            $('#patient_name').select2();
+            $('#room_type').select2();
+            $('#room_number').select2();
+            $('#bed_number').select2();
+            $('#doctor_name').select2();
+
+            // Pre-select patient if patientId is provided
+            if (patientId) {
+                $('#patient_name').val(patientId).trigger('change');
+            }
+
+            // Pre-select doctor if doctorId is provided
+            if (doctorId) {
+                $('#doctor_name').val(doctorId).trigger('change');
+            }
+
+            // Set current date and time as default
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('appointment_date').value = now.toISOString().slice(0, 16);
+
+            $('#room_type').on('change', function () {
+                const roomTypeId = $(this).val();
+                if (roomTypeId) {
+                    showLoadingScreen();
+                    $.ajax({
+                        url: `/rooms-by-room-type/${roomTypeId}`,
+                        type: 'GET',
+                        success: function (rooms) {
+                            $('#room_number').empty(); // Clear existing options
+                            $('#room_number').append('<option value="">Select Room Number</option>');
+                            rooms.forEach(room => {
+                                $('#room_number').append(`<option value="${room.id}">${room.room_no} (${room.available_beds} beds available)</option>`);
+                            });
+                        },
+                        error: function (error) {
+                            console.error('Error fetching rooms:', error);
+                            alert('Error fetching rooms. Please try again.');
+                        },
+                        complete: function () {
+                            hideLoadingScreen();
+                        }
+                    });
+                } else {
+                    $('#room_number').empty(); // Clear options if room type is not selected
+                    $('#room_number').append('<option value="">Select Room Number</option>');
+                }
+            });
+
+            // Add change event handler for room_number select
+            $('#room_number').on('change', function () {
+                const roomId = $(this).val();
+                if (roomId) {
+                    showLoadingScreen();
+                    $.ajax({
+                        url: `/beds-by-room/${roomId}`,
+                        type: 'GET',
+                        success: function (beds) {
+                            $('#bed_number').empty(); // Clear existing options
+                            $('#bed_number').append('<option value="">Select Bed Number</option>');
+
+                            if (beds.length === 0) {
+                                $('#bed_number').append('<option value="" disabled>No beds available in this room</option>');
+                            } else {
+                                beds.forEach(bed => {
+                                    $('#bed_number').append(
+                                        `<option value="${bed.bed_id}">
+                                            Bed ${bed.bed_no}
+                                        </option>`
+                                    );
+                                });
+                            }
+                        },
+                        error: function (error) {
+                            console.error('Error fetching beds:', error);
+                            alert('Error fetching beds. Please try again.');
+                        },
+                        complete: function () {
+                            hideLoadingScreen();
+                        }
+                    });
+                } else {
+                    // Clear bed options if no room is selected
+                    $('#bed_number').empty();
+                    $('#bed_number').append('<option value="">Select Bed Number</option>');
+                }
+            });
+
+            // Reset bed_number when room_type changes
+            $('#room_type').on('change', function () {
+                $('#bed_number').empty();
+                $('#bed_number').append('<option value="">Select Bed Number</option>');
+            });
+        });
+    </script>
+
+
+</body>
+
+</html>

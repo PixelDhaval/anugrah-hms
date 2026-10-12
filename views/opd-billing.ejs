@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>AHMS :: All Patients</title>
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        />
+        <meta
+            name="description"
+            content="Iconic Bootstrap 4.5.0 Admin Template"
+        />
+        <meta name="author" content="WrapTheme, design by: ThemeMakker.com" />
+        <link rel="icon" href="favicon.ico" type="image/x-icon" />
+
+        <!-- VENDOR CSS -->
+        <link rel="stylesheet" href="../dist/assets/css/bootstrap.min.css" />
+        <link
+            rel="stylesheet"
+            href="../dist/assets/vendor/bootstrap/css/bootstrap.min.css"
+        />
+        <link
+            rel="stylesheet"
+            href="../dist/assets/vendor/font-awesome/css/font-awesome.min.css"
+        />
+
+        <!-- MAIN Project CSS file -->
+        <link rel="stylesheet" href="../dist/assets/css/main.css" />
+        <link
+            rel="stylesheet"
+            href="../dist/assets/css/tabulator_bootstrap5.css"
+        />
+
+        <style>
+            .tabulator {
+                font-size: 12px;
+                text-align: center;
+            }
+        </style>
+    </head>
+
+    <body data-theme="light" class="font-nunito">
+        <div id="wrapper" class="theme-cyan">
+            <%- include('navbar') %>
+
+
+            <!-- main page content body part -->
+            <div id="main-content">
+                <div class="container-fluid">
+                    <div class="block-header">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <h2>OPD Billing</h2>
+                                <ul class="breadcrumb">
+                                    <li class="breadcrumb-item">
+                                        <a href="index.html"
+                                            ><i class="fa fa-dashboard"></i
+                                        ></a>
+                                    </li>
+                                    <li class="breadcrumb-item">Billing</li>
+                                    <li class="breadcrumb-item active">
+                                        OPD Billing
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row clearfix">
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                            <div class="card mt-4">
+                                <div class="header">
+                                    <h2>OPD Billing Form</h2>
+                                </div>
+                                <div class="body">
+                                    <form id="patientForm" novalidate>
+                                        <div class="row mb-3">
+                                            <div class="col-md-4">
+                                                <label
+                                                    for="patientId"
+                                                    class="form-label"
+                                                    >Patient ID</label
+                                                >
+                                                <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    id="patientId"
+                                                    value="<%= data.patient_id %>"
+                                                    required
+                                                />
+                                                <div class="invalid-feedback">
+                                                    Please enter a valid Patient
+                                                    ID.
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label
+                                                    for="date"
+                                                    class="form-label"
+                                                    >Date</label
+                                                >
+                                                <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    id="date"
+                                                    readonly
+                                                />
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label
+                                                    for="opdNo"
+                                                    class="form-label"
+                                                    >OPD No.</label
+                                                >
+                                                <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    id="opdNo"
+                                                    readonly
+                                                />
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-4">
+                                                <label
+                                                    for="firstName"
+                                                    class="form-label"
+                                                    >First Name</label
+                                                >
+                                                <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    id="firstName"
+                                                    value="<%= data.name %>"
+                                                    readonly
+                                                    required
+                                                />
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label
+                                                    for="address"
+                                                    class="form-label"
+                                                    >Address</label
+                                                >
+                                                <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    id="address"
+                                                    value="<%= data.address %>"
+                                                    readonly
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+                                        <div class="mt-3">
+                                            <div
+                                                class="form-check form-check-inline"
+                                            >
+                                                <input
+                                                    class="form-check-input"
+                                                    type="radio"
+                                                    name="patientType"
+                                                    id="newBtn"
+                                                    value="new"
+                                                    checked
+                                                />
+                                                <label
+                                                    class="form-check-label"
+                                                    for="newBtn"
+                                                    >New</label
+                                                >
+                                            </div>
+                                            <div
+                                                class="form-check form-check-inline"
+                                            >
+                                                <input
+                                                    class="form-check-input"
+                                                    type="radio"
+                                                    name="patientType"
+                                                    id="oldBtn"
+                                                    value="old"
+                                                />
+                                                <label
+                                                    class="form-check-label"
+                                                    for="oldBtn"
+                                                    >Old</label
+                                                >
+                                            </div>
+                                        </div>
+                                        <div class="mt-3">
+                                            <label
+                                                for="paymentMode"
+                                                class="form-label"
+                                                >Mode of Payment</label
+                                            >
+                                            <div>
+                                                <div
+                                                    class="form-check form-check-inline"
+                                                >
+                                                    <input
+                                                        class="form-check-input"
+                                                        type="radio"
+                                                        name="paymentMode"
+                                                        id="cash"
+                                                        value="cash"
+                                                        required
+                                                    />
+                                                    <label
+                                                        class="form-check-label"
+                                                        for="cash"
+                                                        >Cash</label
+                                                    >
+                                                </div>
+                                                <div
+                                                    class="form-check form-check-inline"
+                                                >
+                                                    <input
+                                                        class="form-check-input"
+                                                        type="radio"
+                                                        name="paymentMode"
+                                                        id="card"
+                                                        value="card"
+                                                    />
+                                                    <label
+                                                        class="form-check-label"
+                                                        for="card"
+                                                        >Credit/Debit
+                                                        Card</label
+                                                    >
+                                                </div>
+                                                <div
+                                                    class="form-check form-check-inline"
+                                                >
+                                                    <input
+                                                        class="form-check-input"
+                                                        type="radio"
+                                                        name="paymentMode"
+                                                        id="upi"
+                                                        value="upi"
+                                                    />
+                                                    <label
+                                                        class="form-check-label"
+                                                        for="upi"
+                                                        >UPI</label
+                                                    >
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+
+                                    <div class="card mt-4">
+                                        <div class="header">
+                                            <h2>Services</h2>
+                                        </div>
+                                        <div class="body">
+                                            <div id="service-table"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-4">
+                                        <div class="col-md-3">
+                                            <label
+                                                for="total"
+                                                class="form-label"
+                                                >Total</label
+                                            >
+                                            <input
+                                                type="number"
+                                                class="form-control"
+                                                id="total"
+                                                readonly
+                                            />
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label
+                                                for="discountPercent"
+                                                class="form-label"
+                                                >Discount (%)</label
+                                            >
+                                            <input
+                                                type="text"
+                                                class="form-control"
+                                                id="discountPercent"
+                                                value="0"
+                                            />
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label
+                                                for="discountAmount"
+                                                class="form-label"
+                                                >Discount Amount</label
+                                            >
+                                            <input
+                                                type="text"
+                                                class="form-control"
+                                                id="discountAmount"
+                                                value="0"
+                                            />
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label
+                                                for="netAmount"
+                                                class="form-label"
+                                                >Net Amount</label
+                                            >
+                                            <input
+                                                type="number"
+                                                class="form-control"
+                                                id="netAmount"
+                                                readonly
+                                            />
+                                        </div>
+                                    </div>
+                                    <div class="mt-4">
+                                        <button
+                                            type="button"
+                                            class="btn btn-success"
+                                            id="printBillBtn"
+                                        >
+                                            Save
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Javascript-->
+        <script src="../dist/assets/bundles/libscripts.bundle.js"></script>
+        <script src="../dist/assets/bundles/vendorscripts.bundle.js"></script>
+        <!-- page vendor js file -->
+        <script src="../dist/assets/bundles/apexcharts.bundle.js"></script>
+        <!-- page js file -->
+        <script src="../dist/assets/bundles/mainscripts.bundle.js"></script>
+        <script src="../../js/hospital/index.js"></script>
+        <script src="../dist/assets/js/bootstrap.bundle.min.js"></script>
+        <script src="../dist/assets/js/tabulator.min.js"></script>
+
+        <script>
+document.addEventListener("DOMContentLoaded", () => {
+            fetch('get-user-name')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("login-name").innerHTML = data.name
+                if(data.gender == "female"){
+                    document.getElementById("login-img").src = "../dist/assets/images/user-f.jpg"
+                } else if (data.gender == "male"){
+                document.getElementById("login-img").src = "../dist/assets/images/user-m.jpg"
+
+                }
+            })
+        })
+            var serviceData = [];
+
+            document.addEventListener("DOMContentLoaded", () => {
+                fetch("/get-opd-master")
+                    .then((response) => response.json())
+                    .then((data) => {
+                        serviceData = data.data;
+                        serviceData = serviceData.map((e) => {
+                            e.qty = 1;
+                            e.rate = e.new_patient
+                            return e;
+                        });
+                        console.log(serviceData);
+                        table.setData(serviceData);
+                    });
+            });
+
+            
+
+            let currentRateType = "rateForNewPatient";
+
+            //Current date
+            document.getElementById("date").value =
+                new Date().toLocaleDateString();
+
+            //Unique OPD number
+            document.getElementById("opdNo").value =
+                "OPD" + Math.floor(Math.random() * 1000000);
+
+            //Fetch patient details when patient ID entered
+            document
+                .getElementById("patientId")
+                .addEventListener("input", function () {
+                    const patientId = this.value;
+                    if (patientData[patientId]) {
+                        document.getElementById("firstName").value =
+                            patientData[patientId].firstName;
+                        document.getElementById("lastName").value =
+                            patientData[patientId].lastName;
+                        document.getElementById("address").value =
+                            patientData[patientId].address;
+                    } else {
+                        document.getElementById("firstName").value = "";
+                        document.getElementById("lastName").value = "";
+                        document.getElementById("address").value = "";
+                    }
+                });
+
+            //Update rate
+            const table = new Tabulator("#service-table", {
+                data: serviceData,
+                layout: "fitColumns",
+                columns: [
+                    {
+                        title: "Sr No.",
+                        field: "code",
+                        headerHozAlign: "center",
+                    },
+                    {
+                        title: "Service",
+                        field: "opd_service",
+                        headerHozAlign: "center",
+                    },
+                    
+                    {
+                        title: "Rate",
+                        field: "rate",
+                        editor: true,
+                        headerHozAlign: "center",
+                        cellEdited: function(cell){
+                            calculateAmounts()
+                        },
+                        bottomCalc: "sum",
+                    },
+                    
+                    {
+                        title: "Choose",
+                        formatter: "rowSelection",
+                        titleFormatter: "rowSelection",
+                        hozAlign: "center",
+                        headerHozAlign: "center",
+                        cellClick: function (e, cell) {
+                            cell.getRow().toggleSelect();
+                        },
+                    },
+                ],
+
+                selectable: true,
+            });
+
+            document.getElementById("newBtn").addEventListener("change", () => {
+                var data = table.getData()
+                data.map(item => {
+                    item.rate = item.new_patient
+                    return item
+                })
+                table.setData(data);
+            });
+            document.getElementById("oldBtn").addEventListener("change", () => {
+                var data = table.getData()
+                data.map(item => {
+                    item.rate = item.old_patient
+                    return item
+                })
+                table.setData(data);
+            });
+
+            //Calculate total, discount, and net amount
+            function calculateAmounts() {
+                const selectedRows = table.getSelectedData();
+                console.log(selectedRows);
+                const total = selectedRows.reduce(
+                    (sum, row) => sum + parseInt(row.rate),
+                    0
+                );
+                console.log(total);
+                const discountPercent =
+                    parseFloat(
+                        document.getElementById("discountPercent").value
+                    ) || 0;
+                const discountAmount =
+                    parseFloat(
+                        document.getElementById("discountAmount").value
+                    ) || 0;
+
+                if (total === 0) {
+                    document.getElementById("total").value = 0;
+                    document.getElementById("netAmount").value = 0;
+                    document.getElementById("discountPercent").value = 0;
+                    document.getElementById("discountAmount").value = 0;
+
+                    return;
+                }
+
+                if (discountPercent > 0) {
+                    document.getElementById("discountAmount").value = 0;
+                    const discount = (total * discountPercent) / 100;
+                    const netAmount = total - discount;
+                    document.getElementById("total").value = total;
+                    document.getElementById("netAmount").value =
+                        netAmount >= 0 ? netAmount : 0;
+                } else if (discountAmount > 0) {
+                    document.getElementById("discountPercent").value = 0;
+                    const netAmount = total - discountAmount;
+                    document.getElementById("total").value = total;
+                    document.getElementById("netAmount").value =
+                        netAmount >= 0 ? netAmount : 0;
+                } else {
+                    document.getElementById("total").value = total;
+                    document.getElementById("netAmount").value = total;
+                }
+            }
+
+            document
+                .getElementById("discountPercent")
+                .addEventListener("input", calculateAmounts);
+            document
+                .getElementById("discountAmount")
+                .addEventListener("input", calculateAmounts);
+            table.on("rowSelectionChanged", calculateAmounts);
+
+            //Print bill
+            document
+                .getElementById("printBillBtn")
+                .addEventListener("click", function () {
+                    const form = document.getElementById("patientForm");
+
+                    const patientId =
+                        document.getElementById("patientId").value;
+                    var particulars = table.getSelectedData();
+                    var discountPercent =
+                        document.getElementById("discountPercent").value;
+                    var discountAmount =
+                        document.getElementById("discountAmount").value;
+                    const paymentMethod = document.querySelectorAll(
+                        'input[name="paymentMode"]'
+                    );
+
+                    var total = document.getElementById("netAmount").value
+
+                    let selectedValue = null;
+
+                    paymentMethod.forEach((radio) => {
+                        if (radio.checked) {
+                            selectedValue = radio.value;
+                        }
+                    });
+                    var data = {
+                        patientId: patientId,
+                        particulars: particulars,
+                        discountPercent: discountPercent,
+                        discountAmount: discountAmount,
+                        paymentMethod: selectedValue,
+                        type: "opd",
+                        total: total
+                    };
+                    fetch(`/generate-bill`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(data),
+                    })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.success == false) {
+                                alert("Error: ", data.err);
+                            } else {
+                                window.location.href = "../manage-appointment"
+                            }
+                        });
+                });
+        </script>
+    </body>
+</html>

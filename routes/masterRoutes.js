@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const masterController = require('../controllers/masterController');
+const userController = require('../controllers/userController');
+
 
 
 const tables = ['complaint', 'diagnosis', 'tests', 'advice'];
 
-router.get('/master', async (req, res) => {
+router.get('/appointment-master', async (req, res) => {
     try {
         const promises = tables.map(table => masterController.getMostCommonItems(table));
         const [complaints, diagnosis, tests, advice] = await Promise.all(promises);
@@ -18,7 +20,7 @@ router.get('/master', async (req, res) => {
 
 
 tables.forEach(table => {
-    router.post(`/api/add-${table}`, (req, res) => masterController.addItem(req, res, table));
+    router.post(`/api/add-${table}`,userController.checkAuth,  (req, res) => masterController.addItem(req, res, table));
     router.delete(`/api/remove-${table}/:itemId`, (req, res) => {
         masterController.removeItem(req, res, table);
     }); 
@@ -33,14 +35,19 @@ tables.forEach(table => {
     });
 });
 
-router.get('/opd-service-master',(req,res)=>{
+router.get('/opd-service-master',userController.checkAuth, (req,res)=>{
     res.render('opd-service-master');
 })
 
-router.post('/add-service', masterController.addService);
-router.get('/services', masterController.getAllServices);
-router.put('/update-services/:code', masterController.updateService);
-router.delete('/delete-service/:code',masterController.deleteService);
-router.get('/get-next-service-code', masterController.getNextServiceCode);
+router.post('/add-service',userController.checkAuth,  masterController.addService);
+router.get('/services',userController.checkAuth,  masterController.getAllServices);
+router.put('/update-services/:code',userController.checkAuth,  masterController.updateService);
+router.delete('/delete-service/:code',userController.checkAuth, masterController.deleteService);
+router.get('/get-next-service-code',userController.checkAuth,  masterController.getNextServiceCode);
+
+router.get('/indoor-services', userController.checkAuth, masterController.getIndoorServices);
+router.post('/indoor-services', userController.checkAuth, masterController.createIndoorService);
+router.put('/indoor-services/:id', userController.checkAuth, masterController.updateIndoorService);
+router.delete('/indoor-services/:id', userController.checkAuth, masterController.deleteIndoorService); 
 
 module.exports = router;

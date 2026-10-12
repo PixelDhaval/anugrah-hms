@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>AHMS :: All Patients</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="Iconic Bootstrap 4.5.0 Admin Template" />
+    <meta name="author" content="WrapTheme, design by: ThemeMakker.com" />
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+
+    <!-- VENDOR CSS -->
+    <link rel="stylesheet" href="../dist/assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../dist/assets/vendor/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../dist/assets/vendor/font-awesome/css/font-awesome.min.css" />
+
+    <!-- MAIN Project CSS file -->
+    <link rel="stylesheet" href="../dist/assets/css/main.css" />
+    <link rel="stylesheet" href="../dist/assets/css/tabulator_bootstrap5.css" />
+
+    <link rel="stylesheet" href="../dist/assets/vendor/jquery-datatable/dataTables.bootstrap4.min.css" />
+
+    <style>
+        .tabulator {
+            font-size: 12px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body data-theme="light" class="font-nunito">
+    <div id="wrapper" class="theme-cyan">
+        <%- include('navbar') %>
+
+
+        <!-- mani page content body part -->
+        <div id="main-content">
+            <div class="container-fluid">
+                <div class="block-header">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <h2>Payments List</h2>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item">
+                                    <a href="index.html"><i class="fa fa-dashboard"></i></a>
+                                </li>
+                                <li class="breadcrumb-item">Payments</li>
+                                <li class="breadcrumb-item active">
+                                    Payments
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <div class="d-flex flex-row-reverse">
+                                <div class="page_action">
+                                    <button type="button" class="btn btn-primary">
+                                        <i class="fa fa-download"></i>
+                                        Download report
+                                    </button>
+                                    <button type="button" class="btn btn-secondary">
+                                        <i class="fa fa-send"></i> Send
+                                        report
+                                    </button>
+                                </div>
+                                <div class="p-2 d-flex"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row clearfix">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="header">
+                                <h2>Payments List</h2>
+                                <ul class="header-dropdown">
+                                    <li>
+                                        <a class="tab_btn" href="javascript:void(0);" title="Weekly">W</a>
+                                    </li>
+                                    <li>
+                                        <a class="tab_btn" href="javascript:void(0);" title="Monthly">M</a>
+                                    </li>
+                                    <li>
+                                        <a class="tab_btn active" href="javascript:void(0);" title="Yearly">Y</a>
+                                    </li>
+                                    <li class="dropdown">
+                                        <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown"
+                                            role="button" aria-haspopup="true" aria-expanded="false"></a>
+                                        <ul class="dropdown-menu dropdown-menu-right">
+                                            <li>
+                                                <a href="javascript:void(0);">Action</a>
+                                            </li>
+                                            <li>
+                                                <a href="javascript:void(0);">Another Action</a>
+                                            </li>
+                                            <li>
+                                                <a href="javascript:void(0);">Something else</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="modal fade" id="payment" tabindex="-1" aria-labelledby="exampleModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h1 class="modal-title fs-5" id="exampleModalLabel">
+                                                Payment Status:
+                                                <span id="bill-id"></span>
+                                            </h1>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+
+                                            <div class="btn-group" role="group"
+                                                aria-label="Basic radio toggle button group">
+                                                <input type="radio" class="btn-check" name="btnradio" id="btnradio1"
+                                                    value="CASH" autocomplete="off" checked />
+                                                <label class="btn btn-outline-primary" for="btnradio1">Cash</label>
+
+                                                <input type="radio" class="btn-check" name="btnradio" id="btnradio2"
+                                                    value="UPI" autocomplete="off" />
+                                                <label class="btn btn-outline-primary" for="btnradio2">UPI</label>
+
+                                                <input type="radio" class="btn-check" name="btnradio" id="btnradio3"
+                                                    value="CARD" autocomplete="off" />
+                                                <label class="btn btn-outline-primary" for="btnradio3">CARD</label>
+                                            </div>
+
+                                            <!-- New Payment Amount Field -->
+                                            <div class="form-group mt-3">
+                                                <label for="payment-amount">Payment Amount</label>
+                                                <input type="number" class="form-control" id="payment-amount"
+                                                    placeholder="Enter payment amount" required />
+                                                <div class="invalid-feedback">
+                                                    Please enter a valid payment amount.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                                                id="cancel-btn">
+                                                Close
+                                            </button>
+                                            <button type="button" class="btn btn-primary" onclick="changePayment()">
+                                                Save changes
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal fade" id="deleteBillModal" tabindex="-1" aria-labelledby="deleteBillModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="deleteBillModalLabel">Delete Bill</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Are you sure you want to delete this bill? This action cannot be undone.
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="button" class="btn btn-danger" onclick="confirmDeleteBill()">Delete</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="body">
+                                <div class="table-responsive">
+                                    <table
+                                        class="table table-hover js-basic-example dataTable table-custom table-striped"
+                                        id="bills">
+                                        <thead>
+                                            <tr>
+                                                <th>Bill No</th>
+                                                <th>Bill date</th>
+                                                <th>Patient ID</th>
+                                                <th>Patient Name</th>
+                                                <th>Total</th>
+                                                <th>Status</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../dist/assets/bundles/libscripts.bundle.js"></script>
+    <script src="../dist/assets/bundles/vendorscripts.bundle.js"></script>
+    <!-- page vendor js file -->
+    <script src="../dist/assets/bundles/apexcharts.bundle.js"></script>
+    <!-- page js file -->
+    <script src="../dist/assets/bundles/mainscripts.bundle.js"></script>
+    <script src="../../js/hospital/index.js"></script>
+    <script src="../dist/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="../dist/assets/bundles/datatablescripts.bundle.js"></script>
+    <script src="../dist/assets/js/tabulator.min.js"></script>
+    <script src="../dist/assets/js/jquery-datatable.js"></script>
+    <script>
+        function getSelectedRadioValue(name) {
+            const selectedRadio = document.querySelector(
+                `input[name="${name}"]:checked`
+            );
+            return selectedRadio ? selectedRadio.value : null;
+        }
+        function changePayment() {
+            console.log("clicked");
+            var paymentMethod = getSelectedRadioValue("btnradio");
+            console.log(paymentMethod);
+            fetch("change-payment-status", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    bill_id: document.getElementById("bill-id").innerHTML,
+                    total: document.getElementById("payment-amount").value,
+                    paymentMethod: paymentMethod,
+                }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = "opd-billing-list"
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                });
+        }
+        document.addEventListener("DOMContentLoaded", () => {
+            fetch("get-user-name")
+                .then((response) => response.json())
+                .then((data) => {
+                    document.getElementById("login-name").innerHTML =
+                        data.name;
+                    if (data.gender == "female") {
+                        document.getElementById("login-img").src =
+                            "../dist/assets/images/user-f.jpg";
+                    } else if (data.gender == "male") {
+                        document.getElementById("login-img").src =
+                            "../dist/assets/images/user-m.jpg";
+                    }
+                });
+        });
+        function redirectTo(billId) {
+            window.location.href = "/opd-billing?id=" + billId;
+        }
+
+        $(document).ready(() => {
+            var table = $("#bills").DataTable();
+
+            fetch("get-opd-bill-list")
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        console.log(data.data);
+                        var arr = data.data;
+                        arr.forEach((item, index) => {
+                            payment_status = item.payment_status == "partially paid" ? "partially paid(" + item.recieved + ")" : item.payment_status
+
+                            table.row.add([
+                                index + 1, // Assuming index should start from 1
+                                item.date.substring(0, 10),
+                                item.patient_id,
+                                item.name,
+                                item.total,
+                                payment_status,
+                                `<button class="btn btn-sm btn-primary" onclick="redirectTo('${item.bill_id}')">Edit</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" onclick="changeBillId('${item.bill_id}', ${item.total - item.recieved})" data-bs-target="#payment">
+  Pay
+</button>
+
+<button class="btn btn-primary" onclick="printBill(${item.bill_id})">Bill</button>
+<button class="btn btn-primary" onclick="printReceipt(${item.bill_id})">Receipt</button>
+<button class="btn btn-danger" onclick="deleteBill(${item.bill_id})">Delete</button>`,
+                            ]);
+                        });
+                        table.draw(false); // Draw the table after adding all rows
+                    }
+                });
+        });
+
+        function printBill(bill_id) {
+            fetch(`/fetch-bill-by-id?bill_id=${bill_id}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Network response was not ok " + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Data destructuring for easier access
+                    const patient_name = data.data.name;
+                    const bill_date = data.data.date;
+                    const particulars = data.data.particulars;
+                    const patient_id = data.data.patient_id
+                    const totalAmount = particulars.reduce((sum, item) => sum + parseInt(item.rate), 0); // Calculate total amount
+
+                    // Function to convert number to words
+                    const numberToWords = (num) => {
+                        console.log(num)
+                        const a = [
+                            '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine',
+                            'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'
+                        ];
+                        const b = [
+                            '', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'
+                        ];
+                        const c = [
+                            '', '', 'Hundred', 'Thousand', 'Thousand'
+                        ];
+                        let n = num.toString();
+                        let n1 = n.split('.');
+
+                        let numString = '';
+                        let x = 0;
+                        while (x < n1[0].length) {
+                            let y = n1[0].substr(x, 1);
+                            if (y !== '0') {
+                                numString += a[parseInt(y)] + ' ' + c[n1[0].length - x - 1] + ' ';
+                            }
+                            x++;
+                        }
+
+                        // Handle decimal part
+                        if (n1.length > 1) {
+                            numString += 'Point ';
+                            for (let i = 0; i < n1[1].length; i++) {
+                                numString += a[parseInt(n1[1].charAt(i))] + ' ';
+                            }
+                        }
+
+                        return numString.trim();
+                    }
+
+                    const totalAmountInWords = numberToWords(parseInt(totalAmount));
+
+                    // Create a new window for printing
+                    const printWindow = window.open('', '_blank');
+
+                    // Format the bill content
+                    printWindow.document.write(`
+                <html>
+    <head>
+        <title>Bill Print - Anugrah Hospital</title>
+        <style>
+            /* Style for A5 Landscape */
+            @page { }
+            .container{
+                height: 140mm;
+                width: 210mm;
+                padding: 10px;
+                position: relative
+            }
+            body { font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; }
+
+            /* Full border for the bill container */
+            .bill-container {
+                width: 100%;
+                height: 100%;
+                border: 2px solid #000; /* Outer border */
+                box-sizing: border-box;
+            }
+
+            h1 { 
+                margin: 0; 
+                font-size: 1.5em; 
+                color: #333; 
+                padding: 10px;
+
+                text-align: center;
+            }
+
+            .address { 
+                font-size: 0.9em; 
+                margin-bottom: 10px; 
+                color: #666; 
+                text-align: center;
+                padding-bottom: 5px;
+            }
+
+            h2 { 
+                font-size: 1.2em;
+                text-align: center;
+                padding-top: 10px;
+                margin-top: 0;
+                border-top: 2px solid #000; /* Border at the top */
+                padding-top: 5px;
+            }
+
+            /* Bill details section with border */
+            .bill-details {
+                text-align: left;
+                margin-bottom: 20px;
+                font-size: 1em;
+                display: flex;
+                justify-content: space-between;
+                padding-bottom: 10px;
+                margin-bottom: 15px;
+            }
+
+            .bill-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 0.9em;
+                table-layout: fixed;
+                border: 1px solid #000; /* Table border */
+            }
+
+            .bill-table th, .bill-table td {
+                border: 1px solid #000; /* Borders for table cells */
+                padding: 8px;
+                text-align: left;
+            }
+
+            .bill-table th {
+                background-color: #f2f2f2;
+            }
+
+            .total {
+                text-align: right;
+                padding: 8px;
+                font-weight: bold;
+                border-top: 2px solid #000; /* Top border for total row */
+            }
+
+            .footer {
+                font-size: 0.9em;
+                text-align: left;
+                margin-top: 15px;
+                border-top: 2px solid #000; /* Footer top border */
+                padding-top: 5px;
+                position: absolute;
+                bottom: 1cm;
+                left: 1cm;
+            }
+
+            .bill-inner-container{
+                margin: 10px
+            }
+
+            .words {
+                margin-top: 20px;
+                font-size: 1em;
+                font-weight: bold;
+                text-align: center;
+                padding-top: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+        <div class="bill-container">
+            <h1>ANUGRAH HOSPITAL</h1>
+            <div class="address">Plot no. 39/40-7D, Gandhidham (Kutch) 370201<br>For Appointment: +91 84698 79199, 02836 299350</div>
+
+            <h2>Bill</h2> <!-- Bill header -->
+            <div class="bill-inner-container">
+
+            <div class="bill-details">
+                <div><strong>Patient Name:</strong> ${patient_name} (${patient_id}) </div>
+                <div><strong>Billing Date:</strong> ${new Date(bill_date).toLocaleDateString('en-GB')}</div>
+            </div>
+
+            <table class="bill-table">
+                <thead>
+                    <tr>
+                        <th style="width: 10%">#</th> <!-- Serial Number -->
+                        <th style="width: 60%">Particular</th>
+                        <th style="width: 30%">Rate (Rs)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${particulars.map((particular, index) => `
+                        <tr>
+                            <td>${index + 1}</td> <!-- Index -->
+                            <td>${particular.opd_service}</td>
+                            <td>${parseInt(particular.rate).toFixed(2)}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2" class="total">Total Amount</td>
+                        <td class="total">Rs ${parseInt(totalAmount).toFixed(2)} </td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div class="words">Rupees in Words: ${totalAmountInWords} Rupees</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Dr. Johnson Samuel</p>
+            <p>Reg no: G-31061</p>
+        </div>
+        </div>
+
+    </body>
+</html>
+
+            `);
+
+                    // Print the bill
+                    printWindow.document.close();
+                    printWindow.print();
+                    printWindow.close()
+
+                })
+                .catch(error => {
+                    console.error("There was a problem with the fetch operation:", error);
+                });
+        }
+
+        function printReceipt(bill_id) {
+            fetch(`/fetch-bill-by-id?bill_id=${bill_id}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Network response was not ok " + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Data destructuring for easier access
+                    const patient_name = data.data.name;
+                    const bill_date = data.data.date;
+                    const patient_id = data.data.patient_id
+                    const amount_paid = data.data.recieved;
+                    const transaction_mode = data.data.payment_method;
+                    const pending_amount = data.data.total - data.data.recieved;
+
+                    // Create a new window for printing the receipt
+                    const printWindow = window.open('', '_blank');
+
+                    // Format the receipt content
+                    printWindow.document.write(`
+            <html>
+    <head>
+        <title>Receipt Print - Anugrah Hospital</title>
+        <style>
+            /* Style for A5 Landscape */@page { }
+            .container{
+                height: 140mm;
+                width: 210mm;
+                position: relative;
+                padding: 10px;
+            }
+            body { font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; }
+
+            .receipt-container {
+                width: 100%;
+                height: 100%;
+                border: 2px solid #000; /* Outer border */
+                box-sizing: border-box;
+            }
+
+            h1 { 
+                margin: 0; 
+                font-size: 1.5em; 
+                color: #333; 
+                padding: 10px;
+                text-align: center;
+            }
+
+            .address { 
+                font-size: 0.9em; 
+                margin-bottom: 10px; 
+                color: #666; 
+                text-align: center;
+                padding-bottom: 5px;
+            }
+
+            h2 { 
+                font-size: 1.2em;
+                text-align: center;
+                padding-top: 10px;
+                margin-top: 0;
+                border-top: 2px solid #000; /* Border at the top */
+                padding-top: 5px;
+            }
+
+            .receipt-details {
+                text-align: left;
+                margin-bottom: 20px;
+                font-size: 1em;
+                display: flex;
+                justify-content: space-between;
+                padding-bottom: 10px;
+                margin-bottom: 15px;
+            }
+
+            .receipt-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 0.9em;
+                table-layout: fixed;
+                border: 1px solid #000; /* Table border */
+            }
+
+            .receipt-table th, .receipt-table td {
+                border: 1px solid #000; /* Borders for table cells */
+                padding: 8px;
+                text-align: left;
+            }
+
+            .receipt-table th {
+                background-color: #f2f2f2;
+            }
+
+            .total {
+                text-align: right;
+                padding: 8px;
+                font-weight: bold;
+                border-top: 2px solid #000; /* Top border for total row */
+            }
+
+            .footer {
+                font-size: 0.9em;
+                text-align: left;
+                margin-top: 15px;
+                border-top: 2px solid #000; /* Footer top border */
+                padding-top: 5px;
+                position: absolute;
+                bottom: 1cm;
+                left: 1cm;
+            }
+
+            .receipt-inner-container{
+                margin: 10px
+            }
+
+        </style>
+    </head>
+    <body>
+        <div class="container">
+        <div class="receipt-container">
+            <h1>ANUGRAH HOSPITAL</h1>
+                        <div class="address">Plot no. 39/40-7D, Gandhidham (Kutch) 370201<br>For Appointment: +91 84698 79199, 02836 299350</div>
+
+            <h2>Receipt</h2> <!-- Receipt header -->
+            <div class="receipt-inner-container">
+
+            <div class="receipt-details">
+                <div><strong>Patient Name:</strong> ${patient_name} (${patient_id}) </div>
+                <div><strong>Receipt Date:</strong> ${new Date(bill_date).toLocaleDateString('en-GB')}</div>
+            </div>
+
+            <table class="receipt-table">
+                <thead>
+                    <tr>
+                        <th style="width: 60%">Description</th>
+                        <th style="width: 40%">Amount (Rs)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Amount Paid</td>
+                        <td>${amount_paid.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                        <td>Transaction Mode</td>
+                        <td>${transaction_mode}</td>
+                    </tr>
+                    <tr>
+                        <td>Pending Amount</td>
+                        <td>${pending_amount.toFixed(2)}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Dr. Johnson Samuel</p>
+            <p>Reg no: G-31061</p>
+        </div>
+</div>
+    </body>
+</html>
+        `);
+
+                    // Print the receipt
+                    printWindow.document.close();
+                    printWindow.print();
+                    printWindow.close()
+                })
+                .catch(error => {
+                    console.error("There was a problem with the fetch operation:", error);
+                });
+        }
+
+        function changeBillId(bill_id, total) {
+            document.getElementById("bill-id").innerHTML = bill_id
+            document.getElementById("payment-amount").value = total
+        }
+
+        let billToDelete = null;
+
+        function deleteBill(billId) {
+            billToDelete = billId;
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteBillModal'));
+            deleteModal.show();
+        }
+
+        function confirmDeleteBill() {
+            if (!billToDelete) return;
+
+            fetch(`/delete-bill/${billToDelete}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Refresh the table
+                    window.location.reload();
+                } else {
+                    alert('Error deleting bill: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error deleting bill. Please try again.');
+            })
+            .finally(() => {
+                // Close the modal
+                const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteBillModal'));
+                deleteModal.hide();
+                billToDelete = null;
+            });
+        }
+    </script>
+</body>
+
+</html>

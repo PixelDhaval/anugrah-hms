@@ -21,266 +21,14 @@
 <body data-theme="light" class="font-nunito">
     <div id="wrapper" class="theme-cyan">
 
-        <!-- Page Loader -->
-        <div class="page-loader-wrapper">
-            <div class="loader">
-                <div class="m-t-30"><img src="../dist/assets/images/logo-icon.svg" width="48" height="48" alt="Iconic"></div>
-                <p>Please wait...</p>
-            </div>
-        </div>
+        <%- include('navbar') %>
 
-        <!-- Top navbar div start -->
-        <nav class="navbar navbar-fixed-top">
-            <div class="container-fluid">
-                <div class="navbar-brand">
-                    <button type="button" class="btn-toggle-offcanvas"><i class="fa fa-bars"></i></button>
-                    <button type="button" class="btn-toggle-fullwidth"><i class="fa fa-bars"></i></button>
-                    <a href="index.html">Anugrah</a>
-                </div>
-
-                <div class="navbar-right">
-                    <form id="navbar-search" class="navbar-form search-form">
-                        <input value="" class="form-control" placeholder="Search here..." type="text">
-                        <button type="button" class="btn btn-default"><i class="icon-magnifier"></i></button>
-                    </form>
-
-                    <div id="navbar-menu">
-                        <ul class="nav navbar-nav">
-                            <li class="dropdown">
-                                <a href="javascript:void(0);" class="dropdown-toggle icon-menu" data-toggle="dropdown">
-                                    <i class="fa fa-bell"></i>
-                                    <span class="notification-dot"></span>
-                                </a>
-                                <ul class="dropdown-menu notifications">
-                                    <li class="header"><strong>You have 4 new Notifications</strong></li>
-                                    <li>
-                                        <a href="javascript:void(0);">
-                                            <div class="media">
-                                                <div class="media-left">
-                                                    <i class="icon-info text-warning"></i>
-                                                </div>
-                                                <div class="media-body">
-                                                    <p class="text">Campaign <strong>Holiday Sale</strong> is nearly
-                                                        reach budget limit.</p>
-                                                    <span class="timestamp">10:00 AM Today</span>
-                                                </div>
-                                            </div>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:void(0);">
-                                            <div class="media">
-                                                <div class="media-left">
-                                                    <i class="icon-like text-success"></i>
-                                                </div>
-                                                <div class="media-body">
-                                                    <p class="text">Your New Campaign <strong>Holiday Sale</strong> is
-                                                        approved.</p>
-                                                    <span class="timestamp">11:30 AM Today</span>
-                                                </div>
-                                            </div>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:void(0);">
-                                            <div class="media">
-                                                <div class="media-left">
-                                                    <i class="icon-pie-chart text-info"></i>
-                                                </div>
-                                                <div class="media-body">
-                                                    <p class="text">Website visits from Twitter is 27% higher than last
-                                                        week.</p>
-                                                    <span class="timestamp">04:00 PM Today</span>
-                                                </div>
-                                            </div>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:void(0);">
-                                            <div class="media">
-                                                <div class="media-left">
-                                                    <i class="icon-info text-danger"></i>
-                                                </div>
-                                                <div class="media-body">
-                                                    <p class="text">Error on website analytics configurations</p>
-                                                    <span class="timestamp">Yesterday</span>
-                                                </div>
-                                            </div>
-                                        </a>
-                                    </li>
-                                    <li class="footer"><a href="javascript:void(0);" class="more">See all
-                                            notifications</a></li>
-                                </ul>
-                            </li>
-                            <li>
-                                <a href="page-login.html" class="icon-menu"><i class="fa fa-power-off"></i></a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </nav>
-
-        <!-- main left menu -->
-        <div id="left-sidebar" class="sidebar">
-            <button type="button" class="btn-toggle-offcanvas"><i class="fa fa-arrow-left"></i></button>
-            <div class="sidebar-scroll">
-                <div class="user-account">
-                    <img src="../dist/assets/images/user.png" class="rounded-circle user-photo" alt="User Profile Picture">
-                    <div class="dropdown">
-                        <span>Welcome,</span>
-                        <a href="javascript:void(0);" class="dropdown-toggle user-name"
-                            data-toggle="dropdown"><strong>Dr. Johnson</strong></a>
-                        <ul class="dropdown-menu dropdown-menu-right account">
-                            <li><a href="doctor-profile.html"><i class="icon-user"></i>My Profile</a></li>
-                            <li><a href="app-inbox.html"><i class="icon-envelope-open"></i>Messages</a></li>
-                            <li><a href="javascript:void(0);"><i class="icon-settings"></i>Settings</a></li>
-                            <li class="divider"></li>
-                            <li><a href="page-login.html"><i class="icon-power"></i>Logout</a></li>
-                        </ul>
-                    </div>
-                    <hr>
-                    <ul class="row list-unstyled">
-                        <li class="col-4">
-                            <small>Exp</small>
-                            <h6>14</h6>
-                        </li>
-                        <li class="col-4">
-                            <small>Awards</small>
-                            <h6>13</h6>
-                        </li>
-                        <li class="col-4">
-                            <small>Clients</small>
-                            <h6>213</h6>
-                        </li>
-                    </ul>
-                </div>
-                <!-- Nav tabs -->
-                <ul class="nav nav-tabs">
-                    <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#menu">Menu</a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#Chat"><i
-                                class="icon-book-open"></i></a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#setting"><i
-                                class="icon-settings"></i></a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#question"><i
-                                class="icon-question"></i></a></li>
-                </ul>
-
-                <!-- Tab panes -->
-                <div class="tab-content padding-0">
-                    <div class="tab-pane active" id="menu">
-                        <nav id="left-sidebar-nav" class="sidebar-nav">
-                            <ul class="metismenu li_animation_delay">
-                                <li><a href="javascript:void(0);" class="has-arrow"><i
-                                            class="fa fa-dashboard"></i><span>Dashboard</span></a>
-                                    <ul>
-                                        <li><a href="index.html">Hospital Analytics</a></li>
-                                    </ul>
-                                </li>
-                                <li class="active"><a href="javascript:void(0);" class="has-arrow"><i
-                                            class="fa fa-user"></i><span>Patients</span></a>
-                                    <ul>
-                                        <li><a href="patient-all.html">All Patients</a></li>
-                                        <li class="active"><a href="patient-add.html">Add Patient</a></li>
-                                        <!-- <li><a href="patient-profile.html">Patient Medical history and records</a></li> -->
-                                        <!-- <li><a href="patient-invoice.html">Invoice</a></li> -->
-                                    </ul>
-                                </li>
-
-                                <li><a href="javascript:void(0);" class="has-arrow"><i
-                                            class="fa fa-folder"></i><span>Appointments</span></a>
-                                    <ul>
-                                        <li><a href="manage-appointment.html">Patient Records</a></li>
-                                        <li><a href="create-prescriptions.html">Create Prescriptions</a></li>
-                                    </ul>
-                                </li>
-
-                                <li><a href="javascript:void(0);" class="has-arrow"><i class="fa fa-tag"></i><span>User
-                                            Management</span></a>
-                                    <ul>
-                                        <li><a href="create-users.html">Create Users</a></li>
-                                        <li><a href="user-authentication.html">User Authentication</a></li>
-                                    </ul>
-                                </li>
-                                <li><a href="javascript:void(0);" class="has-arrow"><i
-                                            class="fa fa-building"></i><span>Room Allotment</span></a>
-                                    <ul>
-                                        <li><a href="manage-beds.html">Manage Beds</a></li>
-                                        <li><a href="room-all.html">View Rooms</a></li>
-                                        <li><a href="room-allot.html">Allot Room</a></li>
-                                    </ul>
-                                </li>
-                                <!-- <li><a href="javascript:void(0);" class="has-arrow"><i class="fa fa-users"></i><span>Departments</span></a>
-                            <ul>
-                                <li><a href="depa-add.html">Add</a></li>
-                                <li><a href="depa-all.html">All Departments</a></li>
-                            </ul>
-                        </li> -->
-                                <li><a href="javascript:void(0);" class="has-arrow"><i
-                                            class="fa fa-cc-visa"></i><span>Billing</span></a>
-                                    <ul>
-                                        <li><a href="payments.html">Indoor Billing</a></li>
-                                        <li><a href="payments-add.html">OPD patient Billing</a></li>
-                                        <li><a href="payments-invoice.html">Payment Status</a></li>
-                                    </ul>
-                                </li>
-                                <li><a href="javascript:void(0);" class="has-arrow"><i
-                                            class="fa fa-globe"></i><span>Reports</span></a>
-                                    <ul>
-                                        <li><a href="report-opd.html">Monthly OPD Report</a></li>
-                                        <li><a href="report-admitted.html">Monthly Admitted Patients</a></li>
-                                        <li><a href="report-cash-coll.html">Daily Cash Collection</a></li>
-                                        <li><a href="report-indoor.html">Indoor Billing Detail</a></li>
-                                    </ul>
-                                </li>
-
-                                <li><a href="javascript:void(0);" class="has-arrow"><i
-                                            class="fa fa-user-md"></i><span>Doctors</span></a>
-                                    <ul>
-                                        <li><a href="doctor-all.html">All Doctors</a></li>
-                                        <li><a href="doctor-add.html">Add/Edit Doctor</a></li>
-                                    </ul>
-                                </li>
-                                <!-- <li><a href="our-centres.html"><i class="fa fa-map"></i>WorldWide Centres</a></li> -->
-                                <li>
-                                    <a href="#Authentication" class="has-arrow"><i
-                                            class="fa fa-lock"></i><span>Authentication</span></a>
-                                    <ul>
-                                        <li><a href="page-login.html">Login</a></li>
-                                        <li><a href="page-register.html">Register</a></li>
-                                        <li><a href="page-lockscreen.html">Lockscreen</a></li>
-                                        <li><a href="page-forgot-password.html">Forgot Password</a></li>
-                                        <li><a href="page-404.html">Page 404</a></li>
-                                        <li><a href="page-403.html">Page 403</a></li>
-                                        <li><a href="page-500.html">Page 500</a></li>
-                                        <li><a href="page-503.html">Page 503</a></li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- rightbar icon div -->
-        <div class="right_icon_bar">
-            <ul>
-                <li><a href="app-inbox.html"><i class="fa fa-envelope"></i></a></li>
-                <li><a href="app-chat.html"><i class="fa fa-comments"></i></a></li>
-                <li><a href="app-calendar.html"><i class="fa fa-calendar"></i></a></li>
-                <li><a href="manage-appointment.html"><i class="fa fa-folder"></i></a></li>
-                <li><a href="app-contact.html"><i class="fa fa-id-card"></i></a></li>
-                <li><a href="blog-list.html"><i class="fa fa-globe"></i></a></li>
-                <li><a href="javascript:void(0);"><i class="fa fa-plus"></i></a></li>
-                <li><a href="javascript:void(0);" class="right_icon_btn"><i class="fa fa-angle-right"></i></a></li>
-            </ul>
-        </div>
 
 
         <!-- main page content body part -->
         <div id="main-content">
             <div class="container-fluid">
+                
                 <div class="block-header">
                     <div class="row">
                         <div class="col-lg-6 col-md-6 col-sm-12">
@@ -296,12 +44,69 @@
                 </div>
 
                 <div class="row clearfix">
+                    
                     <div class="col-md-12">
                         <div class="card patients-list">
                             <div class="header">
                                 <h2>Add Complaints</h2>
                             </div>
-                            <div class="body">
+                            
+                            <div class="row container align-items-end">
+                                <div class="col-md-4">
+                                    <label
+                                        for="weight"
+                                        class="form-label"
+                                        >Weight</label
+                                    >
+                                    <input
+                                        type="number"
+                                        
+                                        class="form-control"
+                                        id="weight"
+                                        name="weight"
+                                    
+                                    />
+                                    
+                                </div>
+                            </div>
+                                <div class="container my-3 row">
+                                <div class="col-md-2">
+                                    <div class="input-group">
+                                        <span class="input-group-text" id="">BP</span>
+                                        <input type="text" class="form-control" id="bp">
+                                      </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="input-group">
+                                        <span class="input-group-text" id="">Pulse</span>
+                                        <input type="text" class="form-control" id="pulse">
+                                      </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="input-group">
+                                        <span class="input-group-text" id="">SpO2</span>
+                                        <input type="text" class="form-control" id="spo2">
+                                      </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="input-group">
+                                        <span class="input-group-text" id="">Temp</span>
+                                        <input type="text" class="form-control" id="temp">
+                                        <span class="input-group-text" id="">C</span>
+
+                                      </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="input-group">
+                                        <span class="input-group-text" id="">Sugar</span>
+                                        <input type="text" class="form-control" id="sugar">
+
+                                      </div>
+                                </div>
+                            </div>
+                            <div class="container mt-3 col-sm-12">
+
+                                <h5>Most Common</h5>
                                 <div class="input-group">
                                     <input type="text" class="form-control" placeholder="Enter New Complaint"
                                         id="customComplaint">
@@ -310,10 +115,6 @@
                                             onclick="addCustomComplaint()">Add</button>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="container mt-3 col-sm-12">
-
-                                <h5>Most Common</h5>
 
                                 <div class="input-group mt-3 mb-3">
                                     <div class="input-group-prepend">
@@ -354,6 +155,20 @@
     <script src="../../js/hospital/index.js"></script>
 
     <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            fetch('get-user-name')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("login-name").innerHTML = data.name
+                if(data.gender == "female"){
+                    document.getElementById("login-img").src = "../dist/assets/images/user-f.jpg"
+                } else if (data.gender == "male"){
+                document.getElementById("login-img").src = "../dist/assets/images/user-m.jpg"
+
+                }
+            })
+        })
+
         function getUrlParameter(name) {
             const queryString = window.location.search.substring(1);
             const params = queryString.split('&');
@@ -371,6 +186,8 @@
             fetchComplaints();
             const patientId = getUrlParameter('patientId');
             const doctorId = getUrlParameter('doctorId');
+            const weight = getUrlParameter('w');
+            $("#weight").val(weight)
     
             console.log('doctor id:' + doctorId);
             console.log('patient id:' + patientId);
@@ -473,7 +290,7 @@
     
                     complaintData.forEach(complaint => {
                         const button = document.createElement('button');
-                        button.className = 'btn btn-outline-secondary mb-2';
+                        button.className = 'btn btn-outline-secondary m-1';
                         button.textContent = complaint.complaint;
                         button.onclick = function () { addButton(button); };
                         container.appendChild(button);
@@ -488,11 +305,10 @@
             const selectedComplaints = Array.from(document.querySelectorAll('.selected-buttons .selected-button')).map(btn => btn.innerText);
             const patientId = getUrlParameter('patientId');
             const doctorId = getUrlParameter('doctorId');
+            
+            
         
-            if (selectedComplaints.length === 0 || !patientId || !doctorId) {
-                alert('Please select complaints, doctor, and patient.');
-                return;
-            }
+           
         
             fetch('/add-appointment', {
                 method: 'POST',
@@ -502,7 +318,13 @@
                 body: JSON.stringify({
                     patient_id: patientId,
                     doctor_id: doctorId,
-                    complaints: selectedComplaints.join(', ')
+                    complaints: selectedComplaints.join(', '),
+                    weight: document.getElementById("weight").value,
+                    bp: document.getElementById("bp").value,
+                    pulse: document.getElementById("pulse").value,
+                    spo2: document.getElementById("spo2").value,
+                    temp: document.getElementById("temp").value,
+                    sugar: document.getElementById("sugar").value
                 }),
             })
             .then(response => response.json())
@@ -510,7 +332,7 @@
                 if (data.success) {
                     alert('Appointment added successfully.');
                     document.querySelector('.selected-buttons').innerHTML = '';
-                    window.location.href = '/manage-appointment';
+                    window.location.href = '/all-patients';
                 } else {
                     console.error('Error adding appointment:', data.error);
                 }
