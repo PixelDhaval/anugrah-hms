@@ -188,6 +188,11 @@
                                                     value="<%= bill_no %>"
                                                     readonly
                                                 />
+                                                <input
+                                                    type="hidden"
+                                                    id="billId"
+                                                    value="<%= bill_id %>"
+                                                />
                                             </div>
                                         </div>
                                         <div class="row mb-3">
@@ -510,7 +515,7 @@
 
     // Fetch OPD particular data based on opdNo and update table
     setTimeout(() => {
-        fetch(`/get-opd-particular/${$("#opdNo").val()}`)
+        fetch(`/get-opd-particular/${$("#billId").val()}`)
             .then((response) => response.json())
             .then((data) => {
                 
@@ -819,7 +824,7 @@ var serviceData = []
                     const paymentMethod = document.querySelectorAll(
                         'input[name="paymentMode"]'
                     );
-                    const billId = document.getElementById("opdNo").value;
+                    const billId = document.getElementById("billId").value;
 
                     var total = document.getElementById("netAmount").value;
 
