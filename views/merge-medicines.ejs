@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>AHMS :: Merge Medicines</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <link rel="icon" href="favicon.ico" type="image/x-icon" />
+        <link rel="stylesheet" href="../dist/assets/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="../dist/assets/vendor/bootstrap/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="../dist/assets/vendor/font-awesome/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="../dist/assets/css/main.css" />
+        <style>
+            .group-card { border: 1px solid #e3e6ea; border-radius: 4px; padding: 12px 14px; margin-bottom: 14px; }
+            table.med td, table.med th { font-size: 13px; padding: 4px 8px; vertical-align: middle; }
+            #manual-wrap { max-height: 420px; overflow-y: auto; }
+            tr.is-keep { background: #e8f7ee; }
+        </style>
+    </head>
+
+    <body data-theme="light" class="font-nunito">
+        <div id="wrapper" class="theme-cyan">
+            <%- include('navbar') %>
+
+            <div id="main-content">
+                <div class="container-fluid">
+                    <div class="block-header">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <h2>Merge Medicines</h2>
+                                <ul class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="/index"><i class="fa fa-dashboard"></i></a></li>
+                                    <li class="breadcrumb-item">Master</li>
+                                    <li class="breadcrumb-item active">Merge Medicines</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        Merging keeps the medicine you choose and removes the others from the medicine list.
+                        IPD prescriptions that used a removed medicine move to the kept one. OPD prescriptions
+                        and templates only store the medicine name, so they are not changed.
+                        <strong>This cannot be undone from this page.</strong>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="header"><h2>Likely duplicates</h2></div>
+                        <div class="body" id="suggestions">Loading...</div>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="header"><h2>Merge any medicines</h2></div>
+                        <div class="body">
+                            <p class="text-muted mb-2">Tick two or more medicines, choose which one to keep, then merge.</p>
+                            <input type="search" class="form-control mb-3" id="manual-search" placeholder="Search medicines" autocomplete="off" />
+                            <div id="manual-wrap">
+                                <table class="table table-sm table-hover med mb-0">
+                                    <thead>
+                                        <tr><th>Merge</th><th>Keep</th><th>Name</th><th>Nos</th><th>Dose Qty</th><th>Doses</th><th>Timing</th><th>IPD uses</th></tr>
+                                    </thead>
+                                    <tbody id="manual-body"></tbody>
+                                </table>
+                            </div>
+                            <div class="mt-3">
+                                <button class="btn btn-danger" id="manual-merge" disabled>Merge selected</button>
+                                <span class="text-muted ml-2" id="manual-status"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="../dist/assets/bundles/libscripts.bundle.js"></script>
+        <script src="../dist/assets/bundles/vendorscripts.bundle.js"></script>
+        <script src="../dist/assets/bundles/mainscripts.bundle.js"></script>
+        <script src="../dist/assets/js/bootstrap.bundle.min.js"></script>
+        <script>
+            let medicines = [];
+            const checked = new Set(); // ids ticked in the manual table
+            let manualKeep = null;
+
+            const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+            // "Paracetamol 500" / "paracetamol500" / "PARACETAMOL-500" all give the same key
+            const looseKey = (name) => String(name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
+            const dosingCells = (m) => `<td>${esc(m.qty)}</td><td>${esc(m.dose_qty)}</td><td>${esc(m.doses)}</td><td>${esc(m.timing)}</td><td>${m.ipd_uses}</td>`;
+
+            async function load() {
+                const res = await fetch('/api/merge-medicines');
+                medicines = (await res.json()).data || [];
+                // drop selections that no longer exist
+                const ids = new Set(medicines.map((m) => m.id));
+                [...checked].forEach((id) => !ids.has(id) && checked.delete(id));
+                if (!checked.has(manualKeep)) manualKeep = null;
+                renderSuggestions();
+                renderManual();
+            }
+
+            async function doMerge(keepId, mergeIds, label) {
+                if (!confirm(`Merge ${mergeIds.length} medicine(s) into "${label}"?\n\nThis cannot be undone from this page.`)) return;
+                const res = await fetch('/api/merge-medicines', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ keepId, mergeIds }),
+                });
+                const json = await res.json().catch(() => ({}));
+                if (!res.ok) alert(json.error || 'Could not merge the medicines.');
+                load();
+            }
+
+            // ---- Likely duplicates ----
+            function renderSuggestions() {
+                const groups = {};
+                medicines.forEach((m) => {
+                    const k = looseKey(m.name);
+                    if (k) (groups[k] = groups[k] || []).push(m);
+                });
+                const dup = Object.values(groups).filter((g) => g.length > 1);
+                const box = document.getElementById('suggestions');
+                if (!dup.length) {
+                    box.textContent = 'No duplicates found.';
+                    return;
+                }
+                box.innerHTML = dup.map((g, gi) => {
+                    // default keeper: the most used in IPD, then the oldest
+                    const keep = [...g].sort((a, b) => b.ipd_uses - a.ipd_uses || a.id - b.id)[0];
+                    return `<div class="group-card" data-group="${gi}">
+                        <table class="table table-sm med mb-2">
+                            <thead><tr><th>Keep</th><th>Name</th><th>Nos</th><th>Dose Qty</th><th>Doses</th><th>Timing</th><th>IPD uses</th></tr></thead>
+                            <tbody>${g.map((m) => `<tr class="${m.id === keep.id ? 'is-keep' : ''}">
+                                <td><input type="radio" name="keep-${gi}" value="${m.id}" ${m.id === keep.id ? 'checked' : ''} /></td>
+                                <td>${esc(m.name)}</td>${dosingCells(m)}</tr>`).join('')}</tbody>
+                        </table>
+                        <button class="btn btn-sm btn-danger" data-merge-group="${gi}">Merge into selected</button>
+                    </div>`;
+                }).join('');
+                box._groups = dup;
+            }
+
+            document.getElementById('suggestions').addEventListener('change', (e) => {
+                if (e.target.type !== 'radio') return;
+                e.target.closest('tbody').querySelectorAll('tr').forEach((tr) => tr.classList.toggle('is-keep', tr.contains(e.target)));
+            });
+
+            document.getElementById('suggestions').addEventListener('click', (e) => {
+                const gi = e.target.dataset.mergeGroup;
+                if (gi === undefined) return;
+                const card = e.target.closest('.group-card');
+                const keepId = Number(card.querySelector('input[type=radio]:checked').value);
+                const group = document.getElementById('suggestions')._groups[gi];
+                const keep = group.find((m) => m.id === keepId);
+                doMerge(keepId, group.filter((m) => m.id !== keepId).map((m) => m.id), keep.name);
+            });
+
+            // ---- Manual merge ----
+            function renderManual() {
+                const words = document.getElementById('manual-search').value.toLowerCase().split(/\s+/).filter(Boolean);
+                const rows = medicines.filter((m) => checked.has(m.id) || words.every((w) => m.name.toLowerCase().includes(w)));
+                document.getElementById('manual-body').innerHTML = rows.map((m) => `
+                    <tr class="${m.id === manualKeep ? 'is-keep' : ''}">
+                        <td><input type="checkbox" data-pick="${m.id}" ${checked.has(m.id) ? 'checked' : ''} /></td>
+                        <td>${checked.has(m.id) ? `<input type="radio" name="manual-keep" data-keep="${m.id}" ${m.id === manualKeep ? 'checked' : ''} />` : ''}</td>
+                        <td>${esc(m.name)}</td>${dosingCells(m)}
+                    </tr>`).join('');
+                updateManualButton();
+            }
+
+            function updateManualButton() {
+                const n = checked.size;
+                document.getElementById('manual-merge').disabled = !(n >= 2 && manualKeep);
+                document.getElementById('manual-status').textContent =
+                    n < 2 ? `${n} selected` : manualKeep ? `${n} selected, ${n - 1} will be merged into the kept one` : `${n} selected, choose which one to keep`;
+            }
+
+            document.getElementById('manual-search').addEventListener('input', renderManual);
+
+            document.getElementById('manual-body').addEventListener('change', (e) => {
+                if (e.target.dataset.pick) {
+                    const id = Number(e.target.dataset.pick);
+                    if (e.target.checked) checked.add(id);
+                    else {
+                        checked.delete(id);
+                        if (manualKeep === id) manualKeep = null;
+                    }
+                } else if (e.target.dataset.keep) {
+                    manualKeep = Number(e.target.dataset.keep);
+                }
+                renderManual();
+            });
+
+            document.getElementById('manual-merge').addEventListener('click', () => {
+                const keep = medicines.find((m) => m.id === manualKeep);
+                doMerge(manualKeep, [...checked].filter((id) => id !== manualKeep), keep.name);
+            });
+
+            document.addEventListener('DOMContentLoaded', load);
+        </script>
+    </body>
+</html>

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>AHMS :: Prescription Templates</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <link rel="icon" href="favicon.ico" type="image/x-icon" />
+        <link rel="stylesheet" href="../dist/assets/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="../dist/assets/vendor/bootstrap/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="../dist/assets/vendor/font-awesome/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="../dist/assets/css/main.css" />
+        <style>
+            .med-row { border: 1px solid #e3e6ea; border-radius: 4px; padding: 10px 12px; margin-bottom: 10px; }
+            .tpl-card { border: 1px solid #e3e6ea; border-radius: 4px; padding: 12px 14px; margin-bottom: 12px; }
+            .tpl-card ul { margin: 8px 0 0; padding-left: 18px; font-size: 13px; }
+        </style>
+    </head>
+
+    <body data-theme="light" class="font-nunito">
+        <div id="wrapper" class="theme-cyan">
+            <%- include('navbar') %>
+
+            <div id="main-content">
+                <div class="container-fluid">
+                    <div class="block-header">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <h2>Prescription Templates</h2>
+                                <ul class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="/index"><i class="fa fa-dashboard"></i></a></li>
+                                    <li class="breadcrumb-item">Doctors</li>
+                                    <li class="breadcrumb-item active">Prescription Templates</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row clearfix">
+                        <div class="col-lg-12">
+                            <div class="card mt-4">
+                                <div class="header"><h2 id="form-title">New Template</h2></div>
+                                <div class="body">
+                                    <div id="not-doctor" class="alert alert-warning d-none">
+                                        Only doctors can create or edit templates. You can still see them below.
+                                    </div>
+                                    <form id="template-form" novalidate>
+                                        <div class="form-group">
+                                            <label for="tpl-name">Template name</label>
+                                            <input type="text" class="form-control" id="tpl-name" maxlength="100"
+                                                placeholder="e.g. Viral fever - adult" required />
+                                        </div>
+                                        <div id="med-container"></div>
+                                        <button type="button" class="btn btn-primary" id="add-med">Add Medicine</button>
+                                        <hr />
+                                        <button type="submit" class="btn btn-success" id="save-btn">Save Template</button>
+                                        <button type="button" class="btn btn-secondary d-none" id="cancel-edit">Cancel edit</button>
+                                    </form>
+                                    <datalist id="med-names"></datalist>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row clearfix">
+                        <div class="col-lg-12">
+                            <div class="card mt-3">
+                                <div class="header"><h2>Templates</h2></div>
+                                <div class="body" id="template-list">Loading...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="../dist/assets/bundles/libscripts.bundle.js"></script>
+        <script src="../dist/assets/bundles/vendorscripts.bundle.js"></script>
+        <script src="../dist/assets/bundles/mainscripts.bundle.js"></script>
+        <script src="../dist/assets/js/bootstrap.bundle.min.js"></script>
+        <script>
+            const DOSES = ['morning', 'afternoon', 'evening'];
+            const TIMINGS = ['After', 'Before', 'With', 'If Required'];
+            let rowSeq = 0;
+            let editingId = null;
+            let templates = [];
+            let isDoctor = false;
+            let medMaster = [];
+
+            const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+            function addMedRow(m = {}) {
+                const n = ++rowSeq;
+                const doses = (m.doses || '').split(',').map((d) => d.trim());
+                const row = document.createElement('div');
+                row.className = 'med-row';
+                row.innerHTML = `
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Medicine</label>
+                            <input type="text" class="form-control m-name" list="med-names" value="${esc(m.name)}" />
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label>Nos</label>
+                            <input type="number" min="1" step="1" class="form-control m-nos" value="${esc(m.nos)}" />
+                        </div>
+                        <div class="form-group col-md-4 d-flex align-items-end">
+                            <label class="mr-3 mb-2"><input type="checkbox" class="m-custom" ${m.is_custom ? 'checked' : ''} /> Custom dose</label>
+                            <button type="button" class="btn btn-danger btn-sm mb-2 ml-auto m-remove">Remove</button>
+                        </div>
+                    </div>
+                    <div class="form-row m-standard">
+                        <div class="form-group col-md-2">
+                            <label>Dose Qty</label>
+                            <input type="number" min="0.5" step="0.5" class="form-control m-qty" value="${esc(m.dose_qty)}" />
+                        </div>
+                        <div class="form-group col-md-5">
+                            <label class="d-block">When</label>
+                            ${DOSES.map((d) => `<label class="mr-3"><input type="checkbox" class="m-dose" value="${d}" ${doses.includes(d) ? 'checked' : ''} /> ${d[0].toUpperCase() + d.slice(1)}</label>`).join('')}
+                        </div>
+                        <div class="form-group col-md-5">
+                            <label class="d-block">Timing</label>
+                            ${TIMINGS.map((t) => `<label class="mr-3"><input type="radio" name="timing-${n}" class="m-timing" value="${t}" ${m.timing === t ? 'checked' : ''} /> ${t}</label>`).join('')}
+                        </div>
+                    </div>
+                    <div class="form-row m-customwrap">
+                        <div class="form-group col-md-12">
+                            <label>Custom dose instructions</label>
+                            <input type="text" class="form-control m-customtext" value="${esc(m.custom_doses)}" placeholder="e.g. 1 tablet twice a week" />
+                        </div>
+                    </div>`;
+                const sync = () => {
+                    const custom = row.querySelector('.m-custom').checked;
+                    row.querySelector('.m-standard').style.display = custom ? 'none' : '';
+                    row.querySelector('.m-customwrap').style.display = custom ? '' : 'none';
+                };
+                row.querySelector('.m-custom').addEventListener('change', sync);
+                // Picking a medicine from the master fills its default dosing, as on the OPD form
+                row.querySelector('.m-name').addEventListener('change', (e) => {
+                    const item = medMaster.find((x) => x.name === e.target.value.trim());
+                    if (!item) return;
+                    row.querySelector('.m-nos').value = item.qty ?? '';
+                    row.querySelector('.m-qty').value = item.dose_qty ?? '';
+                    const itemDoses = (item.doses || '').split(',').map((d) => d.trim());
+                    row.querySelectorAll('.m-dose').forEach((c) => (c.checked = itemDoses.includes(c.value)));
+                    row.querySelectorAll('.m-timing').forEach((r) => (r.checked = r.value === item.timing));
+                });
+                row.querySelector('.m-remove').addEventListener('click', () => row.remove());
+                sync();
+                document.getElementById('med-container').appendChild(row);
+            }
+
+            function readForm() {
+                const medicines = [...document.querySelectorAll('.med-row')].map((row) => ({
+                    name: row.querySelector('.m-name').value.trim(),
+                    nos: row.querySelector('.m-nos').value,
+                    is_custom: row.querySelector('.m-custom').checked,
+                    dose_qty: row.querySelector('.m-qty').value,
+                    doses: [...row.querySelectorAll('.m-dose:checked')].map((c) => c.value),
+                    timing: (row.querySelector('.m-timing:checked') || {}).value || '',
+                    custom_doses: row.querySelector('.m-customtext').value.trim(),
+                }));
+                return { name: document.getElementById('tpl-name').value.trim(), medicines };
+            }
+
+            function resetForm() {
+                editingId = null;
+                document.getElementById('template-form').reset();
+                document.getElementById('med-container').innerHTML = '';
+                document.getElementById('form-title').textContent = 'New Template';
+                document.getElementById('save-btn').textContent = 'Save Template';
+                document.getElementById('cancel-edit').classList.add('d-none');
+                addMedRow();
+            }
+
+            function describe(m) {
+                if (m.is_custom) return `${esc(m.name)} &times; ${esc(m.nos)} &mdash; ${esc(m.custom_doses)}`;
+                return `${esc(m.name)} &times; ${esc(m.nos)} &mdash; ${esc(m.dose_qty)} dose, ${esc(m.doses)}, ${esc(m.timing)} food`;
+            }
+
+            function renderList() {
+                const box = document.getElementById('template-list');
+                if (!templates.length) {
+                    box.textContent = 'No templates yet.';
+                    return;
+                }
+                box.innerHTML = templates.map((t) => `
+                    <div class="tpl-card">
+                        <div class="d-flex align-items-center">
+                            <strong>${esc(t.name)}</strong>
+                            <span class="text-muted ml-2">Dr. ${esc(t.doctor_name)}</span>
+                            ${t.editable ? `<span class="ml-auto">
+                                <button class="btn btn-sm btn-outline-primary" data-edit="${t.template_id}">Edit</button>
+                                <button class="btn btn-sm btn-outline-danger" data-del="${t.template_id}">Delete</button>
+                            </span>` : ''}
+                        </div>
+                        <ul>${t.medicines.map((m) => `<li>${describe(m)}</li>`).join('')}</ul>
+                    </div>`).join('');
+            }
+
+            async function loadTemplates() {
+                const res = await fetch('/api/prescription-templates');
+                const json = await res.json();
+                isDoctor = json.doctorId != null;
+                templates = json.data || [];
+                document.getElementById('not-doctor').classList.toggle('d-none', isDoctor);
+                document.getElementById('save-btn').disabled = !isDoctor;
+                renderList();
+            }
+
+            document.getElementById('add-med').addEventListener('click', () => addMedRow());
+            document.getElementById('cancel-edit').addEventListener('click', resetForm);
+
+            document.getElementById('template-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const url = editingId ? `/api/prescription-templates/${editingId}` : '/api/prescription-templates';
+                const res = await fetch(url, {
+                    method: editingId ? 'PUT' : 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(readForm()),
+                });
+                const json = await res.json().catch(() => ({}));
+                if (!res.ok) return alert(json.error || 'Could not save the template.');
+                resetForm();
+                loadTemplates();
+            });
+
+            document.getElementById('template-list').addEventListener('click', async (e) => {
+                const editId = e.target.dataset.edit;
+                const delId = e.target.dataset.del;
+                if (editId) {
+                    const t = templates.find((x) => String(x.template_id) === editId);
+                    editingId = t.template_id;
+                    document.getElementById('tpl-name').value = t.name;
+                    document.getElementById('med-container').innerHTML = '';
+                    t.medicines.forEach(addMedRow);
+                    document.getElementById('form-title').textContent = 'Edit Template';
+                    document.getElementById('save-btn').textContent = 'Update Template';
+                    document.getElementById('cancel-edit').classList.remove('d-none');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else if (delId) {
+                    if (!confirm('Delete this template? Prescriptions already made from it are not affected.')) return;
+                    const res = await fetch(`/api/prescription-templates/${delId}`, { method: 'DELETE' });
+                    if (!res.ok) return alert('Could not delete the template.');
+                    if (String(editingId) === delId) resetForm();
+                    loadTemplates();
+                }
+            });
+
+            document.addEventListener('DOMContentLoaded', async () => {
+                resetForm();
+                loadTemplates();
+                const res = await fetch('/api/prescription-templates/medicine-names');
+                const json = await res.json().catch(() => ({ data: [] }));
+                medMaster = json.data || [];
+                document.getElementById('med-names').innerHTML = medMaster.map((m) => `<option value="${esc(m.name)}">`).join('');
+            });
+        </script>
+    </body>
+</html>

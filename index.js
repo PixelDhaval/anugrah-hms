@@ -25,6 +25,8 @@ const appointmentRoutes = require('./routes/appointmentRoutes');
 const bedRoutes = require('./routes/bedRoutes');
 const ipdAppointmentRoutes = require('./routes/ipdAppointmentRoutes');
 const ipdAppointmentParticularRoutes = require('./routes/ipdAppointmentParticularRoutes');
+const prescriptionTemplateRoutes = require('./routes/prescriptionTemplateRoutes');
+const medicineMergeRoutes = require('./routes/medicineMergeRoutes');
 
 const app = express();
 app.use(methodOverride('_method'));
@@ -66,6 +68,8 @@ app.use('/', masterRoutes);
 app.use('/', appointmentRoutes);
 app.use('/', bedRoutes);
 app.use('/', ipdAppointmentRoutes);
+app.use('/', prescriptionTemplateRoutes);
+app.use('/', medicineMergeRoutes);
 app.use('/ipd-appointment-particulars', ipdAppointmentParticularRoutes);
 
 // Error handling middleware

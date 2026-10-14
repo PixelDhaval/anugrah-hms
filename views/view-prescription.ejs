@@ -223,6 +223,9 @@
                                             </div>
                                         </div>
 
+                                        <button type="button" class="btn btn-info mt-3" id="import-template">
+                                            Import Template
+                                        </button>
                                         <div id="medicine-container"></div>
                                         <button type="button" class="btn btn-primary mt-3" id="add-medicine">
                                             Add Medicine
@@ -385,6 +388,22 @@
     </div>
 
     <!-- Javascript -->
+    <div class="modal fade" id="template-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Import Template</h5>
+                    <button type="button" class="close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <input type="search" class="form-control mb-3" id="template-search"
+                        placeholder="Search by template, doctor or medicine" autocomplete="off" />
+                    <div class="list-group" id="template-pick-list"></div>
+                    <p class="text-muted mb-0 d-none" id="template-no-match">No templates match your search.</p>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="../dist/assets/bundles/libscripts.bundle.js"></script>
     <script src="../dist/assets/bundles/vendorscripts.bundle.js"></script>
 
@@ -614,11 +633,17 @@
         }
 
         function importMedicines(instructions) {
-            const medicines = cleanAndParseJSON(instructions);
+            importMedicineList(cleanAndParseJSON(instructions));
+        }
 
-            // Clear existing medicine fields if any
-            $("#medicine-container").empty();
-            medicineCount = 0;
+        // Fills the medicine rows from a list of medicine objects.
+        // append = true keeps the rows already on the form (used by templates).
+        function importMedicineList(medicines, append = false) {
+            if (!append) {
+                // Clear existing medicine fields if any
+                $("#medicine-container").empty();
+                medicineCount = 0;
+            }
 
             medicines.forEach((medData) => {
                 // Add a new set of fields
@@ -634,7 +659,9 @@
                 $(`#medicine-${medicineIndex}-custom-doses`).val(medData.custom_doses);
 
                 // Set doses checkboxes
-                const doses = medData.doses.split(",").map((dose) => dose.trim());
+                // Drop the master's default doses (set when the name changed) first
+                $(`#medicine-${medicineIndex} input[name*="[doses]"]`).prop("checked", false);
+                const doses = (medData.doses || "").split(",").map((dose) => dose.trim()).filter(Boolean);
                 doses.forEach((dose) => {
                     $(`#medicine-${medicineIndex}-${dose}`).prop("checked", true);
                 });
@@ -662,6 +689,61 @@
             });
         }
 
+
+        // ---- Prescription templates ----
+        let rxTemplates = [];
+
+        $("#import-template").click(async () => {
+            try {
+                const res = await fetch("/api/prescription-templates");
+                rxTemplates = (await res.json()).data || [];
+            } catch (err) {
+                console.error("Error fetching templates:", err);
+                return alert("Could not load the templates.");
+            }
+            if (!rxTemplates.length) {
+                return alert("No templates yet. Doctors can create them under Doctors > Prescription Templates.");
+            }
+            const list = $("#template-pick-list").empty();
+            rxTemplates.forEach((t) => {
+                const meds = t.medicines.map((m) => $("<li>").text(m.name));
+                list.append(
+                    $('<a href="#" class="list-group-item list-group-item-action">')
+                        .attr("data-id", t.template_id)
+                        .append($("<strong>").text(t.name), $('<small class="text-muted ml-2">').text("Dr. " + t.doctor_name),
+                            $('<ul class="mb-0 small">').append(meds))
+                );
+            });
+            $("#template-search").val("");
+            $("#template-pick-list a").show();
+            $("#template-no-match").addClass("d-none");
+            $("#template-modal").modal("show");
+        });
+
+        // Focus the search box once the popup is open
+        $(document).on("shown.bs.modal", "#template-modal", () => $("#template-search").trigger("focus"));
+
+        // Filter by template name, doctor or any medicine name
+        $(document).on("input", "#template-search", function () {
+            const words = $(this).val().toLowerCase().split(/\s+/).filter(Boolean);
+            let shown = 0;
+            $("#template-pick-list a").each(function () {
+                const text = $(this).text().toLowerCase();
+                const match = words.every((w) => text.includes(w));
+                $(this).toggle(match);
+                if (match) shown++;
+            });
+            $("#template-no-match").toggleClass("d-none", shown > 0);
+        });
+
+        $(document).on("click", "#template-pick-list a", function (e) {
+            e.preventDefault();
+            const t = rxTemplates.find((x) => String(x.template_id) === String($(this).data("id")));
+            $("#template-modal").modal("hide");
+            if (!t) return;
+            // Templates are added below any medicines already on the form
+            importMedicineList(t.medicines, true);
+        });
 
         // Event listener to add fields
         $("#add-medicine").click(() => addMedicineFields());
