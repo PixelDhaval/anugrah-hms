@@ -308,17 +308,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 paginationCounter: "rows",
                 sortMode: "remote",
                 filterMode: "remote",
-                headerFilterLiveFilterDelay: 400,
                 placeholder: "No appointments found",
                 columns: [
                     { title: "Date", field: "appointment_date", headerHozAlign: "center" },
-                    { title: "Doctor", field: 'doctor_name', headerFilter: "input", headerHozAlign: "center" },
+                    { title: "Doctor", field: 'doctor_name', headerHozAlign: "center" },
                     { title: "Appointment ID", field: "appointment_id", visible: false },
-                    { title: "Patient ID", field: "patient_id", headerFilter: "input", headerHozAlign: "center" },
-                    { title: "Name", field: "name", headerFilter: "input", headerHozAlign: "center" },
-                    { title: "Age", field: "age", headerFilter: "input", headerTooltip: "Filter by exact age (40) or range (30-40)", headerHozAlign: "center" },
-                    { title: "Address", field: "address", headerFilter: "input", headerHozAlign: "center" },
-                    { title: "Number", field: "number", headerFilter: "input", headerHozAlign: "center" },
+                    { title: "Patient ID", field: "patient_id", headerHozAlign: "center" },
+                    { title: "Name", field: "name", headerHozAlign: "center" },
+                    { title: "Age", field: "age", headerHozAlign: "center" },
+                    { title: "Address", field: "address", headerHozAlign: "center" },
+                    { title: "Number", field: "number", headerHozAlign: "center" },
                     { title: "Last Visit", field: "last_visited", headerHozAlign: "center" },
                     {
                         title: "Status", field: "status", headerHozAlign: "center", formatter: function (cell, formatterParams, onRendered) {

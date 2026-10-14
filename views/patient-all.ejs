@@ -363,26 +363,22 @@
                     paginationCounter: "rows",
                     sortMode: "remote",
                     filterMode: "remote",
-                    headerFilterLiveFilterDelay: 400,
                     placeholder: "No patients found",
                     columns: [
                         {
                             title: "ID",
                             field: "patient_id",
-                            headerFilter: "input",
                             headerHozAlign: "center",
                         },
                         {
                             title: "Name",
                             field: "name",
-                            headerFilter: "input",
                             headerHozAlign: "center",
                         },
 
                         {
                             title: "Number",
                             field: "phone",
-                            headerFilter: "input",
                             headerHozAlign: "center",
                         },
                         {
@@ -393,8 +389,6 @@
                         {
                             title: "Doctor Assigned",
                             field: "doctor_assigned",
-                            headerFilter: "list",
-                            headerFilterParams: { values: doctorNames, clearable: true },
                             headerHozAlign: "center",
                         },
                         {

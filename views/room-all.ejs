@@ -198,16 +198,15 @@ document.addEventListener("DOMContentLoaded", () => {
             data: roomData,
             layout: "fitDataFill",
             columns: [
-                { title: "Room No", field: "roomNo", headerFilter: "input", headerHozAlign: "center" },
-                { title: "Patient Name", field: "patientName", headerFilter: "input", headerHozAlign: "center" },
-                { title: "Room Type", field: "roomType", headerFilter: "input", headerHozAlign: "center" },
+                { title: "Room No", field: "roomNo", headerHozAlign: "center" },
+                { title: "Patient Name", field: "patientName", headerHozAlign: "center" },
+                { title: "Room Type", field: "roomType", headerHozAlign: "center" },
                 { title: "Gender", field: "gender", headerHozAlign: "center" },
-                { title: "Admin Date", field: "adminDate", headerFilter: "input", headerHozAlign: "center" },
-                { title: "Discharge Date", field: "dischargeDate", headerFilter: "input", headerHozAlign: "center" },
+                { title: "Admin Date", field: "adminDate", headerHozAlign: "center" },
+                { title: "Discharge Date", field: "dischargeDate", headerHozAlign: "center" },
                 {
                     title: "Status",
                     field: "status",
-                    headerFilter: "input",
                     headerHozAlign: "center",
                     formatter: function (cell, formatterParams, onRendered) {
                         const value = cell.getValue();

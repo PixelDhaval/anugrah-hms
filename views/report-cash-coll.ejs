@@ -162,36 +162,27 @@ document.addEventListener("DOMContentLoaded", () => {
                         {
                             title: "Bill No",
                             field: "bill_no",
-                            headerFilter: "input",
                             headerHozAlign: "center",
                         },
                         {
                             title: "Patient ID",
                             field: "patient_id",
-                            headerFilter: "input",
                             headerHozAlign: "center",
                         },
                         {
                             title: "Patient Name",
                             field: "name",
-                            headerFilter: "input",
                             headerHozAlign: "center",
                         },
                         {
                             title: "Doctor Assigned",
                             field: "doctor",
                             headerHozAlign: "center",
-                            headerFilter: "input"
                         },
                         {
                             title: "Payment Mode",
                             field: "mode",
                             headerHozAlign: "center",
-                            headerFilter: "list",
-                            headerFilterParams: {
-                                values: ["CASH", "UPI", "CARD"], // Available payment modes
-                                clearable: true // Allows clearing the filter
-                            }
                         },
                         {
                             title: "Bill Total",
@@ -210,11 +201,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         {
                             title: "Bill Status",
                             field: "status",
-                            headerFilter: "list",
-                            headerFilterParams: {
-                                values: ["pending", "partially paid", "completed"],
-                                clearable: true,
-                            },
                             headerHozAlign: "center",
                             formatter: function (cell) {
                                 const value = cell.getValue();

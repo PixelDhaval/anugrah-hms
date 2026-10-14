@@ -230,7 +230,6 @@
                         {
                             title: "Date",
                             field: "date",
-                            headerFilter: "input",
                             headerHozAlign: "center",
                             sorter: "date",
                             sorterParams: {
@@ -240,29 +239,21 @@
                         {
                             title: "Bill No",
                             field: "bill_no",
-                            headerFilter: "input",
                             headerHozAlign: "center",
                         },
                         {
                             title: "Patient ID",
                             field: "patient_id",
-                            headerFilter: "input",
                             headerHozAlign: "center",
                         },
                         {
                             title: "Patient Name",
                             field: "name",
-                            headerFilter: "input",
                             headerHozAlign: "center",
                         },
                         {
                             title: "Payment Method",
                             field: "payment_method",
-                            headerFilter: "list",
-                            headerFilterParams: {
-                                values: ["CASH", "UPI", "CARD"],
-                                clearable: true
-                            },
                             headerHozAlign: "center",
                         },
                         {
@@ -316,11 +307,6 @@
                         {
                             title: "Payment Status",
                             field: "payment_status",
-                            headerFilter: "list",
-                            headerFilterParams: {
-                                values: ["pending", "partially paid", "completed"],
-                                clearable: true
-                            },
                             headerHozAlign: "center",
                             formatter: function (cell) {
                                 const value = cell.getValue();
